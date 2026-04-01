@@ -118,7 +118,7 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 .value-bet .sel-type-pill{background:rgba(239,159,39,.2);color:var(--amber)}
 .place-bet .sel-type-pill{background:rgba(59,130,246,.2);color:var(--blue)}
 .next-bet .sel-type-pill,.treble-bet .sel-type-pill,.pick6-bet .sel-type-pill{background:var(--s3);color:var(--muted)}
-.sel-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;word-break:break-word}
 .sel-detail{font-size:11px;color:var(--muted);white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis}
 .sel-odds{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--green);min-width:40px;text-align:right;flex-shrink:0}
 .bet-note{margin-top:8px;padding:9px 12px;background:var(--s2);border-radius:7px;font-size:11px;color:var(--muted);line-height:1.7;border-left:2px solid var(--mg)}
@@ -307,7 +307,26 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 .share-code-copy{font-size:10px;color:var(--dim);cursor:pointer}
 .share-code-copy:hover{color:var(--muted)}
 
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+/* ─── COMMUNITY PICKS ─── */
+.cp-card{background:var(--s1);border:1px solid var(--border);border-radius:11px;overflow:hidden;transition:border-color .2s}
+.cp-card:hover{border-color:var(--border2)}
+.cp-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.cp-avatar{width:32px;height:32px;border-radius:50%;background:var(--mg-dim);border:1px solid var(--mg-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--mg);flex-shrink:0;font-family:'Syne',sans-serif}
+.cp-nick{font-size:13px;font-weight:500;flex:1}
+.cp-platform{font-size:10px;padding:2px 8px;border-radius:5px;font-weight:600;background:var(--s3);color:var(--muted)}
+.cp-platform.betway{background:rgba(0,180,100,.1);color:#22C55E}
+.cp-platform.ten{background:var(--blue-dim);color:var(--blue)}
+.cp-platform.easy{background:var(--amber-dim);color:var(--amber)}
+.cp-body{padding:10px 14px}
+.cp-desc{font-size:12px;color:var(--text);margin-bottom:8px;line-height:1.5}
+.cp-code-row{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:8px 12px;cursor:pointer;transition:border-color .2s}
+.cp-code-row:hover{border-color:var(--mg-border)}
+.cp-code-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--mg);flex:1;letter-spacing:1px}
+.cp-copy-btn{font-size:10px;color:var(--dim);white-space:nowrap}
+.cp-footer{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-top:1px solid var(--border);background:rgba(255,255,255,0.01)}
+.cp-meta{display:flex;gap:12px;font-size:10px;color:var(--dim);font-family:'DM Mono',monospace}
+.cp-like{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;padding:3px 8px;border-radius:6px;background:var(--s2);border:1px solid var(--border);transition:all .15s}
+.cp-like:hover,.cp-like.liked{background:var(--mg-dim);border-color:var(--mg-border);color:var(--mg)}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
 /* ─── MOBILE BOTTOM NAV ─── */
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(11,11,11,0.98);border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:400;padding:10px 0 max(10px,env(safe-area-inset-bottom))}
 .mobile-nav-inner{display:flex;align-items:center;justify-content:space-around;width:100%;padding:0}
@@ -362,7 +381,7 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
   /* Bet cards full width */
   .sel-row{flex-wrap:wrap;gap:6px}
   .sel-detail{max-width:none;font-size:10px}
-  .sel-name{font-size:12px}
+  .sel-name{font-size:12px;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word;line-height:1.3}
 
   /* Bet header tighter */
   .bet-header{padding:10px 12px}
@@ -512,6 +531,10 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
         <svg viewBox="0 0 13 13" fill="none"><ellipse cx="6.5" cy="8" rx="5" ry="3.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 8V5.5a2.5 2.5 0 015 0V8" stroke="currentColor" stroke-width="1.2"/></svg>
         Horse Racing <span class="sb-chip" id="chip-racing">0</span>
       </div>
+      <div class="sb-item" id="sb-pick6" onclick="filterFeed('pick6',this)">
+        <svg viewBox="0 0 13 13" fill="none"><rect x="1.5" y="2" width="10" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1M9 2V1M1.5 5.5h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Pick 6 <span class="sb-chip hot" id="chip-pick6">0</span>
+      </div>
       <div class="sb-item" id="sb-soccer" onclick="filterFeed('soccer',this)">
         <svg viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M6.5 3.5l1.5 4H5l1.5-4z" stroke="currentColor" stroke-width="1" fill="none"/></svg>
         Soccer <span class="sb-chip" id="chip-soccer">0</span>
@@ -519,6 +542,10 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
       <div class="sb-item" id="sb-efc" onclick="filterFeed('efc',this)">
         <svg viewBox="0 0 13 13" fill="none"><path d="M3 10L6.5 3 10 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 7.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         EFC / UFC <span class="sb-chip" id="chip-efc">0</span>
+      </div>
+      <div class="sb-item" id="sb-golf" onclick="filterFeed('golf',this)">
+        <svg viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="9.5" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M6.5 7.5V2l3 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Golf <span class="sb-chip new" id="chip-golf">0</span>
       </div>
     </div>
     <div class="sb-divider"></div>
@@ -548,6 +575,10 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
         <svg viewBox="0 0 13 13" fill="none"><rect x="1" y="3.5" width="11" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 3.5V2.5a2.5 2 0 015 0v1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         Enter Bet Code <span class="sb-chip new">Code</span>
       </div>
+      <div class="sb-item" onclick="scrollTo('#community-section')">
+        <svg viewBox="0 0 13 13" fill="none"><circle cx="4.5" cy="5" r="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8.5" cy="5" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M1 11c0-2.21 1.567-4 3.5-4M7 11c0-2.21 1.567-4 3.5-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Community Picks <span class="sb-chip hot">New</span>
+      </div>
     </div>
     <div class="sb-divider"></div>
     <div class="account-tier" id="account-tier-block">
@@ -564,7 +595,7 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
       <div class="stat-c"><div class="stat-l">Total selections</div><div class="stat-v c-mg" id="stat-total">—</div><div class="stat-s">Published in DB</div></div>
       <div class="stat-c"><div class="stat-l">Win rate</div><div class="stat-v c-green" id="stat-winrate">—</div><div class="stat-s">Settled bets</div></div>
       <div class="stat-c"><div class="stat-l">Pending</div><div class="stat-v c-amber" id="stat-pending">—</div><div class="stat-s">Awaiting result</div></div>
-      <div class="stat-c"><div class="stat-l">Gold subs</div><div class="stat-v">247</div><div class="stat-s">VIP members</div></div>
+      <div class="stat-c"><div class="stat-l">Community picks</div><div class="stat-v c-amber" id="stat-community">—</div><div class="stat-s">Shared this week</div></div>
     </div>
 
     <div class="sec-h">
@@ -614,12 +645,65 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
         </div>
       </div>
     </div>
+
+    <!-- ══ COMMUNITY PICKS ══ -->
+    <div id="community-section">
+      <div class="sec-h">
+        <div class="sec-t">Community Picks <span class="tag tag-free">Free</span></div>
+        <span class="sec-a" onclick="loadCommunityPicks()">↻ Refresh</span>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:var(--muted);line-height:1.7">
+        Share your booking code from <strong style="color:var(--text)">Betway, 10bet or Easybet</strong> and let the community follow your picks. Recipients paste your code directly into their betslip to replicate your bet instantly.
+      </div>
+
+      <!-- Submit a pick -->
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:14px">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Share your pick</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><label class="form-label">Your nickname</label><input class="form-input" id="cp-nick" placeholder="e.g. TurfKing_ZA" style="font-size:13px"></div>
+          <div><label class="form-label">Platform</label>
+            <select class="form-select" id="cp-platform" style="font-size:13px">
+              <option value="Betway">Betway</option>
+              <option value="10bet">10bet</option>
+              <option value="Easybet">Easybet</option>
+              <option value="Hollywoodbets">Hollywoodbets</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div><label class="form-label">Booking Code</label><input class="form-input" id="cp-code" placeholder="Paste your bet code" style="font-size:13px;font-family:'DM Mono',monospace;letter-spacing:1px" oninput="this.value=this.value.toUpperCase()"></div>
+          <div><label class="form-label">Combined Odds</label><input class="form-input" id="cp-odds" placeholder="e.g. 12.50" style="font-size:13px"></div>
+        </div>
+        <div style="margin-bottom:10px"><label class="form-label">Describe your pick</label><input class="form-input" id="cp-desc" placeholder="e.g. 4-leg acca — Man City, Bayern, Dortmund, Arsenal" style="font-size:13px"></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select class="form-select" id="cp-sport" style="font-size:12px;padding:7px 10px;width:auto">
+            <option value="soccer">⚽ Soccer</option>
+            <option value="racing">🐎 Racing</option>
+            <option value="efc">🥊 EFC/UFC</option>
+            <option value="golf">⛳ Golf</option>
+          </select>
+          <input class="form-input" id="cp-legs" placeholder="Legs" type="number" min="1" max="20" style="width:72px;font-size:13px" value="4">
+          <button class="btn btn-mg" style="margin-left:auto" onclick="submitCommunityPick()">Share Pick →</button>
+        </div>
+      </div>
+
+      <!-- Community feed -->
+      <div id="community-feed" style="display:flex;flex-direction:column;gap:8px;margin-bottom:22px">
+        <div style="text-align:center;padding:28px;color:var(--muted);font-size:12px">Loading community picks...</div>
+      </div>
+    </div>
+
+    <!-- ══ SOCCER PREDICTIONS (populated by AI when prompted) ══ -->
+    <div id="soccer-section" style="display:none">
+      <div class="sec-h">
+        <div class="sec-t">Weekend Predictions <span class="tag tag-soccer">AI Powered</span></div>
+      </div>
+      <div id="soccer-predictions-feed" style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px"></div>
+    </div>
+
   </div>
 </div>
-
-<!-- ══════════════════════════════
-     ADMIN VIEW
-══════════════════════════════ -->
 <div class="view" id="view-admin" style="position:relative">
 
   <!-- ADMIN GATE -->
@@ -680,6 +764,7 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
             <option value="soccer">⚽ Soccer</option>
             <option value="efc">🥊 EFC</option>
             <option value="ufc">🥊 UFC</option>
+            <option value="golf">⛳ Golf</option>
           </select>
         </div>
         <div class="form-group"><label class="form-label">Event / Race</label>
@@ -767,6 +852,7 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
                   <option value="soccer">⚽ Soccer</option>
                   <option value="efc">🥊 EFC</option>
                   <option value="ufc">🥊 UFC</option>
+                  <option value="golf">⛳ Golf</option>
                 </select>
               </div>
               <div class="form-group"><label class="form-label">Event / Bet description</label>
@@ -1060,8 +1146,8 @@ async function loadBets() {
 }
 
 // ── RENDER FEED ────────────────────────────────
-const ICONS = { racing:'🐎', soccer:'⚽', efc:'🥊', ufc:'🥊' };
-const ICLS  = { racing:'icon-racing', soccer:'icon-soccer', efc:'icon-efc', ufc:'icon-efc' };
+const ICONS = { racing:'🐎', soccer:'⚽', efc:'🥊', ufc:'🥊', golf:'⛳' };
+const ICLS  = { racing:'icon-racing', soccer:'icon-soccer', efc:'icon-efc', ufc:'icon-efc', golf:'icon-soccer' };
 
 function renderFeed(bets, filter='all') {
   const feed = document.getElementById('bets-feed');
@@ -1818,6 +1904,176 @@ function copyCode(code) {
   navigator.clipboard.writeText(code).then(() => showToast('Code ' + code + ' copied to clipboard', 'success'));
 }
 
+// ── COMMUNITY PICKS ───────────────────────────
+async function loadCommunityPicks() {
+  if (!sb) return;
+  const feed = document.getElementById('community-feed');
+  if (!feed) return;
+  try {
+    const { data, error } = await sb
+      .from('community_picks')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    if (error) throw error;
+
+    // Update stat
+    const statEl = document.getElementById('stat-community');
+    if (statEl) statEl.textContent = (data||[]).length || '—';
+
+    if (!data || !data.length) {
+      feed.innerHTML = `<div style="text-align:center;padding:28px;color:var(--muted);font-size:12px">No community picks yet. Be the first to share one above.</div>`;
+      return;
+    }
+
+    const platformClass = { Betway:'betway', '10bet':'ten', Easybet:'easy' };
+    feed.innerHTML = data.map(p => `
+      <div class="cp-card">
+        <div class="cp-header">
+          <div class="cp-avatar">${(p.nickname||'?').slice(0,2).toUpperCase()}</div>
+          <div class="cp-nick">${p.nickname||'Anonymous'}</div>
+          <span class="cp-platform ${platformClass[p.platform]||''}">${p.platform||'Other'}</span>
+          <span style="font-size:10px;color:var(--dim);margin-left:4px">${ICONS[p.sport]||'🎯'}</span>
+        </div>
+        <div class="cp-body">
+          <div class="cp-desc">${p.description||''}</div>
+          <div class="cp-code-row" onclick="copyCode('${p.booking_code}')">
+            <span class="cp-code-val">${p.booking_code}</span>
+            <span style="font-size:9px;color:var(--dim)">TAP TO COPY</span>
+          </div>
+        </div>
+        <div class="cp-footer">
+          <div class="cp-meta">
+            <span>${p.legs||1} leg${(p.legs||1)>1?'s':''}</span>
+            ${p.odds ? `<span>@ ${p.odds}</span>` : ''}
+            <span>${timeAgo(p.created_at)}</span>
+          </div>
+          <div class="cp-like ${(likedPicks.has(p.id)?'liked':'')}" onclick="likePick('${p.id}',this)" id="like-${p.id}">
+            ♥ <span>${p.likes||0}</span>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    feed.innerHTML = `<div style="color:var(--red);font-size:12px;padding:12px">Error loading picks: ${e.message}</div>`;
+  }
+}
+
+const likedPicks = new Set(JSON.parse(localStorage.getItem('fiq_liked_picks')||'[]'));
+
+async function likePick(id, el) {
+  if (likedPicks.has(id)) return;
+  likedPicks.add(id);
+  localStorage.setItem('fiq_liked_picks', JSON.stringify([...likedPicks]));
+  el.classList.add('liked');
+  const span = el.querySelector('span');
+  if (span) span.textContent = parseInt(span.textContent||0) + 1;
+  if (sb) await sb.from('community_picks').update({ likes: (parseInt(span?.textContent||1)) }).eq('id', id);
+}
+
+async function submitCommunityPick() {
+  const nick   = document.getElementById('cp-nick')?.value.trim();
+  const code   = document.getElementById('cp-code')?.value.trim().toUpperCase();
+  const desc   = document.getElementById('cp-desc')?.value.trim();
+  const odds   = document.getElementById('cp-odds')?.value.trim();
+  const sport  = document.getElementById('cp-sport')?.value;
+  const legs   = parseInt(document.getElementById('cp-legs')?.value||'1');
+  const platform = document.getElementById('cp-platform')?.value;
+
+  if (!nick) { showToast('Enter a nickname', 'error'); return; }
+  if (!code) { showToast('Enter your booking code', 'error'); return; }
+  if (!desc) { showToast('Describe your pick briefly', 'error'); return; }
+
+  if (!sb) { showToast('Database not connected', 'error'); return; }
+
+  const { error } = await sb.from('community_picks').insert([{
+    nickname: nick, booking_code: code, description: desc,
+    odds, sport, legs, platform, likes: 0, status: 'pending',
+    created_at: new Date().toISOString()
+  }]);
+
+  if (error) { showToast('Submit failed: ' + error.message, 'error'); return; }
+
+  showToast('Pick shared — the community can now follow it', 'success');
+  ['cp-nick','cp-code','cp-desc','cp-odds'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  await loadCommunityPicks();
+}
+
+// ── EXTEND filterFeed for pick6 + golf ────────
+const _baseFilterFeed = filterFeed;
+filterFeed = function(filter, el) {
+  currentFeedFilter = filter;
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('on'));
+  if(el) el.classList.add('on');
+
+  if (filter === 'pick6') {
+    // Filter bets where event contains Pick 6 or id contains P6
+    const p6bets = allBets.filter(b => b.id?.includes('P6') || b.event?.toLowerCase().includes('pick 6') || b.event?.toLowerCase().includes('pick six'));
+    renderFeed(p6bets, 'all');
+    document.getElementById('feed-title').innerHTML = 'Pick 6 <span class="tag tag-racing" id="feed-count-tag">' + p6bets.length + ' selections</span>';
+  } else if (filter === 'golf') {
+    const golfBets = allBets.filter(b => b.sport === 'golf');
+    renderFeed(golfBets, 'all');
+    document.getElementById('feed-title').innerHTML = 'Golf <span class="tag tag-free" id="feed-count-tag">' + golfBets.length + ' selections</span>';
+  } else {
+    _baseFilterFeed(filter, el);
+  }
+};
+
+// ── EXTEND updateSidebarCounts for pick6 + golf ──
+const _baseUpdateCounts = updateSidebarCounts;
+updateSidebarCounts = function(bets) {
+  _baseUpdateCounts(bets);
+  const p6 = document.getElementById('chip-pick6');
+  const golf = document.getElementById('chip-golf');
+  if(p6) p6.textContent = bets.filter(b=>b.id?.includes('P6')||b.event?.toLowerCase().includes('pick 6')).length;
+  if(golf) golf.textContent = bets.filter(b=>b.sport==='golf').length;
+};
+
+// ── SOCCER PREDICTIONS DISPLAY ────────────────
+function showSoccerPredictions(predictions) {
+  const section = document.getElementById('soccer-section');
+  const feed = document.getElementById('soccer-predictions-feed');
+  if (!section || !feed) return;
+  section.style.display = 'block';
+
+  feed.innerHTML = predictions.map(m => `
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:11px;overflow:hidden">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--muted)">${m.league||''} · ${m.time||''}</div>
+        <div style="font-size:10px;background:var(--green-dim);color:var(--green);padding:2px 8px;border-radius:5px;font-weight:600">${m.confidence||''}% consensus</div>
+      </div>
+      <div style="padding:12px 14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="flex:1;text-align:center">
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">${m.home||''}</div>
+            <div style="font-size:10px;color:var(--muted)">Home</div>
+          </div>
+          <div style="font-size:11px;color:var(--dim);font-weight:600">VS</div>
+          <div style="flex:1;text-align:center">
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">${m.away||''}</div>
+            <div style="font-size:10px;color:var(--muted)">Away</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          ${['homeWin','draw','awayWin'].map((k,i)=>{
+            const label=['Home','Draw','Away'][i];
+            const val=m[k]||0;
+            const isTop = Math.max(m.homeWin||0,m.draw||0,m.awayWin||0)===val;
+            return `<div style="flex:1;background:${isTop?'var(--green-dim)':'var(--s2)'};border:1px solid ${isTop?'var(--green-b)':'var(--border)'};border-radius:7px;padding:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);margin-bottom:2px">${label}</div>
+              <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:${isTop?'var(--green)':'var(--text)'}">${val}%</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:8px 10px;background:var(--s2);border-radius:7px;border-left:2px solid var(--green)">
+          <strong style="color:var(--text)">Prediction:</strong> ${m.prediction||''}${m.btts?` · BTTS: ${m.btts}`:''}${m.over25!==undefined?` · O2.5: ${m.over25}%`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
 // ── CLEAR PUBLISH FORM ─────────────────────────
 function clearPublishForm() {
   ['f-event','f-time','f-venue','f-note'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
@@ -1983,7 +2239,10 @@ switchView = function(view, btn) {
 };
 
 // ── INIT ───────────────────────────────────────
-window.addEventListener('load', initSupabase);
+window.addEventListener('load', async () => {
+  await initSupabase();
+  await loadCommunityPicks();
+});
 </script>
 </body>
 </html>
