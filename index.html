@@ -309,13 +309,15 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
 /* ─── MOBILE BOTTOM NAV ─── */
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:58px;background:rgba(11,11,11,0.97);border-top:1px solid var(--border);backdrop-filter:blur(16px);z-index:400;padding:0 8px}
-.mobile-nav-inner{display:flex;align-items:center;justify-content:space-around;height:100%}
-.mnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 12px;border-radius:10px;transition:all .15s;color:var(--muted);flex:1}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:62px;background:rgba(11,11,11,0.98);border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:400;padding:0 4px;padding-bottom:env(safe-area-inset-bottom)}
+.mobile-nav-inner{display:flex;align-items:center;justify-content:space-between;height:100%;gap:0}
+.mnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:4px 0;border-radius:10px;transition:all .15s;color:var(--muted);flex:1;min-width:0}
 .mnav-item.on{color:var(--mg)}
-.mnav-item svg{width:20px;height:20px}
-.mnav-label{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
-.mobile-sub-btn{background:var(--mg);border:none;border-radius:20px;padding:8px 16px;color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:4px}
+.mnav-item svg{width:18px;height:18px;flex-shrink:0}
+.mnav-label{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.mnav-gold{flex:1;display:flex;align-items:center;justify-content:center}
+.mobile-sub-btn{background:var(--mg);border:none;border-radius:16px;padding:7px 14px;color:#fff;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:.3px;white-space:nowrap;transition:background .2s}
+.mobile-sub-btn:active{background:var(--mg2)}
 
 /* ─── MOBILE CODE LOOKUP BAR ─── */
 .mobile-code-bar{display:none;position:sticky;top:52px;z-index:200;background:var(--black);border-bottom:1px solid var(--border);padding:8px 14px;gap:8px}
@@ -473,8 +475,8 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
       <svg viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="13" rx="7" ry="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M6 13V9a4 4 0 018 0v4" stroke="currentColor" stroke-width="1.5"/></svg>
       <span class="mnav-label">Racing</span>
     </div>
-    <div class="mnav-item" onclick="openSubscribeModal()" style="margin-top:-10px">
-      <div class="mobile-sub-btn">Gold</div>
+    <div class="mnav-gold" onclick="openSubscribeModal()">
+      <button class="mobile-sub-btn">Gold</button>
     </div>
     <div class="mnav-item" id="mnav-code" onclick="mobileNav('code',this)">
       <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="6" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 6V5a3 2.5 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
