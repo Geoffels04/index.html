@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FanatIQ.bet — Built for Fanatics. Powered by Intelligence.</title>
+<title>FanatIQ — Built for Fanatics. Powered by Intelligence.</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -308,6 +308,131 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
 .share-code-copy:hover{color:var(--muted)}
 
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+/* ─── MOBILE BOTTOM NAV ─── */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:58px;background:rgba(11,11,11,0.97);border-top:1px solid var(--border);backdrop-filter:blur(16px);z-index:400;padding:0 8px}
+.mobile-nav-inner{display:flex;align-items:center;justify-content:space-around;height:100%}
+.mnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px 12px;border-radius:10px;transition:all .15s;color:var(--muted);flex:1}
+.mnav-item.on{color:var(--mg)}
+.mnav-item svg{width:20px;height:20px}
+.mnav-label{font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.mobile-sub-btn{background:var(--mg);border:none;border-radius:20px;padding:8px 16px;color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:4px}
+
+/* ─── MOBILE CODE LOOKUP BAR ─── */
+.mobile-code-bar{display:none;position:sticky;top:52px;z-index:200;background:var(--black);border-bottom:1px solid var(--border);padding:8px 14px;gap:8px}
+.mobile-code-bar input{flex:1;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:8px 12px;color:var(--text);font-size:14px;font-family:'DM Mono',monospace;outline:none;text-transform:uppercase;letter-spacing:1px}
+.mobile-code-bar input::placeholder{text-transform:none;letter-spacing:0;color:var(--dim);font-size:13px}
+
+/* ─── MEDIA QUERIES ─── */
+@media(max-width:768px){
+  /* Hide desktop nav center, show mobile nav */
+  .nav-center{display:none}
+  .db-status{display:none}
+  .pill-live{display:none}
+  .topbar{padding:0 14px;height:48px}
+  .brand-sub{display:none}
+  .brand-name{font-size:16px}
+  .btn-mg.btn-sm{padding:5px 12px;font-size:11px}
+
+  /* Views become full width column */
+  #view-sub{flex-direction:column;height:calc(100vh - 48px);padding-bottom:58px}
+  #view-admin{flex-direction:column;height:calc(100vh - 48px);padding-bottom:58px}
+
+  /* Hide sidebars */
+  .sub-sidebar{display:none}
+  .admin-sidebar{display:none}
+
+  /* Full width main areas */
+  .sub-main{padding:14px 14px 0}
+  .admin-main{width:100%}
+  .admin-panel{padding:14px}
+
+  /* Show mobile nav */
+  .mobile-nav{display:flex}
+
+  /* Show code bar on subscriber view */
+  .mobile-code-bar{display:flex}
+
+  /* Stack stat bar 2x2 on mobile */
+  .stat-bar{grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+  .stat-v{font-size:18px}
+  .stat-c{padding:10px 12px}
+
+  /* Bet cards full width */
+  .sel-row{flex-wrap:wrap;gap:6px}
+  .sel-detail{max-width:none;font-size:10px}
+  .sel-name{font-size:12px}
+
+  /* Bet header tighter */
+  .bet-header{padding:10px 12px}
+  .bet-body{padding:10px 12px}
+  .bet-footer{padding:6px 12px}
+  .bet-title{font-size:12px}
+
+  /* Publish form single column */
+  .pub-form{grid-template-columns:1fr;gap:10px}
+  .sel-builder-row{grid-template-columns:1fr 1fr;gap:6px}
+  .sel-builder-row .form-input:nth-child(3),
+  .sel-builder-row .form-input:nth-child(4),
+  .sel-builder-row .form-input:nth-child(5){display:none}
+  .remove-sel{grid-column:2;justify-self:end}
+
+  /* Analytics 2 cols */
+  .an-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .sport-bars{grid-template-columns:1fr;gap:8px}
+
+  /* Settings single col */
+  .settings-grid{grid-template-columns:1fr}
+
+  /* Subscribe modal */
+  .modal{max-width:calc(100vw - 24px);margin:12px}
+  .plan-options{grid-template-columns:1fr}
+
+  /* Admin gate */
+  .gate-box{width:calc(100vw - 40px);padding:24px 20px}
+
+  /* Slip uploader */
+  .slip-dropzone{padding:28px 16px}
+  #slip-preview-wrap > div:first-of-type{grid-template-columns:1fr}
+
+  /* Accas */
+  .acca-row{grid-template-columns:1fr}
+  .vc-grid{grid-template-columns:1fr 1fr}
+
+  /* Bet time col smaller */
+  .bet-time-col .bet-time{font-size:9px}
+  .bet-time-col .bet-ago{font-size:8px}
+
+  /* Inner tabs scroll */
+  .inner-tabs{overflow-x:auto;width:100%}
+
+  /* Bets table responsive */
+  .bets-table th:nth-child(3),
+  .bets-table td:nth-child(3),
+  .bets-table th:nth-child(5),
+  .bets-table td:nth-child(5){display:none}
+  .bets-table{font-size:11px}
+  .bets-table td{padding:8px 8px}
+  .tbl-actions{flex-direction:column;gap:3px}
+
+  /* Sub banner stack */
+  .sub-banner{flex-direction:column;gap:12px;padding:14px}
+
+  /* Pick6 grid */
+  .pick6-legs{grid-template-columns:1fr 1fr}
+
+  /* Section header */
+  .sec-h{margin-bottom:8px}
+  .sec-t{font-size:12px}
+}
+
+@media(max-width:420px){
+  .stat-bar{grid-template-columns:repeat(2,1fr)}
+  .vc-grid{grid-template-columns:1fr 1fr}
+  .an-grid{grid-template-columns:1fr 1fr}
+  .bet-time-col{display:none}
+  .sel-odds{font-size:12px;min-width:32px}
+  .topbar .btn-mg{display:none}
+}
 </style>
 </head>
 <body>
@@ -322,13 +447,13 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
       </svg>
     </div>
     <div>
-      <div class="brand-name">Fanat<em>IQ</em><small>.bet</small></div>
+      <div class="brand-name">Fanat<em>IQ</em></div>
       <span class="brand-sub">Built for Fanatics · Powered by AI</span>
     </div>
   </div>
   <div class="nav-center">
     <button class="ntab on" id="tab-sub" onclick="switchView('sub',this)">Subscriber View</button>
-    <button class="ntab" id="tab-admin" onclick="switchView('admin',this)">Admin Backend</button>
+    <button class="ntab" id="tab-admin" onclick="switchView('admin',this)">Admin</button>
   </div>
   <div class="nav-right">
     <div class="db-status"><div class="db-dot" id="db-dot"></div><span id="db-label">Connecting...</span></div>
@@ -336,6 +461,38 @@ body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;
     <button class="btn btn-mg btn-sm" onclick="openSubscribeModal()">Subscribe R299/mo</button>
   </div>
 </div>
+
+<!-- ══════ MOBILE BOTTOM NAV ══════ -->
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <div class="mnav-item on" id="mnav-home" onclick="mobileNav('home',this)">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 3l7 6.5V17a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="currentColor" stroke-width="1.5"/><path d="M7 18v-5h6v5" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span class="mnav-label">Home</span>
+    </div>
+    <div class="mnav-item" id="mnav-racing" onclick="mobileNav('racing',this)">
+      <svg viewBox="0 0 20 20" fill="none"><ellipse cx="10" cy="13" rx="7" ry="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M6 13V9a4 4 0 018 0v4" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span class="mnav-label">Racing</span>
+    </div>
+    <div class="mnav-item" onclick="openSubscribeModal()" style="margin-top:-10px">
+      <div class="mobile-sub-btn">Gold</div>
+    </div>
+    <div class="mnav-item" id="mnav-code" onclick="mobileNav('code',this)">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="6" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 6V5a3 2.5 0 016 0v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span class="mnav-label">Code</span>
+    </div>
+    <div class="mnav-item" id="mnav-admin" onclick="switchView('admin',document.getElementById('tab-admin'));syncMnav('admin')">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7.5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 17.5c0-3.59 2.91-6.5 6.5-6.5s6.5 2.91 6.5 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span class="mnav-label">Admin</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MOBILE CODE LOOKUP BAR ══════ -->
+<div id="mobile-code-bar" style="display:none;position:sticky;top:48px;z-index:200;background:var(--black);border-bottom:1px solid var(--border);padding:8px 14px;gap:8px;align-items:center">
+  <input type="text" id="mobile-code-input" style="flex:1;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:9px 12px;color:var(--text);font-size:14px;font-family:'DM Mono',monospace;outline:none;letter-spacing:1px;text-transform:uppercase;width:100%" placeholder="Enter bet code e.g. RACE-SAT-07" maxlength="20" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')mobileCodeLookup()">
+  <button class="btn btn-mg btn-sm" onclick="mobileCodeLookup()">Load →</button>
+</div>
+<div id="mobile-code-result" style="display:none;padding:0 14px 10px;background:var(--black)"></div>
 
 <!-- ══════════════════════════════
      SUBSCRIBER VIEW
@@ -917,7 +1074,7 @@ function renderFeed(bets, filter='all') {
   document.getElementById('feed-count-tag').textContent = filtered.length + ' selections';
 
   if (!filtered.length) {
-    feed.innerHTML = `<div class="empty-state"><div class="empty-icon">${filter==='won'?'🏆':filter==='lost'?'📉':'📋'}</div><div class="empty-title">${filter==='all'?'No bets published yet':'No '+ filter +' bets'}</div><div class="empty-sub">${filter==='all'?'Switch to Admin Backend and publish your first selection to see it here.':'Check back later or view all selections.'}</div></div>`;
+    feed.innerHTML = `<div class="empty-state"><div class="empty-icon">${filter==='won'?'🏆':filter==='lost'?'📉':'📋'}</div><div class="empty-title">${filter==='all'?'No bets published yet':'No '+ filter +' bets'}</div><div class="empty-sub">${filter==='all'?'Switch to Admin and publish your first selection to see it here.':'Check back later or view all selections.'}</div></div>`;
     return;
   }
 
@@ -1674,6 +1831,154 @@ function clearPublishForm() {
 
 // Update bet card render to show share codes on free bets
 const _origRenderFeed = renderFeed;
+
+// ── EDGE FUNCTION (secure writes) ──────────────
+const EDGE_URL = 'https://nzxjbzgxdokbppchattt.supabase.co/functions/v1/admin-bets';
+
+async function edgeWrite(action, payload, id) {
+  const adminSecret = localStorage.getItem('fanatiq_admin_pw') || 'fanatiq2026';
+  const res = await fetch(EDGE_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-secret': adminSecret
+    },
+    body: JSON.stringify({ action, payload, id })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Edge function error');
+  return data;
+}
+
+// Override publishBet to use edge function
+const _origPublishBet = publishBet;
+publishBet = async function() {
+  if (!sb) { showToast('Database not connected', 'error'); return; }
+  const sport  = document.getElementById('f-sport').value;
+  const event  = document.getElementById('f-event').value.trim();
+  const time   = document.getElementById('f-time').value.trim();
+  const venue  = document.getElementById('f-venue').value.trim();
+  const note   = document.getElementById('f-note').value.trim();
+  const tier   = document.querySelector('input[name="tier"]:checked').value;
+  if (!event) { showToast('Enter an event name', 'error'); return; }
+  const rows = document.querySelectorAll('#sel-rows .sel-builder-row');
+  const selections = [];
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const type = row.querySelector('select')?.value;
+    const name = inputs[0]?.value.trim();
+    if (name) selections.push({ type, name, odds: inputs[1]?.value.trim(), ar: inputs[2]?.value.trim(), detail: inputs[3]?.value.trim() });
+  });
+  if (!selections.length) { showToast('Add at least one selection', 'error'); return; }
+  const btn = document.getElementById('pub-btn');
+  btn.textContent = 'Publishing...'; btn.disabled = true;
+  const pfx = localStorage.getItem('fanatiq_watermark') || 'FIQ';
+  const id = pfx + '-' + (1000 + Math.floor(Math.random() * 9000));
+  const shareCode = document.getElementById('slip-gen-code')?.checked ? generateShareCode(sport) : null;
+  try {
+    await edgeWrite('insert', { id, sport, event, time, venue, tier, status:'pending', note, selections, share_code: shareCode, published_at: new Date().toISOString() });
+    showToast('✓ ' + id + ' published', 'success');
+    clearPublishForm();
+    await loadBets();
+  } catch(e) { showToast('Publish failed: ' + e.message, 'error'); }
+  btn.textContent = 'Publish Now →'; btn.disabled = false;
+};
+
+// Override updateStatus to use edge function
+const _origUpdateStatus = updateStatus;
+updateStatus = async function(id, status) {
+  try {
+    await edgeWrite('update', { status }, id);
+    showToast('Updated to ' + status, 'success');
+    await loadBets();
+  } catch(e) {
+    // Fallback to direct for reads
+    if (sb) { await sb.from('bets').update({ status }).eq('id', id); await loadBets(); }
+  }
+};
+
+// Override deleteBet to use edge function
+const _origDeleteBet = deleteBet;
+deleteBet = async function(id) {
+  if (!confirm('Delete ' + id + '? Cannot be undone.')) return;
+  try {
+    await edgeWrite('delete', {}, id);
+    showToast('Deleted ' + id, 'success');
+    await loadBets();
+  } catch(e) { showToast('Delete failed: ' + e.message, 'error'); }
+};
+
+// ── MOBILE NAV ─────────────────────────────────
+function mobileNav(section, el) {
+  document.querySelectorAll('.mnav-item').forEach(i => i.classList.remove('on'));
+  if (el) el.classList.add('on');
+  const codeBar = document.getElementById('mobile-code-bar');
+  const codeResult = document.getElementById('mobile-code-result');
+
+  if (section === 'home') {
+    switchView('sub', document.getElementById('tab-sub'));
+    if (codeBar) codeBar.style.display = 'none';
+    if (codeResult) codeResult.style.display = 'none';
+    currentFeedFilter = 'all';
+    renderFeed(allBets, 'all');
+  } else if (section === 'racing') {
+    switchView('sub', document.getElementById('tab-sub'));
+    if (codeBar) codeBar.style.display = 'none';
+    currentFeedFilter = 'racing';
+    renderFeed(allBets, 'racing');
+    document.querySelector('.sub-main')?.scrollTo(0, 0);
+  } else if (section === 'code') {
+    switchView('sub', document.getElementById('tab-sub'));
+    if (codeBar) { codeBar.style.display = 'flex'; }
+    document.getElementById('mobile-code-input')?.focus();
+  }
+}
+
+function syncMnav(section) {
+  document.querySelectorAll('.mnav-item').forEach(i => i.classList.remove('on'));
+  const map = { admin: 'mnav-admin', home: 'mnav-home', racing: 'mnav-racing', code: 'mnav-code' };
+  const el = document.getElementById(map[section]);
+  if (el) el.classList.add('on');
+}
+
+async function mobileCodeLookup() {
+  const input = document.getElementById('mobile-code-input');
+  const resultEl = document.getElementById('mobile-code-result');
+  if (!input || !resultEl) return;
+  const code = input.value.trim().toUpperCase();
+  if (!code || code.length < 3) return;
+  if (!sb) return;
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0">Looking up code...</div>';
+  try {
+    let bet = null;
+    const { data: byCode } = await sb.from('bets').select('*').eq('share_code', code).limit(1);
+    if (byCode?.length) bet = byCode[0];
+    else {
+      const { data: byId } = await sb.from('bets').select('*').eq('id', code).limit(1);
+      if (byId?.length) bet = byId[0];
+    }
+    if (!bet) { resultEl.innerHTML = `<div style="background:var(--red-dim);border:1px solid var(--red-b);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--red)">No bet found for code <strong>${code}</strong></div>`; return; }
+    const isGold = bet.tier === 'gold';
+    const sels = (bet.selections||[]).map(s=>`<div class="sel-row ${s.type}-bet" style="margin-bottom:4px"><span class="sel-type-pill">${s.type==='best'?'Best Bet':s.type==='value'?'Value':s.type==='next'?'Next Best':'Other'}</span><span class="sel-name">${s.name}</span><span class="sel-odds">${s.odds||''}</span></div>`).join('');
+    if (isGold) {
+      resultEl.innerHTML = `<div style="background:var(--s1);border:1px solid var(--mg-border);border-radius:9px;padding:14px;text-align:center"><div style="color:var(--mg);margin-bottom:8px">🔒 Gold bet</div><button class="btn btn-mg btn-sm" onclick="openSubscribeModal()">Subscribe to view</button></div>`;
+    } else {
+      resultEl.innerHTML = `<div style="background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:14px"><div style="font-weight:500;margin-bottom:8px">${bet.event}</div><div class="bet-selections" style="margin-bottom:8px">${sels}</div>${bet.note?`<div class="bet-note"><strong>FanatIQ Analysis:</strong> ${bet.note}</div>`:''}</div>`;
+    }
+  } catch(e) { resultEl.innerHTML = '<div style="color:var(--red);font-size:12px">Error loading bet.</div>'; }
+}
+
+// Show/hide mobile code bar based on active view
+const _origSwitchView = switchView;
+switchView = function(view, btn) {
+  _origSwitchView(view, btn);
+  const codeBar = document.getElementById('mobile-code-bar');
+  const codeResult = document.getElementById('mobile-code-result');
+  if (codeBar) codeBar.style.display = 'none';
+  if (codeResult) { codeResult.style.display = 'none'; codeResult.innerHTML = ''; }
+  if (view === 'admin') syncMnav('admin');
+};
 
 // ── INIT ───────────────────────────────────────
 window.addEventListener('load', initSupabase);
