@@ -1147,10 +1147,14 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
             <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
               <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-epl" checked style="accent-color:var(--mg)"> Premier League</label>
               <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-bun" checked style="accent-color:var(--mg)"> Bundesliga</label>
-              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-lla" style="accent-color:var(--mg)"> La Liga</label>
-              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-ser" style="accent-color:var(--mg)"> Serie A</label>
-              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-ligue" style="accent-color:var(--mg)"> Ligue 1</label>
-              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-psl" style="accent-color:var(--mg)"> PSL (SA)</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-bun2" style="accent-color:var(--mg)"> 2. Bundesliga</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-lla" checked style="accent-color:var(--mg)"> La Liga</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-ser" checked style="accent-color:var(--mg)"> Serie A</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-ligue" checked style="accent-color:var(--mg)"> Ligue 1</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-bel" checked style="accent-color:var(--mg)"> Pro League (Belgium)</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-ere" style="accent-color:var(--mg)"> Eredivisie</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-por" style="accent-color:var(--mg)"> Liga Portugal</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-tur" style="accent-color:var(--mg)"> Super Lig (Turkey)</label>
             </div>
           </div>
           <div class="form-group">
@@ -2816,12 +2820,16 @@ async function publishSlipBet() {
 // ═══════════════════════════════════════════════
 async function runPredictionsEngine() {
   const leagues = [];
-  if (document.getElementById('lg-epl')?.checked) leagues.push('Premier League');
-  if (document.getElementById('lg-bun')?.checked) leagues.push('Bundesliga');
-  if (document.getElementById('lg-lla')?.checked) leagues.push('La Liga');
-  if (document.getElementById('lg-ser')?.checked) leagues.push('Serie A');
+  if (document.getElementById('lg-epl')?.checked)  leagues.push('Premier League');
+  if (document.getElementById('lg-bun')?.checked)  leagues.push('Bundesliga');
+  if (document.getElementById('lg-bun2')?.checked) leagues.push('2. Bundesliga');
+  if (document.getElementById('lg-lla')?.checked)  leagues.push('La Liga');
+  if (document.getElementById('lg-ser')?.checked)  leagues.push('Serie A');
   if (document.getElementById('lg-ligue')?.checked) leagues.push('Ligue 1');
-  if (document.getElementById('lg-psl')?.checked) leagues.push('PSL');
+  if (document.getElementById('lg-bel')?.checked)  leagues.push('Jupiler Pro');
+  if (document.getElementById('lg-ere')?.checked)  leagues.push('Eredivisie');
+  if (document.getElementById('lg-por')?.checked)  leagues.push('Liga Portugal');
+  if (document.getElementById('lg-tur')?.checked)  leagues.push('Super Lig');
 
   if (!leagues.length) { showToast('Select at least one league', 'error'); return; }
 
