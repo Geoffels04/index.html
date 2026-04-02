@@ -2054,8 +2054,9 @@ function renderLeagueAccordions(data, containerId) {
               <div class="detail-stat"><div class="detail-stat-label">Avg Goals</div><div class="detail-stat-val">${goalsAvg.toFixed(1)}</div></div>
               <div class="detail-stat"><div class="detail-stat-label">Over 2.5</div><div class="detail-stat-val">${over25}%</div></div>
             </div>
-            <!-- Form: home full width, then away full width -->
+            <!-- Form: 4 blocks — home all, home at home, away all, away away -->
             <div class="detail-form-row">
+              <!-- Home team last 5 overall -->
               <div class="detail-form-block">
                 <div class="detail-form-title">
                   <span>${m.home_team} — Last 5</span>
@@ -2063,12 +2064,29 @@ function renderLeagueAccordions(data, containerId) {
                 </div>
                 ${renderFormResults(m.home_form_5, m.home_form_results)}
               </div>
+              <!-- Home team last 5 at home -->
+              <div class="detail-form-block" style="border-left:2px solid var(--green)">
+                <div class="detail-form-title">
+                  <span>${m.home_team} — Last 5 at Home</span>
+                  <span style="font-size:9px;color:var(--green)">🏠 Home only</span>
+                </div>
+                ${renderFormResults(m.home_form_5, m.home_form_home_results || m.home_form_results)}
+              </div>
+              <!-- Away team last 5 overall -->
               <div class="detail-form-block">
                 <div class="detail-form-title">
                   <span>${m.away_team} — Last 5</span>
                   <span style="color:var(--mg);font-size:9px">${awayGoals} goals/game avg</span>
                 </div>
                 ${renderFormResults(m.away_form_5, m.away_form_results)}
+              </div>
+              <!-- Away team last 5 away -->
+              <div class="detail-form-block" style="border-left:2px solid var(--mg)">
+                <div class="detail-form-title">
+                  <span>${m.away_team} — Last 5 Away</span>
+                  <span style="font-size:9px;color:var(--mg)">✈ Away only</span>
+                </div>
+                ${renderFormResults(m.away_form_5, m.away_form_away_results || m.away_form_results)}
               </div>
             </div>
             <!-- H2H: each result as its own row -->
