@@ -291,9 +291,12 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .pub-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .tier-opt{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);cursor:pointer}
 .tier-opt input{accent-color:var(--mg)}
-.order-btns{display:flex;gap:3px}
-.order-btn{width:26px;height:26px;border-radius:5px;background:var(--s3);border:1px solid var(--border2);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
-.order-btn:hover{background:var(--s4);color:var(--text)}
+.drag-handle{width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--dim);cursor:grab;flex-shrink:0;border-radius:6px;transition:all .15s}
+.drag-handle:hover{color:var(--muted);background:var(--s3)}
+.drag-handle:active{cursor:grabbing}
+.ro-item{display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:10px 12px;transition:all .2s;user-select:none}
+.ro-item.dragging{opacity:.4;border-style:dashed;border-color:var(--mg-border)}
+.ro-item.drag-over{border-color:var(--mg);background:var(--mg-dim);transform:scale(1.01)}
 .bets-table{width:100%;border-collapse:collapse}
 .bets-table th{font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
 .bets-table td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
@@ -1718,48 +1721,93 @@ async function deleteBet(id) {
 // ═══════════════════════════════════════════════
 let reorderSport = 'racing';
 
+let dragSrcId = null;
+
 function loadReorderList(sport, btn) {
   reorderSport = sport;
   document.querySelectorAll('#panel-reorder .inner-tab').forEach(t => t.classList.remove('on'));
   if (btn) btn.classList.add('on');
   const bets = allBets.filter(b => b.sport === sport || (sport==='efc' && (b.sport==='efc'||b.sport==='ufc')));
   const list = document.getElementById('reorder-list');
-  if (!bets.length) { list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:20px">No bets for this sport yet.</div>'; return; }
+  if (!bets.length) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:20px">No bets for this sport yet.</div>';
+    return;
+  }
   list.innerHTML = bets.map((b,i) => `
-    <div id="ro-${b.id}" style="display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
-      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);width:18px">${i+1}</span>
+    <div class="ro-item" id="ro-${b.id}" data-id="${b.id}" draggable="true">
+      <div class="drag-handle" title="Drag to reorder">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="5" cy="3" r="1.2" fill="currentColor"/>
+          <circle cx="9" cy="3" r="1.2" fill="currentColor"/>
+          <circle cx="5" cy="7" r="1.2" fill="currentColor"/>
+          <circle cx="9" cy="7" r="1.2" fill="currentColor"/>
+          <circle cx="5" cy="11" r="1.2" fill="currentColor"/>
+          <circle cx="9" cy="11" r="1.2" fill="currentColor"/>
+        </svg>
+      </div>
+      <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);width:16px;flex-shrink:0">${i+1}</span>
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.event}</div>
-        <div style="font-size:10px;color:var(--dim)">${b.id}</div>
+        <div style="font-size:10px;color:var(--dim);font-family:'DM Mono',monospace">${b.id}</div>
       </div>
-      <div class="order-btns">
-        <button class="order-btn" onclick="moveOrder('${b.id}',-1)" ${i===0?'disabled':''}>↑</button>
-        <button class="order-btn" onclick="moveOrder('${b.id}',1)" ${i===bets.length-1?'disabled':''}>↓</button>
-      </div>
+      <div style="font-size:9px;padding:2px 7px;border-radius:4px;background:var(--s3);color:var(--dim);flex-shrink:0">${(b.tier||'free').toUpperCase()}</div>
     </div>`).join('');
+
+  // Attach drag events
+  list.querySelectorAll('.ro-item').forEach(item => {
+    item.addEventListener('dragstart', e => {
+      dragSrcId = item.dataset.id;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', dragSrcId);
+    });
+    item.addEventListener('dragend', () => {
+      item.classList.remove('dragging');
+      list.querySelectorAll('.ro-item').forEach(i => i.classList.remove('drag-over'));
+    });
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (item.dataset.id !== dragSrcId) {
+        list.querySelectorAll('.ro-item').forEach(i => i.classList.remove('drag-over'));
+        item.classList.add('drag-over');
+      }
+    });
+    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+    item.addEventListener('drop', async e => {
+      e.preventDefault();
+      item.classList.remove('drag-over');
+      if (!dragSrcId || dragSrcId === item.dataset.id) return;
+      await swapBetOrder(dragSrcId, item.dataset.id);
+    });
+  });
 }
 
-async function moveOrder(id, dir) {
+async function swapBetOrder(srcId, destId) {
   const sportBets = allBets.filter(b => b.sport === reorderSport || (reorderSport==='efc' && (b.sport==='efc'||b.sport==='ufc')));
-  const idx = sportBets.findIndex(b => b.id === id);
-  const swapIdx = idx + dir;
-  if (swapIdx < 0 || swapIdx >= sportBets.length) return;
-  const a = sportBets[idx];
-  const b2 = sportBets[swapIdx];
-  const aOrder = a.display_order || idx;
-  const bOrder = b2.display_order || swapIdx;
-  try {
-    await edgeWrite('update',{display_order:bOrder},a.id);
-    await edgeWrite('update',{display_order:aOrder},b2.id);
-  } catch(e) {
-    if (sb) {
-      await sb.from('bets').update({display_order:bOrder}).eq('id',a.id);
-      await sb.from('bets').update({display_order:aOrder}).eq('id',b2.id);
+  const srcIdx = sportBets.findIndex(b => b.id === srcId);
+  const destIdx = sportBets.findIndex(b => b.id === destId);
+  if (srcIdx === -1 || destIdx === -1) return;
+
+  // Reorder array
+  const reordered = [...sportBets];
+  const [moved] = reordered.splice(srcIdx, 1);
+  reordered.splice(destIdx, 0, moved);
+
+  // Save new display_order for all affected items
+  const saves = reordered.map((b, i) => {
+    const newOrder = i + 1;
+    try {
+      return edgeWrite('update', { display_order: newOrder }, b.id);
+    } catch(e) {
+      return sb ? sb.from('bets').update({ display_order: newOrder }).eq('id', b.id) : Promise.resolve();
     }
-  }
+  });
+
+  await Promise.all(saves);
+  showToast('Order saved', 'success');
   await loadAllData();
   loadReorderList(reorderSport, null);
-  showToast('Order updated','success');
 }
 
 // ═══════════════════════════════════════════════
