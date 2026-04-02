@@ -472,7 +472,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
     <!-- Community bet codes strip -->
     <div class="cp-strip-wrap" id="home-codes-strip">
       <div class="cp-strip-label">
-        Community codes
+        Member Bet Codes
         <span class="sec-a" onclick="goPage('community')">View all →</span>
       </div>
       <div class="cp-strip" id="cp-strip-inner">
@@ -598,12 +598,12 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 ══════════════════════════════ -->
 <div class="page" id="page-community">
   <div class="page-inner">
-    <div class="sec-h" style="margin-bottom:6px"><div class="sec-t">Community Picks <span class="tag tag-free">Open</span></div><span class="sec-a" onclick="loadCommunityPicks()">↻</span></div>
-    <p style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:16px">Share your booking code from Betway, 10bet or Easybet. Others click your code to load the same bet directly into their betslip.</p>
+    <div class="sec-h" style="margin-bottom:6px"><div class="sec-t">Member Bet Codes <span class="tag tag-free">Members</span></div><span class="sec-a" onclick="loadCommunityPicks()">↻</span></div>
+    <p style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:16px">Members share their booking codes here. Click any code to open the bet directly in your bookmaker's betslip and replicate the selection instantly.</p>
 
     <!-- Submit form -->
     <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">
-      <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Share your pick</div>
+      <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Upload your bet code</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <div><label class="form-label">Nickname</label><input class="form-input" id="cp-nick" placeholder="e.g. TurfKing_ZA" style="font-size:13px"></div>
         <div><label class="form-label">Platform</label>
@@ -1235,7 +1235,7 @@ function renderBetCard(b, idx) {
     </div>
     <div class="bet-footer">
       <div class="bet-status-row"><div class="sdot" style="background:${sc}"></div><span style="color:${sc};font-family:'DM Mono',monospace;font-size:10px">${sl}</span></div>
-      ${b.share_code ? `<span class="share-code-badge" onclick="copyCode('${b.share_code}')">${b.share_code}</span>` : ''}
+
       <div class="watermark">${b.id}</div>
     </div>`;
 
@@ -1390,7 +1390,7 @@ async function loadCommunityStrip() {
   const { data } = await sb.from('community_picks').select('*').order('created_at',{ascending:false}).limit(12);
   const strip = document.getElementById('cp-strip-inner');
   if (!strip || !data || !data.length) {
-    if (strip) strip.innerHTML = `<div style="font-size:12px;color:var(--dim);padding:10px 0">No community picks yet — be the first to share one.</div>`;
+    if (strip) strip.innerHTML = `<div style="font-size:12px;color:var(--dim);padding:10px 0">No member codes yet today.</div>`;
     return;
   }
   strip.innerHTML = data.map(p => {
