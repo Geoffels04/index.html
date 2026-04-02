@@ -183,6 +183,48 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .trend-extras{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .trend-extra-pill{font-size:10px;padding:3px 9px;border-radius:6px;background:var(--s2);color:var(--muted);border:1px solid var(--border)}
 
+/* ── VALUE / ODDS DISPLAY ── */
+.value-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;padding:3px 8px;border-radius:5px}
+.value-A{background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3)}
+.value-B{background:rgba(239,159,39,0.15);color:var(--amber);border:1px solid rgba(239,159,39,0.3)}
+.value-C{background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3)}
+.no-value{background:var(--s3);color:var(--dim);border:1px solid var(--border)}
+.odds-row{display:flex;gap:6px;margin-bottom:10px}
+.odds-cell{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center}
+.odds-cell.best-val{border-color:var(--green);background:rgba(34,197,94,0.06)}
+.odds-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.odds-price{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--text)}
+.odds-book{font-size:9px;color:var(--mg);margin-top:2px}
+.odds-edge{font-size:10px;font-weight:600;margin-top:3px}
+.edge-pos{color:var(--green)}.edge-neg{color:var(--dim)}.edge-zero{color:var(--muted)}
+.value-box{background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(11,11,11,0));border:1px solid rgba(34,197,94,0.25);border-radius:9px;padding:12px 14px;margin-bottom:10px}
+.value-box-A{border-color:rgba(34,197,94,0.35);background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(11,11,11,0))}
+.value-box-B{border-color:rgba(239,159,39,0.35);background:linear-gradient(135deg,rgba(239,159,39,0.08),rgba(11,11,11,0))}
+.value-box-C{border-color:rgba(59,130,246,0.3);background:linear-gradient(135deg,rgba(59,130,246,0.06),rgba(11,11,11,0))}
+.value-box-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.value-box-market{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:4px}
+.value-box-detail{font-size:11px;color:var(--muted);line-height:1.6}
+.market-margin{font-size:9px;color:var(--dim);text-align:right;margin-top:4px}
+
+/* ── TIPSTER SOURCE PILLS ── */
+.tipster-row{display:flex;flex-wrap:wrap;gap:5px;padding:7px 12px;background:var(--s2);border-bottom:1px solid var(--border)}
+.tipster-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 7px;border-radius:5px;background:var(--s3);border:1px solid var(--border);line-height:1.4}
+.tipster-name{color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.4px;font-size:9px}
+.tipster-tip{color:var(--text);font-weight:500}
+
+/* ── SUGGESTED BET BLOCK ── */
+.suggested-bet-block{padding:10px 14px 11px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sb-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:3px}
+.sb-market{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px;line-height:1.1}
+.sb-conf-pill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;flex-shrink:0;font-family:'DM Mono',monospace}
+
+/* ── FIXTURE CARD HEADER (new layout) ── */
+.fixture-header-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer}
+.fixture-matchup{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fixture-meta-col{text-align:right;flex-shrink:0;margin-left:8px}
+.fixture-kickoff{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+.fixture-conf-pct{font-size:10px;font-weight:600;color:var(--green);margin-top:1px}
+
 /* ── SPORT SPORT CARDS (home page sport nav) ── */
 .sport-nav-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
 .sport-nav-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;text-decoration:none;display:block}
@@ -425,10 +467,13 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .pct-bar-track{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:3px}
 .pct-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
 .pct-bar-pct{font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
-.detail-form-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.detail-form-block{flex:1;min-width:140px;background:var(--s1);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
-.detail-form-title{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.detail-form-team{font-size:11px;font-weight:600;color:var(--text);margin-bottom:5px}
+.detail-form-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.detail-form-block{background:var(--s1);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+.detail-form-title{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+.detail-form-team{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--text);margin-bottom:7px}
+.form-result-row{display:flex;align-items:center;gap:8px;padding:5px 8px;margin-bottom:3px;border-radius:6px}
+.form-result-badge{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;color:#000}
+.form-result-badge.W{background:var(--green)}.form-result-badge.D{background:var(--amber)}.form-result-badge.L{background:var(--red)}
 .form-pills{display:flex;gap:3px;flex-wrap:wrap}
 .fp{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
 .fp-W{background:var(--green-dim);color:var(--green)}
@@ -436,7 +481,11 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .fp-L{background:var(--red-dim);color:var(--red)}
 .fp-x{background:var(--s3);color:var(--dim)}
 .detail-h2h{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px}
-.detail-h2h-title{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.detail-h2h-title{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.detail-h2h-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
+.detail-h2h-row:last-child{border-bottom:none}
+.detail-h2h-score{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--text);min-width:40px;text-align:center;flex-shrink:0}
+.detail-h2h-team{font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .detail-h2h-results{font-size:11px;color:var(--muted);line-height:1.7;font-family:'DM Mono',monospace}
 .detail-stats-row{display:flex;gap:8px;margin-bottom:10px}
 .detail-stat{flex:1;background:var(--s1);border-radius:8px;padding:8px 10px;text-align:center;border:1px solid var(--border)}
@@ -901,6 +950,10 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
         <svg viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 7l2 2 3-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Soccer Engine
       </div>
+      <div class="admin-nav-item" onclick="switchAdmin('odds',this)">
+        <svg viewBox="0 0 13 13" fill="none"><path d="M2 10L5 4l3 4 2-3 1.5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Odds Sync
+      </div>
       <div class="admin-nav-item" onclick="switchAdmin('push',this)">
         <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 2C6.5 2 3 3.5 3 7.5v3l-1 1h9l-1-1v-3c0-4-3.5-5.5-3.5-5.5z" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 11.5a1 1 0 002 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         Push Alerts
@@ -1119,6 +1172,52 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
           <span id="pred-status" style="font-size:12px;color:var(--muted)"></span>
         </div>
         <div id="pred-results" style="margin-top:14px;display:flex;flex-direction:column;gap:6px;max-width:600px"></div>
+      </div>
+
+      <!-- ODDS SYNC -->
+      <div class="admin-panel" id="panel-odds">
+        <div class="admin-page-title">Odds Sync</div>
+        <div class="admin-page-sub">Fetches live odds from 40+ bookmakers via The Odds API. Calculates model vs market value gaps and writes them to your fixture cards. Run after the Soccer Engine to get value grades.</div>
+
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px;max-width:600px">
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            <strong style="color:var(--text)">What Odds Sync adds to each fixture:</strong><br>
+            ⚡ Best available odds across 40+ books · Best bookmaker per outcome<br>
+            📊 Fair implied probabilities (margin removed) · Market margin %<br>
+            🎯 Model edge = your prob minus market prob · EV% calculation<br>
+            🏆 Value grade A/B/C shown on fixture cards · Best value market flagged
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;max-width:600px">
+          <div class="form-group">
+            <label class="form-label">Date to sync</label>
+            <input class="form-input" id="odds-date" type="date">
+            <div style="font-size:10px;color:var(--dim);margin-top:4px">Leave blank for today</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Leagues</label>
+            <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px">
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-epl" checked style="accent-color:var(--mg)"> Premier League</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-bun" checked style="accent-color:var(--mg)"> Bundesliga</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-lla" style="accent-color:var(--mg)"> La Liga</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-ser" style="accent-color:var(--mg)"> Serie A</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-bel" checked style="accent-color:var(--mg)"> Belgian Pro League</label>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+          <button class="btn btn-green" onclick="runOddsSync()" id="odds-btn" style="padding:9px 22px;font-size:13px">⚡ Run Odds Sync →</button>
+          <span id="odds-status" style="font-size:12px;color:var(--muted)"></span>
+        </div>
+
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;max-width:600px">
+          <div style="font-size:10px;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px">API Usage</div>
+          <div id="odds-api-usage" style="font-size:12px;color:var(--muted)">Run sync to see usage</div>
+        </div>
+
+        <div id="odds-results" style="display:flex;flex-direction:column;gap:5px;max-width:600px"></div>
       </div>
 
       <!-- PUSH ALERTS -->
@@ -1667,6 +1766,40 @@ function renderFormPills(formStr) {
   }).join('');
 }
 
+// Renders last 5 results as rows.
+// resultsArr: [{result:'W',opponent:'Arsenal',score:'2-1',competition:'EPL'}, ...]
+// Falls back to W/D/L string chars if no structured data.
+function renderFormResults(formStr, resultsArr) {
+  if (resultsArr && Array.isArray(resultsArr) && resultsArr.length) {
+    return resultsArr.slice(0,5).map(g => {
+      const r = (g.result||'').toUpperCase();
+      const badgeColor = r==='W'?'var(--green)':r==='D'?'var(--amber)':'var(--red)';
+      const bgColor = r==='W'?'rgba(34,197,94,0.07)':r==='D'?'rgba(239,159,39,0.07)':'rgba(239,68,68,0.07)';
+      return `<div class="form-result-row" style="background:${bgColor};border:1px solid ${badgeColor}25">
+        <div class="form-result-badge ${r}" style="background:${badgeColor}">${r}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${g.opponent||'Opponent'}</div>
+          ${g.competition ? `<div style="font-size:9px;color:var(--dim)">${g.competition}</div>` : ''}
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:${badgeColor};flex-shrink:0">${g.score||'—'}</div>
+      </div>`;
+    }).join('');
+  }
+  // Fallback: just the W/D/L string
+  if (!formStr || formStr === '-----') return '<div style="font-size:10px;color:var(--dim);padding:4px 0">No data</div>';
+  const chars = formStr.replace(/[^WDLwdl]/g,'').toUpperCase().split('').slice(0,5);
+  if (!chars.length) return '<div style="font-size:10px;color:var(--dim);padding:4px 0">No data</div>';
+  return chars.map((r,i) => {
+    const badgeColor = r==='W'?'var(--green)':r==='D'?'var(--amber)':'var(--red)';
+    const bgColor = r==='W'?'rgba(34,197,94,0.07)':r==='D'?'rgba(239,159,39,0.07)':'rgba(239,68,68,0.07)';
+    return `<div class="form-result-row" style="background:${bgColor};border:1px solid ${badgeColor}25">
+      <div class="form-result-badge ${r}" style="background:${badgeColor}">${r}</div>
+      <div style="flex:1;font-size:11px;color:var(--muted)">Match ${i+1}</div>
+      <div style="font-size:10px;color:var(--dim);font-family:'DM Mono',monospace">score loading...</div>
+    </div>`;
+  }).join('');
+}
+
 function toggleLeague(id) {
   const header = document.getElementById('lh-' + id);
   const body   = document.getElementById('lb-' + id);
@@ -1721,25 +1854,186 @@ function renderLeagueAccordions(data, containerId) {
     const fixtureCards = fixtures.map((m, fi) => {
       const fid = leagueId + '_' + fi;
       const max = Math.max(m.home_pct||0, m.draw_pct||0, m.away_pct||0);
-      const signalType = m.trend_type || 'CONSENSUS';
-      const signalLabel = SIGNAL_LABELS[signalType] || 'Trend';
-      const signalColor = SIGNAL_COLORS[signalType] || 'var(--muted)';
+
+      // ── SUGGESTED BET ALGORITHM ──────────────────────────
+      const btts      = m.btts_pct || 0;
+      const h2hBtts   = m.btts_pct_h2h || 0;
+      const homeGoals = m.home_goals_avg || 0;
+      const awayGoals = m.away_goals_avg || 0;
+      const goalsAvg  = homeGoals + awayGoals;
+      const homePct   = m.home_pct || 0;
+      const awayPct   = m.away_pct || 0;
+      const over25    = m.over25_pct || 0;
+
+      const homeWins5 = (m.home_form_5||'').split('').filter(c=>c==='W').length;
+      const awayWins5 = (m.away_form_5||'').split('').filter(c=>c==='W').length;
+      const domPct    = Math.max(homePct, awayPct);
+      const domWins5  = homePct >= awayPct ? homeWins5 : awayWins5;
+      const domTeam   = homePct >= awayPct ? m.home_team : m.away_team;
+      const domGoals  = homePct >= awayPct ? homeGoals : awayGoals;
+
+      // ── ALGORITHM: score each market, no soft defaults ──────────
+      // BTTS gets bonus only when BOTH btts_pct AND h2h_btts are strong
+      const scores = {
+        WIN_FORM:   (domPct>=65 && domWins5>=4) ? 3 : (domPct>=70 && domWins5>=3) ? 2 : 0,
+        TEAM_GOALS: (domGoals>=2.8) ? 3 : (domGoals>=2.5 && domWins5>=3) ? 2 : 0,
+        BTTS:       (btts>=65 && h2hBtts>=55) ? 3 : (btts>=60 && h2hBtts>=50) ? 2 : (btts>=55) ? 1 : 0,
+        OVER_25:    (goalsAvg>=3.2 && over25>=65) ? 3 : (goalsAvg>=3.0 && over25>=60) ? 2 : 0,
+        HANDICAP:   (domPct>=72 && goalsAvg>=2.0 && domWins5>=4) ? 3 : (domPct>=70 && goalsAvg>=2.0) ? 2 : 0,
+        TWO_UP:     (domPct>=65 && domWins5>=4 && goalsAvg>=2.5) ? 3 : (domPct>=60 && domWins5>=4 && goalsAvg>=2.2) ? 2 : 0,
+      };
+      // Tie-break priority: WIN_FORM > OVER_25 > HANDICAP > TEAM_GOALS > TWO_UP > BTTS
+      const TIE_PRIORITY = ['WIN_FORM','OVER_25','HANDICAP','TEAM_GOALS','TWO_UP','BTTS'];
+      let bestMarket = null, bestScore = 0;
+      TIE_PRIORITY.forEach(k => {
+        if (scores[k] > bestScore) { bestScore = scores[k]; bestMarket = k; }
+        else if (scores[k] === bestScore && bestScore > 0 && bestMarket === null) { bestMarket = k; }
+      });
+      if (!bestMarket) bestMarket = 'CONSENSUS'; // only if all scores are 0
+
+      const BET_LABELS = {
+        BTTS:       'BTTS — Both Teams to Score',
+        WIN_FORM:   `${domTeam} to Win`,
+        HANDICAP:   `${domTeam} Asian Handicap`,
+        TEAM_GOALS: `${domTeam} Over 1.5 Goals`,
+        OVER_25:    'Over 2.5 Goals',
+        TWO_UP:     `${domTeam} 2-Up`,
+        CONSENSUS:  m.trend_signal || 'See full analysis',
+      };
+      const BET_COLORS = {
+        BTTS:'var(--green)', WIN_FORM:'var(--mg)', HANDICAP:'var(--amber)',
+        TEAM_GOALS:'var(--blue)', OVER_25:'var(--amber)', TWO_UP:'var(--purple)', CONSENSUS:'var(--muted)'
+      };
+      const suggestedLabel = BET_LABELS[bestMarket];
+      const suggestedColor = BET_COLORS[bestMarket];
+      const conf = m.confidence || Math.min(95, 50 + bestScore * 8);
+
+      // ── TIPSTER SOURCE PILLS ──────────────────────────────
+      let tipsterHTML = '';
+      const makePill = (src, tip) =>
+        `<div class="tipster-pill"><span class="tipster-name">${src}</span><span style="color:var(--dim);margin:0 3px">→</span><span class="tipster-tip">${tip}</span></div>`;
+
+      // Try structured tipster_sources first (object or array from DB)
+      if (m.tipster_sources) {
+        let pills = '';
+        try {
+          let ts = m.tipster_sources;
+          if (typeof ts === 'string') ts = JSON.parse(ts);
+          if (Array.isArray(ts)) {
+            pills = ts.map(t => makePill(t.source || t.name || 'Source', t.tip || t.pick || t.prediction || '')).join('');
+          } else if (typeof ts === 'object' && ts !== null) {
+            pills = Object.entries(ts).map(([src, tip]) => makePill(src, typeof tip === 'string' ? tip : JSON.stringify(tip))).join('');
+          }
+        } catch(e) {
+          pills = makePill('Sources', String(m.tipster_sources));
+        }
+        if (pills) tipsterHTML = `<div class="tipster-row">${pills}</div>`;
+      }
+
+      // Fall back to tipster_consensus text — parse known source names out of it
+      if (!tipsterHTML && m.tipster_consensus) {
+        const txt = m.tipster_consensus;
+        // Known tipster name patterns to look for in the text
+        const KNOWN_SOURCES = ['Forebet','WinDrawWin','Sportskeeda','TalkSport','PredictZ','Windrawwin','Betensured','FootyStats','SoccerWay','BettingExpert','Tips180'];
+        const found = KNOWN_SOURCES.filter(s => txt.toLowerCase().includes(s.toLowerCase()));
+        if (found.length >= 2) {
+          // Try to extract per-source tips from the text
+          const pills = found.map(src => {
+            // Look for patterns like "Forebet: BTTS" or "Forebet says BTTS"
+            const re = new RegExp(src + '[:\s]+([\w\s\.]+?)(?:\.|,|;|$)', 'i');
+            const m2 = txt.match(re);
+            const tip = m2 ? m2[1].trim() : 'See analysis';
+            return makePill(src, tip);
+          }).join('');
+          tipsterHTML = `<div class="tipster-row">${pills}</div>`;
+        } else {
+          // Just show the consensus text as a single pill
+          tipsterHTML = `<div class="tipster-row">${makePill('Tipster consensus', txt.length > 60 ? txt.slice(0,60)+'…' : txt)}</div>`;
+        }
+      }
+
+      // Last resort: show a "no sources loaded" indicator
+      if (!tipsterHTML) {
+        tipsterHTML = `<div class="tipster-row" style="opacity:0.5">${makePill('Sources', 'Not loaded — run predictions engine')}</div>`;
+      }
 
       return `
-        <div class="fixture-card" id="fc-${fid}" onclick="toggleFixture('${fid}')">
-          <div class="fixture-row">
-            <div class="fixture-teams">
-              <div class="fixture-home">${m.home_team}</div>
-              <div class="fixture-away">vs ${m.away_team}</div>
-              <div class="fixture-signal signal-${signalType}">${signalLabel}</div>
+        <div class="fixture-card" id="fc-${fid}">
+          <!-- Header row: Matchup + time + tap affordance -->
+          <div class="fixture-header-row" onclick="toggleFixture('${fid}')">
+            <div style="flex:1;min-width:0">
+              <div class="fixture-matchup">${m.home_team} vs ${m.away_team}</div>
+              <div style="font-size:10px;color:var(--dim);margin-top:2px">${m.match_time || m.match_date || ''} SAST · Tap for analysis</div>
             </div>
-            <div class="fixture-time">
-              <div>${m.match_time || m.match_date || ''}</div>
-              <div style="color:${signalColor};font-size:10px;font-family:'DM Mono',monospace;margin-top:3px">${m.confidence||0}% conf</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:10px">
+              ${m.value_grade ? `<span class="value-badge value-${m.value_grade}">${m.value_grade}</span>` : ''}
+              <div style="font-size:10px;font-weight:600;color:var(--green);font-family:'DM Mono',monospace">${conf}%</div>
+              <div style="width:26px;height:26px;border-radius:6px;background:var(--s3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px" class="fixture-chevron">▾</div>
             </div>
-            <div class="fixture-chevron">▾</div>
           </div>
+
+          <!-- Tipster source pills (always visible) -->
+          ${tipsterHTML}
+
+          <!-- Expandable detail (includes suggested bet) -->
           <div class="fixture-detail">
+            <!-- FanatIQ Suggested Bet -->
+            <div class="suggested-bet-block" style="border-bottom:1px solid var(--border);margin:-12px -14px 14px;padding:12px 14px">
+              <div>
+                <div class="sb-label">FanatIQ Suggested Bet</div>
+                <div class="sb-market" style="color:${suggestedColor}">${suggestedLabel}</div>
+              </div>
+              <div class="sb-conf-pill" style="background:${suggestedColor}20;color:${suggestedColor};border:1px solid ${suggestedColor}40">${conf}%</div>
+            </div>
+            <!-- ═══ VALUE / ODDS SECTION ═══ -->
+            ${(()=>{
+              const grade = m.value_grade;
+              const gradeColor = grade==='A'?'var(--green)':grade==='B'?'var(--amber)':grade==='C'?'var(--blue)':'var(--muted)';
+              const hasOdds = m.best_home_odds && m.best_home_odds > 1;
+
+              if (!hasOdds) return `<div style="font-size:10px;color:var(--dim);padding:6px 0;margin-bottom:10px;border-bottom:1px solid var(--border)">
+                ⚡ Run <strong style="color:var(--mg)">Odds Sync</strong> in admin to load live market odds and value gaps
+              </div>`;
+
+              // Best odds row
+              const oddsHTML = [
+                {label:'Home', odds:m.best_home_odds, book:m.best_home_book, edge:m.home_edge, isBest: m.value_market==='Home Win'},
+                {label:'Draw', odds:m.best_draw_odds, book:m.best_draw_book, edge:m.draw_edge, isBest: m.value_market==='Draw'},
+                {label:'Away', odds:m.best_away_odds, book:m.best_away_book, edge:m.away_edge, isBest: m.value_market==='Away Win'},
+              ].map(o => {
+                const edgePct = o.edge ? (o.edge*100).toFixed(1) : null;
+                const edgeStr = edgePct ? (o.edge>0?`+${edgePct}%`:` ${edgePct}%`) : '—';
+                const edgeCls = o.edge>0.02?'edge-pos':o.edge<-0.02?'edge-neg':'edge-zero';
+                return '<div class="odds-cell' + (o.isBest?' best-val':'') + '">'
+                  + '<div class="odds-label">' + o.label + '</div>'
+                  + '<div class="odds-price">' + (o.odds||'—') + '</div>'
+                  + '<div class="odds-book">' + (o.book||'') + '</div>'
+                  + '<div class="odds-edge ' + edgeCls + '">' + edgeStr + '</div>'
+                  + '</div>';
+              }).join('');
+
+              // Value callout box
+              let valueBoxHTML = '';
+              if (grade) {
+                const evPct = m.value_ev ? (m.value_ev*100).toFixed(1) : '—';
+                valueBoxHTML = '<div class="value-box value-box-'+grade+'">'
+                  + '<div class="value-box-label" style="color:'+gradeColor+'">⚡ Grade ' + grade + ' Value — ' + m.value_market + '</div>'
+                  + '<div class="value-box-market" style="color:'+gradeColor+'">' + (m.value_odds||'') + ' @ ' + (m.value_book||'Best available') + '</div>'
+                  + '<div class="value-box-detail">Model edge: +' + ((m.value_edge||0)*100).toFixed(1) + '% · Expected value: +' + evPct + '% · '+(m.bookmaker_count||0)+' books compared</div>'
+                  + '</div>';
+              } else {
+                valueBoxHTML = '<div style="padding:8px 10px;background:var(--s2);border-radius:8px;border:1px solid var(--border);font-size:11px;color:var(--dim);margin-bottom:10px">No significant value identified in current market prices</div>';
+              }
+
+              const marginNote = m.market_margin ? '<div class="market-margin">Market margin: '+m.market_margin+'%</div>' : '';
+
+              return '<div style="margin-bottom:12px">'
+                + valueBoxHTML
+                + '<div class="odds-row">' + oddsHTML + '</div>'
+                + marginNote
+                + '</div>';
+            })()}
+
             <!-- Win/Draw/Away bars -->
             <div class="detail-pct-bars">
               ${[['Home',m.home_pct,'var(--blue)'],['Draw',m.draw_pct,'var(--muted)'],['Away',m.away_pct,'var(--mg)']].map(([label,pct,color]) => `
@@ -1751,36 +2045,60 @@ function renderLeagueAccordions(data, containerId) {
             </div>
             <!-- Stats row -->
             <div class="detail-stats-row">
-              <div class="detail-stat"><div class="detail-stat-label">BTTS</div><div class="detail-stat-val" style="color:${(m.btts_pct||0)>=60?'var(--green)':'var(--text)'}">${m.btts_pct||0}%</div></div>
-              <div class="detail-stat"><div class="detail-stat-label">H2H BTTS</div><div class="detail-stat-val" style="color:${(m.btts_pct_h2h||0)>=60?'var(--green)':'var(--text)'}">${m.btts_pct_h2h||0}%</div></div>
-              <div class="detail-stat"><div class="detail-stat-label">Avg Goals</div><div class="detail-stat-val">${((m.home_goals_avg||0)+(m.away_goals_avg||0)).toFixed(1)}</div></div>
-              <div class="detail-stat"><div class="detail-stat-label">Over 2.5</div><div class="detail-stat-val">${m.over25_pct||0}%</div></div>
+              <div class="detail-stat"><div class="detail-stat-label">BTTS</div><div class="detail-stat-val" style="color:${btts>=60?'var(--green)':'var(--text)'}">${btts}%</div></div>
+              <div class="detail-stat"><div class="detail-stat-label">H2H BTTS</div><div class="detail-stat-val" style="color:${h2hBtts>=60?'var(--green)':'var(--text)'}">${h2hBtts}%</div></div>
+              <div class="detail-stat"><div class="detail-stat-label">Avg Goals</div><div class="detail-stat-val">${goalsAvg.toFixed(1)}</div></div>
+              <div class="detail-stat"><div class="detail-stat-label">Over 2.5</div><div class="detail-stat-val">${over25}%</div></div>
             </div>
-            <!-- Form -->
+            <!-- Form: home full width, then away full width -->
             <div class="detail-form-row">
               <div class="detail-form-block">
-                <div class="detail-form-title">Home form</div>
-                <div class="detail-form-team">${m.home_team} · ${m.home_goals_avg||0} goals/game</div>
-                <div class="form-pills" style="margin-bottom:6px">${renderFormPills(m.home_form_5)}</div>
-                ${m.home_form_10 ? `<div style="font-size:9px;color:var(--dim);margin-bottom:3px">Last 10</div><div class="form-pills">${renderFormPills(m.home_form_10)}</div>` : ''}
+                <div class="detail-form-title">
+                  <span>${m.home_team} — Last 5</span>
+                  <span style="color:var(--green);font-size:9px">${homeGoals} goals/game avg</span>
+                </div>
+                ${renderFormResults(m.home_form_5, m.home_form_results)}
               </div>
               <div class="detail-form-block">
-                <div class="detail-form-title">Away form</div>
-                <div class="detail-form-team">${m.away_team} · ${m.away_goals_avg||0} goals/game</div>
-                <div class="form-pills" style="margin-bottom:6px">${renderFormPills(m.away_form_5)}</div>
-                ${m.away_form_10 ? `<div style="font-size:9px;color:var(--dim);margin-bottom:3px">Last 10</div><div class="form-pills">${renderFormPills(m.away_form_10)}</div>` : ''}
+                <div class="detail-form-title">
+                  <span>${m.away_team} — Last 5</span>
+                  <span style="color:var(--mg);font-size:9px">${awayGoals} goals/game avg</span>
+                </div>
+                ${renderFormResults(m.away_form_5, m.away_form_results)}
               </div>
             </div>
-            <!-- H2H -->
+            <!-- H2H: each result as its own row -->
             ${m.h2h_last5 && m.h2h_last5 !== 'No H2H data' ? `
             <div class="detail-h2h">
-              <div class="detail-h2h-title">Head to head · Last 5</div>
-              <div class="detail-h2h-results">${m.h2h_last5}</div>
+              <div class="detail-h2h-title">Head to Head — Last 5 meetings</div>
+              ${(()=>{
+                // h2h_last5 is a pipe-separated string like "Charleroi 2-1 Westerlo | Westerlo 0-1 Charleroi | ..."
+                const raw = m.h2h_last5 || '';
+                const matches = raw.split('|').map(s=>s.trim()).filter(Boolean);
+                if (!matches.length) return '<div style="font-size:11px;color:var(--muted)">'+raw+'</div>';
+                return matches.map(match => {
+                  // Try to parse "Team1 X-Y Team2" or "Team1 X-X Team2"
+                  const scoreMatch = match.match(/^(.+?)\s+(\d+[-–]\d+)\s+(.+)$/);
+                  if (scoreMatch) {
+                    const [,home,score,away] = scoreMatch;
+                    const [g1,g2] = score.split(/[-–]/).map(Number);
+                    const homeWon = g1 > g2, draw = g1 === g2;
+                    const homeColor = homeWon?'var(--green)':draw?'var(--amber)':'var(--muted)';
+                    const awayColor = g2 > g1?'var(--mg)':draw?'var(--amber)':'var(--muted)';
+                    return '<div class="detail-h2h-row">'
+                      + '<div class="detail-h2h-team" style="text-align:right;color:'+homeColor+';font-weight:'+(homeWon?'600':'400')+'">' + home.trim() + '</div>'
+                      + '<div class="detail-h2h-score">' + score + '</div>'
+                      + '<div class="detail-h2h-team" style="color:'+awayColor+';font-weight:'+(g2>g1?'600':'400')+'">' + away.trim() + '</div>'
+                      + '</div>';
+                  }
+                  return '<div class="detail-h2h-row"><div style="font-size:11px;color:var(--muted);flex:1">' + match + '</div></div>';
+                }).join('');
+              })()}
             </div>` : ''}
-            <!-- FanatIQ Trend Signal -->
-            <div class="detail-signal-box" style="background:rgba(0,0,0,0.2);border-color:${signalColor}">
-              <strong style="color:${signalColor}">FanatIQ Trend — ${signalLabel}</strong>
-              ${m.trend_signal || m.prediction || 'Analysing...'}
+            <!-- Algorithm breakdown -->
+            <div class="detail-signal-box" style="background:rgba(0,0,0,0.2);border-color:${suggestedColor}">
+              <strong style="color:${suggestedColor}">FanatIQ Analysis</strong>
+              ${m.trend_signal || m.prediction || `Scored across 6 markets. Top signal: ${SIGNAL_LABELS[bestMarket]||'Consensus'} (${bestScore} pts).`}
             </div>
           </div>
         </div>`;
@@ -2073,6 +2391,10 @@ function switchAdmin(panel, el) {
   if (panel === 'analytics') renderAnalytics(allBets);
   if (panel === 'reorder') loadReorderList('racing', document.querySelector('#panel-reorder .inner-tab'));
   if (panel === 'push') loadPushSubCount();
+  if (panel === 'odds') {
+    const d = document.getElementById('odds-date');
+    if (d && !d.value) d.value = new Date().toISOString().split('T')[0];
+  }
   if (panel === 'predictions') {
     // Pre-fill this weekend's dates
     const today = new Date();
@@ -2532,7 +2854,7 @@ async function runPredictionsEngine() {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-secret': adminPw },
-        body: JSON.stringify({ leagues, dates })
+        body: JSON.stringify({ leagues, dates, include_form_results: true, include_tipster_sources: true })
       }
     );
     const data = await res.json();
@@ -2563,6 +2885,102 @@ async function runPredictionsEngine() {
   }
 
   btn.textContent = 'Run Predictions Engine →'; btn.disabled = false;
+}
+
+// ═══════════════════════════════════════════════
+// ODDS SYNC
+// ═══════════════════════════════════════════════
+async function runOddsSync() {
+  const btn = document.getElementById('odds-btn');
+  const status = document.getElementById('odds-status');
+  const resultsEl = document.getElementById('odds-results');
+  const usageEl = document.getElementById('odds-api-usage');
+
+  const date = document.getElementById('odds-date')?.value || new Date().toISOString().split('T')[0];
+
+  const leagueMap = {
+    'odds-lg-epl': 'English Premier League',
+    'odds-lg-bun': 'German Bundesliga',
+    'odds-lg-lla': 'Spanish La Liga',
+    'odds-lg-ser': 'Italian Serie A',
+    'odds-lg-bel': 'Belgian Jupiler Pro League',
+  };
+  const leagues = Object.entries(leagueMap)
+    .filter(([id]) => document.getElementById(id)?.checked)
+    .map(([,name]) => name);
+
+  if (!leagues.length) { showToast('Select at least one league', 'error'); return; }
+
+  btn.textContent = '⏳ Syncing odds...'; btn.disabled = true;
+  status.textContent = `Fetching odds for ${leagues.length} leagues on ${date}...`;
+  resultsEl.innerHTML = '';
+
+  try {
+    const res = await fetch(SB_URL + '/functions/v1/odds-fetcher', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-secret': adminPw,
+      },
+      body: JSON.stringify({ leagues, date }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || 'Odds sync failed');
+
+    status.textContent = `✓ ${data.updated} fixtures updated`;
+    if (usageEl) usageEl.textContent = `${data.requests_used} API requests used this run`;
+
+    showToast(`⚡ Odds synced — ${data.updated} fixtures updated`, 'success');
+
+    if (data.results?.length) {
+      resultsEl.innerHTML = data.results.map(r => {
+        const isValue = r.includes('[') && r.includes('VALUE');
+        return `<div style="font-size:11px;padding:5px 10px;border-radius:6px;font-family:'DM Mono',monospace;${
+          isValue
+            ? 'background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2)'
+            : 'background:var(--s2);color:var(--muted)'
+        }">${r}</div>`;
+      }).join('');
+    }
+
+    if (data.errors?.length) {
+      resultsEl.innerHTML += data.errors.map(e =>
+        `<div style="font-size:11px;color:var(--red);padding:5px 10px;background:var(--red-dim);border-radius:6px">${e}</div>`
+      ).join('');
+    }
+
+    // Reload trends so subscriber view updates
+    await loadTrends();
+
+  } catch(e) {
+    status.textContent = 'Error: ' + e.message;
+    showToast('Odds sync failed: ' + e.message, 'error');
+  }
+
+  btn.textContent = '⚡ Run Odds Sync →'; btn.disabled = false;
+}
+
+// Helper: update a specific market_trends row with structured tipster sources
+// Called from console: updateTipsterSources('fixture-uuid', {Forebet:'BTTS Yes', WinDrawWin:'Over 2.5'})
+async function updateTipsterSources(rowId, sourcesObj) {
+  if (!sb) { console.error('Supabase not ready'); return; }
+  const { error } = await sb.from('market_trends').update({ tipster_sources: sourcesObj }).eq('id', rowId);
+  if (error) console.error('Update failed:', error);
+  else { console.log('✓ tipster_sources updated'); await loadTrends(); }
+}
+
+// Helper: update form results for a fixture row
+// formResultsArr: [{result:'W',opponent:'Arsenal',score:'2-1',competition:'EPL'}, ...]
+async function updateFormResults(rowId, homeResults, awayResults) {
+  if (!sb) { console.error('Supabase not ready'); return; }
+  const { error } = await sb.from('market_trends').update({
+    home_form_results: homeResults,
+    away_form_results: awayResults
+  }).eq('id', rowId);
+  if (error) console.error('Update failed:', error);
+  else { console.log('✓ form results updated'); await loadTrends(); }
 }
 
 async function clearOldTrends() {
@@ -2970,7 +3388,14 @@ async function sendIQMessage() {
 
     const res = await fetch(
       'https://nzxjbzgxdokbppchattt.supabase.co/functions/v1/iq-chat',
-      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages }) }
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SB_KEY
+        },
+        body: JSON.stringify({ messages })
+      }
     );
     const data = await res.json();
     const reply = data.reply || 'Sorry, I could not process that. Try again.';
