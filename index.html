@@ -381,6 +381,94 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+
+/* ─── LEAGUE ACCORDION ─── */
+.league-accordion{margin-bottom:10px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.league-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--s1);cursor:pointer;transition:background .15s;user-select:none}
+.league-header:hover{background:var(--s2)}
+.league-header.open{background:var(--s2);border-bottom:1px solid var(--border)}
+.league-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.league-count{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--s3);color:var(--muted)}
+.league-count.has-tips{background:var(--green-dim);color:var(--green)}
+.league-chevron{color:var(--dim);transition:transform .2s;font-size:12px}
+.league-header.open .league-chevron{transform:rotate(180deg)}
+.league-body{display:none;background:var(--s1)}
+.league-body.open{display:block}
+
+/* ─── FIXTURE CARD ─── */
+.fixture-card{border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.fixture-card:last-child{border-bottom:none}
+.fixture-card:hover{background:var(--s2)}
+.fixture-row{display:flex;align-items:center;padding:11px 16px;gap:10px}
+.fixture-teams{flex:1;min-width:0}
+.fixture-home{font-size:13px;font-weight:500;color:var(--text)}
+.fixture-away{font-size:12px;color:var(--muted);margin-top:1px}
+.fixture-time{font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;white-space:nowrap;text-align:right}
+.fixture-signal{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px;width:fit-content}
+.signal-BTTS{background:rgba(34,197,94,0.15);color:var(--green)}
+.signal-WIN_FORM{background:var(--mg-dim);color:var(--mg)}
+.signal-HANDICAP{background:var(--amber-dim);color:var(--amber)}
+.signal-TEAM_GOALS{background:var(--blue-dim);color:var(--blue)}
+.signal-TWO_UP{background:var(--purple-dim);color:var(--purple)}
+.signal-OVER_25{background:rgba(239,159,39,0.12);color:var(--amber)}
+.signal-CONSENSUS{background:var(--s3);color:var(--muted)}
+.fixture-chevron{color:var(--dim);font-size:11px;flex-shrink:0;transition:transform .2s}
+.fixture-card.open .fixture-chevron{transform:rotate(180deg)}
+
+/* ─── FIXTURE DETAIL ─── */
+.fixture-detail{display:none;padding:14px 16px;background:var(--s2);border-top:1px solid var(--border)}
+.fixture-card.open .fixture-detail{display:block}
+.detail-pct-bars{display:flex;gap:6px;margin-bottom:12px}
+.pct-bar-item{flex:1;text-align:center}
+.pct-bar-label{font-size:9px;color:var(--muted);margin-bottom:4px}
+.pct-bar-track{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:3px}
+.pct-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+.pct-bar-pct{font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+.detail-form-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.detail-form-block{flex:1;min-width:140px;background:var(--s1);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+.detail-form-title{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.detail-form-team{font-size:11px;font-weight:600;color:var(--text);margin-bottom:5px}
+.form-pills{display:flex;gap:3px;flex-wrap:wrap}
+.fp{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.fp-W{background:var(--green-dim);color:var(--green)}
+.fp-D{background:var(--amber-dim);color:var(--amber)}
+.fp-L{background:var(--red-dim);color:var(--red)}
+.fp-x{background:var(--s3);color:var(--dim)}
+.detail-h2h{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.detail-h2h-title{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.detail-h2h-results{font-size:11px;color:var(--muted);line-height:1.7;font-family:'DM Mono',monospace}
+.detail-stats-row{display:flex;gap:8px;margin-bottom:10px}
+.detail-stat{flex:1;background:var(--s1);border-radius:8px;padding:8px 10px;text-align:center;border:1px solid var(--border)}
+.detail-stat-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.detail-stat-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:500}
+.detail-signal-box{padding:10px 12px;border-radius:8px;border-left:3px solid;font-size:12px;line-height:1.7;color:var(--muted)}
+.detail-signal-box strong{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px}
+
+/* ─── FANATIQ IQ CHATBOT ─── */
+.iq-bubble{position:fixed;bottom:76px;right:14px;z-index:450;display:none}
+.iq-bubble-btn{width:48px;height:48px;border-radius:50%;background:var(--mg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(233,30,140,0.4);transition:transform .2s}
+.iq-bubble-btn:hover{transform:scale(1.08)}
+.iq-bubble-badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;border-radius:50%;background:var(--green);border:2px solid var(--black);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#000}
+.iq-chat-window{position:fixed;bottom:132px;right:14px;width:320px;max-height:460px;background:var(--s1);border:1px solid var(--border2);border-radius:16px;z-index:451;display:none;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.6)}
+.iq-chat-window.open{display:flex}
+@media(max-width:380px){.iq-chat-window{width:calc(100vw - 28px);right:14px}}
+.iq-chat-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--s2)}
+.iq-chat-avatar{width:32px;height:32px;border-radius:50%;background:var(--mg-dim);border:1px solid var(--mg-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.iq-chat-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex:1}
+.iq-chat-subtitle{font-size:10px;color:var(--muted)}
+.iq-close-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px}
+.iq-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.iq-msg{max-width:85%;padding:9px 12px;border-radius:10px;font-size:12px;line-height:1.6}
+.iq-msg-user{background:var(--mg-dim);border:1px solid var(--mg-border);color:var(--text);align-self:flex-end;border-radius:10px 10px 2px 10px}
+.iq-msg-bot{background:var(--s2);border:1px solid var(--border);color:var(--text);align-self:flex-start;border-radius:10px 10px 10px 2px}
+.iq-msg-typing{opacity:.6;font-style:italic}
+.iq-input-row{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border);background:var(--s2)}
+.iq-input{flex:1;background:var(--s3);border:1px solid var(--border2);border-radius:8px;padding:8px 11px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.iq-input:focus{border-color:var(--mg-border)}
+.iq-input::placeholder{color:var(--dim)}
+.iq-send-btn{width:32px;height:32px;border-radius:8px;background:var(--mg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.iq-send-btn:hover{background:var(--mg2)}
+.iq-login-prompt{padding:20px;text-align:center;color:var(--muted);font-size:12px;line-height:1.7}
 </style>
 </head>
 <body>
@@ -1001,7 +1089,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
             <input class="form-input" id="pred-date1" type="date" style="margin-bottom:6px">
             <input class="form-input" id="pred-date2" type="date" style="margin-bottom:6px">
             <input class="form-input" id="pred-date3" type="date">
-            <div style="font-size:10px;color:var(--dim);margin-top:6px">Add up to 3 dates — typically Fri/Sat/Sun for a full weekend card</div>
+            <div style="font-size:10px;color:var(--dim);margin-top:6px">Fri/Sat/Sun for a full weekend card. Leave blank to use today.</div>
           </div>
         </div>
         <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;max-width:600px">
@@ -1199,6 +1287,47 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
       <button class="btn btn-mg btn-full" style="padding:12px;margin-bottom:12px" onclick="loginMember()">Log In →</button>
       <div style="text-align:center;font-size:11px;color:var(--dim)">No account? <span style="color:var(--mg);cursor:pointer" onclick="closeModal('login-modal');openSignupModal()">Sign up free</span></div>
     </div>
+  </div>
+</div>
+
+
+<!-- ══════ FANATIQ IQ CHATBOT ══════ -->
+<div class="iq-bubble" id="iq-bubble">
+  <button class="iq-bubble-btn" onclick="toggleIQChat()">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <path d="M11 2C6.03 2 2 5.58 2 10c0 2.1.9 4 2.4 5.4L3 19l3.8-1.2C8.1 18.6 9.5 19 11 19c4.97 0 9-3.58 9-8s-4.03-8-9-8z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M7 10h.01M11 10h.01M15 10h.01" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <div class="iq-bubble-badge">IQ</div>
+</div>
+
+<div class="iq-chat-window" id="iq-chat-window">
+  <div class="iq-chat-header">
+    <div class="iq-chat-avatar">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 15L9 3l7 12" stroke="#E91E8C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 11h9" stroke="#E91E8C" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <div style="flex:1">
+      <div class="iq-chat-title">FanatIQ <em style="color:var(--mg);font-style:normal">IQ</em></div>
+      <div class="iq-chat-subtitle">Betting intelligence assistant</div>
+    </div>
+    <button class="iq-close-btn" onclick="toggleIQChat()">×</button>
+  </div>
+  <div id="iq-messages" class="iq-messages">
+    <!-- Login prompt for guests -->
+    <div class="iq-login-prompt" id="iq-login-prompt">
+      <div style="font-size:24px;margin-bottom:8px">🔒</div>
+      <div style="font-weight:500;color:var(--text);margin-bottom:6px">Members only</div>
+      Sign up or log in to access the FanatIQ IQ assistant. Ask about betting markets, form, trends and more.
+      <br><br>
+      <button class="btn btn-mg btn-sm" style="margin:0 auto" onclick="toggleIQChat();openSignupModal()">Sign Up Free →</button>
+    </div>
+  </div>
+  <div id="iq-input-wrap" class="iq-input-row" style="display:none">
+    <input class="iq-input" id="iq-input" placeholder="Ask about markets, form, trends..." onkeydown="if(event.key==='Enter')sendIQMessage()">
+    <button class="iq-send-btn" onclick="sendIQMessage()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
   </div>
 </div>
 
@@ -1456,7 +1585,11 @@ function renderSoccerPage() {
   if (!feedEl) return;
 
   if (tab === 'trends') {
-    loadTrendsIntoFeed(feedEl);
+    if (!sb) { feedEl.innerHTML = '<div style="padding:20px;color:var(--muted)">Connecting...</div>'; return; }
+    feedEl.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:12px">Loading league data...</div>';
+    sb.from('market_trends').select('*').eq('sport','soccer').order('league').order('match_time').limit(200).then(({data}) => {
+      renderLeagueAccordions(data, 'soccer-feed');
+    });
   } else if (tab === 'tips') {
     const tips = bets.filter(b => !b.id?.includes('ACCA'));
     feedEl.innerHTML = tips.length ? tips.map((b,i) => renderBetCard(b,i)).join('') : renderEmptyState('soccer');
@@ -1476,54 +1609,218 @@ function switchSoccerTab(tab, el) {
 // ═══════════════════════════════════════════════
 // MARKET TRENDS
 // ═══════════════════════════════════════════════
-async function loadTrends() {
+// ─── LEAGUE ACCORDION SYSTEM ─────────────────────
+const LEAGUE_FLAGS = {
+  'Belgian Jupiler Pro League': '🇧🇪',
+  'English Premier League':     '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  'French Ligue 1':             '🇫🇷',
+  'German Bundesliga':          '🇩🇪',
+  'German 2. Bundesliga':       '🇩🇪',
+  'Italian Serie A':            '🇮🇹',
+  'Netherlands Eredivisie':     '🇳🇱',
+  'Portugal Liga Portugal':     '🇵🇹',
+  'Spanish La Liga':            '🇪🇸',
+  'Turkish Super Lig':          '🇹🇷',
+};
+
+const SIGNAL_LABELS = {
+  BTTS:       'BTTS',
+  WIN_FORM:   'Win Form',
+  HANDICAP:   'Handicap',
+  TEAM_GOALS: 'Goals',
+  TWO_UP:     '2-Up',
+  OVER_25:    'Over 2.5',
+  CONSENSUS:  'Trend',
+};
+
+const SIGNAL_COLORS = {
+  BTTS:       'var(--green)',
+  WIN_FORM:   'var(--mg)',
+  HANDICAP:   'var(--amber)',
+  TEAM_GOALS: 'var(--blue)',
+  TWO_UP:     'var(--purple)',
+  OVER_25:    'var(--amber)',
+  CONSENSUS:  'var(--muted)',
+};
+
+function renderFormPills(formStr) {
+  if (!formStr || formStr === '-----') return '<span style="color:var(--dim);font-size:10px">No data</span>';
+  return formStr.split('').slice(0,10).map(c => {
+    const cls = c==='W'?'fp-W':c==='D'?'fp-D':c==='L'?'fp-L':'fp-x';
+    return `<div class="fp ${cls}">${c}</div>`;
+  }).join('');
+}
+
+function toggleLeague(id) {
+  const header = document.getElementById('lh-' + id);
+  const body   = document.getElementById('lb-' + id);
+  if (!header || !body) return;
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+function toggleFixture(id) {
+  const card = document.getElementById('fc-' + id);
+  if (!card) return;
+  card.classList.toggle('open');
+}
+
+function renderLeagueAccordions(data, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (!data || !data.length) {
+    container.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:12px">
+      <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px">No market trends yet</div>
+      Tell me "run soccer predictions for today" and I will pull all 10 leagues from Flashscore and API-Football instantly.
+    </div>`;
+    return;
+  }
+
+  // Group by league
+  const byLeague = {};
+  data.forEach(m => {
+    const l = m.league || 'Other';
+    if (!byLeague[l]) byLeague[l] = [];
+    byLeague[l].push(m);
+  });
+
+  const leagueOrder = [
+    'Belgian Jupiler Pro League','English Premier League','French Ligue 1',
+    'German Bundesliga','German 2. Bundesliga','Italian Serie A',
+    'Netherlands Eredivisie','Portugal Liga Portugal','Spanish La Liga','Turkish Super Lig'
+  ];
+
+  const sorted = Object.keys(byLeague).sort((a,b) => {
+    const ai = leagueOrder.indexOf(a); const bi = leagueOrder.indexOf(b);
+    if (ai === -1 && bi === -1) return 0;
+    if (ai === -1) return 1; if (bi === -1) return -1;
+    return ai - bi;
+  });
+
+  container.innerHTML = sorted.map(league => {
+    const fixtures = byLeague[league];
+    const flag = LEAGUE_FLAGS[league] || '⚽';
+    const leagueId = league.replace(/\s+/g, '_');
+
+    const fixtureCards = fixtures.map((m, fi) => {
+      const fid = leagueId + '_' + fi;
+      const max = Math.max(m.home_pct||0, m.draw_pct||0, m.away_pct||0);
+      const signalType = m.trend_type || 'CONSENSUS';
+      const signalLabel = SIGNAL_LABELS[signalType] || 'Trend';
+      const signalColor = SIGNAL_COLORS[signalType] || 'var(--muted)';
+
+      return `
+        <div class="fixture-card" id="fc-${fid}" onclick="toggleFixture('${fid}')">
+          <div class="fixture-row">
+            <div class="fixture-teams">
+              <div class="fixture-home">${m.home_team}</div>
+              <div class="fixture-away">vs ${m.away_team}</div>
+              <div class="fixture-signal signal-${signalType}">${signalLabel}</div>
+            </div>
+            <div class="fixture-time">
+              <div>${m.match_time || m.match_date || ''}</div>
+              <div style="color:${signalColor};font-size:10px;font-family:'DM Mono',monospace;margin-top:3px">${m.confidence||0}% conf</div>
+            </div>
+            <div class="fixture-chevron">▾</div>
+          </div>
+          <div class="fixture-detail">
+            <!-- Win/Draw/Away bars -->
+            <div class="detail-pct-bars">
+              ${[['Home',m.home_pct,'var(--blue)'],['Draw',m.draw_pct,'var(--muted)'],['Away',m.away_pct,'var(--mg)']].map(([label,pct,color]) => `
+                <div class="pct-bar-item">
+                  <div class="pct-bar-label">${label}</div>
+                  <div class="pct-bar-track"><div class="pct-bar-fill" style="width:${pct||0}%;background:${(pct||0)===max?color:'var(--s4)'}"></div></div>
+                  <div class="pct-bar-pct" style="color:${(pct||0)===max?color:'var(--muted)'}">${pct||0}%</div>
+                </div>`).join('')}
+            </div>
+            <!-- Stats row -->
+            <div class="detail-stats-row">
+              <div class="detail-stat"><div class="detail-stat-label">BTTS</div><div class="detail-stat-val" style="color:${(m.btts_pct||0)>=60?'var(--green)':'var(--text)'}">${m.btts_pct||0}%</div></div>
+              <div class="detail-stat"><div class="detail-stat-label">H2H BTTS</div><div class="detail-stat-val" style="color:${(m.btts_pct_h2h||0)>=60?'var(--green)':'var(--text)'}">${m.btts_pct_h2h||0}%</div></div>
+              <div class="detail-stat"><div class="detail-stat-label">Avg Goals</div><div class="detail-stat-val">${((m.home_goals_avg||0)+(m.away_goals_avg||0)).toFixed(1)}</div></div>
+              <div class="detail-stat"><div class="detail-stat-label">Over 2.5</div><div class="detail-stat-val">${m.over25_pct||0}%</div></div>
+            </div>
+            <!-- Form -->
+            <div class="detail-form-row">
+              <div class="detail-form-block">
+                <div class="detail-form-title">Home form</div>
+                <div class="detail-form-team">${m.home_team} · ${m.home_goals_avg||0} goals/game</div>
+                <div class="form-pills" style="margin-bottom:6px">${renderFormPills(m.home_form_5)}</div>
+                ${m.home_form_10 ? `<div style="font-size:9px;color:var(--dim);margin-bottom:3px">Last 10</div><div class="form-pills">${renderFormPills(m.home_form_10)}</div>` : ''}
+              </div>
+              <div class="detail-form-block">
+                <div class="detail-form-title">Away form</div>
+                <div class="detail-form-team">${m.away_team} · ${m.away_goals_avg||0} goals/game</div>
+                <div class="form-pills" style="margin-bottom:6px">${renderFormPills(m.away_form_5)}</div>
+                ${m.away_form_10 ? `<div style="font-size:9px;color:var(--dim);margin-bottom:3px">Last 10</div><div class="form-pills">${renderFormPills(m.away_form_10)}</div>` : ''}
+              </div>
+            </div>
+            <!-- H2H -->
+            ${m.h2h_last5 && m.h2h_last5 !== 'No H2H data' ? `
+            <div class="detail-h2h">
+              <div class="detail-h2h-title">Head to head · Last 5</div>
+              <div class="detail-h2h-results">${m.h2h_last5}</div>
+            </div>` : ''}
+            <!-- FanatIQ Trend Signal -->
+            <div class="detail-signal-box" style="background:rgba(0,0,0,0.2);border-color:${signalColor}">
+              <strong style="color:${signalColor}">FanatIQ Trend — ${signalLabel}</strong>
+              ${m.trend_signal || m.prediction || 'Analysing...'}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="league-accordion">
+        <div class="league-header" id="lh-${leagueId}" onclick="toggleLeague('${leagueId}')">
+          <div class="league-name">
+            <span>${flag}</span>
+            <span>${league}</span>
+            <span class="league-count has-tips">${fixtures.length} fixture${fixtures.length!==1?'s':''}</span>
+          </div>
+          <div class="league-chevron">▾</div>
+        </div>
+        <div class="league-body" id="lb-${leagueId}">
+          ${fixtureCards}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function loadTrends(date) {
   if (!sb) return;
-  const { data } = await sb.from('market_trends').select('*').order('created_at',{ascending:false}).limit(20);
-  const feed = document.getElementById('trends-feed');
-  if (!feed) return;
-  if (!data || !data.length) return; // Keep placeholder message
-  feed.innerHTML = data.map(m => renderTrendCard(m)).join('');
+  const targetDate = date || new Date().toISOString().split('T')[0];
+  let query = sb.from('market_trends').select('*').eq('sport','soccer').order('league').order('match_time');
+  if (date) query = query.eq('match_date', date);
+  const { data } = await query.limit(200);
+
+  // Home page compact
+  const homeFeed = document.getElementById('trends-feed');
+  if (homeFeed) {
+    if (!data?.length) return;
+    // Show league names as compact pills on home
+    const byLeague = {};
+    (data||[]).forEach(m => { if (!byLeague[m.league]) byLeague[m.league]=[]; byLeague[m.league].push(m); });
+    homeFeed.innerHTML = `<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Click Soccer to see full fixture breakdowns per league.</div>` +
+      Object.entries(byLeague).slice(0,5).map(([league, fixtures]) => `
+        <div onclick="goPage('soccer')" style="cursor:pointer;background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;transition:border-color .15s" onmouseover="this.style.borderColor='var(--border2)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:16px">${LEAGUE_FLAGS[league]||'⚽'}</span>
+            <div>
+              <div style="font-size:12px;font-weight:500">${league}</div>
+              <div style="font-size:10px;color:var(--muted)">${fixtures.length} fixtures</div>
+            </div>
+          </div>
+          <div style="font-size:10px;color:var(--mg)">View →</div>
+        </div>`).join('');
+  }
 }
 
 function loadTrendsIntoFeed(feedEl) {
   if (!sb) return;
-  sb.from('market_trends').select('*').order('created_at',{ascending:false}).limit(10).then(({data}) => {
-    if (!data || !data.length) {
-      feedEl.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:12px">No market trends yet. Prompt me to generate this weekend's predictions.</div>`;
-      return;
-    }
-    feedEl.innerHTML = data.map(m => renderTrendCard(m)).join('');
+  sb.from('market_trends').select('*').eq('sport','soccer').order('league').order('match_time').limit(200).then(({data}) => {
+    renderLeagueAccordions(data, feedEl.id || 'soccer-feed');
   });
-}
-
-function renderTrendCard(m) {
-  const max = Math.max(m.home_pct||0, m.draw_pct||0, m.away_pct||0);
-  const confClass = m.confidence >= 70 ? 'conf-high' : m.confidence >= 50 ? 'conf-med' : 'conf-low';
-  return `
-    <div class="trend-card">
-      <div class="trend-header">
-        <div>
-          <div class="trend-teams">${m.home_team||'Home'} vs ${m.away_team||'Away'}</div>
-          <div class="trend-league">${m.league||''} · ${m.match_time||m.match_date||''}</div>
-        </div>
-        <div class="trend-conf ${confClass}">${m.confidence||0}% consensus</div>
-      </div>
-      <div class="trend-body">
-        <div class="trend-bars">
-          ${[['Home',m.home_pct,'var(--blue)'],['Draw',m.draw_pct,'var(--muted)'],['Away',m.away_pct,'var(--mg)']].map(([label,pct,color]) => `
-            <div class="trend-bar-item">
-              <div class="trend-bar-label">${label}</div>
-              <div class="trend-bar-track"><div class="trend-bar-fill" style="width:${pct||0}%;background:${color}"></div></div>
-              <div class="trend-bar-pct" style="color:${(pct||0)===max?color:'var(--muted)'}">${pct||0}%</div>
-            </div>`).join('')}
-        </div>
-        <div class="trend-prediction"><strong style="color:var(--text)">Prediction:</strong> ${m.prediction||'—'}</div>
-        <div class="trend-extras">
-          ${m.btts_pct ? `<span class="trend-extra-pill">BTTS ${m.btts_pct}%</span>` : ''}
-          ${m.over25_pct ? `<span class="trend-extra-pill">O2.5 ${m.over25_pct}%</span>` : ''}
-        </div>
-      </div>
-    </div>`;
 }
 
 // ═══════════════════════════════════════════════
@@ -2475,6 +2772,7 @@ function updateProfileNav() {
     icon.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M4 19c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
     profileBtn.querySelector('.mnav-label').textContent = 'Profile';
   }
+  updateIQBubble();
 }
 
 function renderProfilePage() {
@@ -2560,7 +2858,124 @@ goPage = function(page, navEl) {
 if (currentMember) {
   setTimeout(() => {
     updateProfileNav();
+    updateIQBubble();
   }, 100);
+}
+
+
+// ═══════════════════════════════════════════════
+// FANATIQ IQ CHATBOT
+// ═══════════════════════════════════════════════
+let iqChatOpen = false;
+let iqMessages = [];
+const IQ_SYSTEM_PROMPT = `You are FanatIQ IQ, the AI betting intelligence assistant for FanatIQ.tips — a premium sports intelligence platform focused on data-driven predictions for horse racing, soccer, golf, and MMA/UFC in South Africa and globally.
+
+You help members understand:
+- Betting markets: BTTS, handicap, Asian handicap, 2-Up, over/under, correct score, accumulator
+- Form analysis: how to read form strings (W/D/L), goals averages, home/away splits
+- Market trends: what the data shows for specific fixtures
+- Terminology: xG, clean sheets, Both Teams to Score, Return on Investment
+- How to interpret the FanatIQ trend signals on the platform
+
+You NEVER:
+- Build specific bets or accumulators
+- Give financial or investment advice
+- Guarantee outcomes or promise profits
+- Discuss topics unrelated to sports betting intelligence
+
+You always explain concepts clearly, reference form data when relevant, and remind members that all content is for information and entertainment purposes only.
+
+You are concise, smart, and speak like a knowledgeable South African sports bettor — not a robot.`;
+
+function toggleIQChat() {
+  const window = document.getElementById('iq-chat-window');
+  if (!window) return;
+  iqChatOpen = !iqChatOpen;
+  window.classList.toggle('open', iqChatOpen);
+  if (iqChatOpen) initIQChat();
+}
+
+function initIQChat() {
+  const loginPrompt = document.getElementById('iq-login-prompt');
+  const inputWrap = document.getElementById('iq-input-wrap');
+  const messagesEl = document.getElementById('iq-messages');
+  if (!loginPrompt || !inputWrap || !messagesEl) return;
+
+  if (!currentMember) {
+    loginPrompt.style.display = 'block';
+    inputWrap.style.display = 'none';
+    return;
+  }
+
+  loginPrompt.style.display = 'none';
+  inputWrap.style.display = 'flex';
+
+  if (iqMessages.length === 0) {
+    const firstName = (currentMember.name || 'there').split(' ')[0];
+    addIQMessage(`Hey ${firstName} — I'm FanatIQ IQ. Ask me anything about betting markets, form analysis, or how to read the trends on the platform.`, 'bot');
+  }
+}
+
+function addIQMessage(text, role) {
+  iqMessages.push({ role, text });
+  const messagesEl = document.getElementById('iq-messages');
+  if (!messagesEl) return;
+  const div = document.createElement('div');
+  div.className = `iq-msg iq-msg-${role}`;
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+async function sendIQMessage() {
+  const input = document.getElementById('iq-input');
+  const text = input?.value?.trim();
+  if (!text) return;
+  if (!currentMember) { openSignupModal(); return; }
+
+  input.value = '';
+  addIQMessage(text, 'user');
+
+  // Typing indicator
+  const messagesEl = document.getElementById('iq-messages');
+  const typing = document.createElement('div');
+  typing.className = 'iq-msg iq-msg-bot iq-msg-typing';
+  typing.id = 'iq-typing';
+  typing.textContent = 'FanatIQ IQ is thinking...';
+  messagesEl?.appendChild(typing);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  try {
+    const messages = iqMessages
+      .filter(m => m.role !== 'bot' || iqMessages.indexOf(m) === 0)
+      .slice(-10)
+      .map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.text }));
+    messages.push({ role: 'user', content: text });
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        system: IQ_SYSTEM_PROMPT,
+        messages
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.filter(b => b.type==='text').map(b => b.text).join('') || 'Sorry, I could not process that. Try again.';
+    document.getElementById('iq-typing')?.remove();
+    addIQMessage(reply, 'bot');
+  } catch(e) {
+    document.getElementById('iq-typing')?.remove();
+    addIQMessage('Connection error — try again in a moment.', 'bot');
+  }
+}
+
+// Show IQ bubble for logged-in members
+function updateIQBubble() {
+  const bubble = document.getElementById('iq-bubble');
+  if (bubble) bubble.style.display = currentMember ? 'block' : 'none';
 }
 
 // ═══════════════════════════════════════════════
