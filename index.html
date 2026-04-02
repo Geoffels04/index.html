@@ -1061,16 +1061,22 @@ async function loadAllData() {
   if (!sb) return;
   const { data } = await sb.from('bets').select('*').order('display_order',{ascending:true}).order('published_at',{ascending:false});
   allBets = data || [];
-  renderCurrentPage();
-  updateSportNavCards();
-  // Always render admin table if admin is unlocked
+
+  const inAdmin = document.getElementById('admin-page')?.classList.contains('on');
+
+  if (!inAdmin) {
+    renderCurrentPage();
+    updateSportNavCards();
+    loadCommunityStrip();
+    loadTrends();
+  }
+
+  // Always render admin table if admin layout is visible
   const adminLayout = document.getElementById('admin-layout');
   if (adminLayout && adminLayout.style.display === 'flex') {
     renderAdminTable(allBets);
     renderAnalytics(allBets);
   }
-  loadCommunityStrip();
-  loadTrends();
 }
 
 // ═══════════════════════════════════════════════
@@ -1532,14 +1538,13 @@ function checkGate() {
     document.getElementById('admin-gate').style.display = 'none';
     document.getElementById('admin-topbar').style.display = 'flex';
     document.getElementById('admin-layout').style.display = 'flex';
-    // Load data and explicitly render table once layout is visible
-    loadAllData().then(() => {
-      renderAdminTable(allBets);
-      renderAnalytics(allBets);
-      // Default to publish panel
-      switchAdmin('publish', document.querySelector('.admin-nav-item'));
-    });
+    // Render immediately with whatever bets are loaded
+    renderAdminTable(allBets);
+    renderAnalytics(allBets);
+    switchAdmin('publish', document.querySelector('.admin-nav-item'));
     loadPushSubCount();
+    // Also reload from DB in case data changed
+    loadAllData();
   } else {
     document.getElementById('gate-error').textContent = 'Incorrect password';
     document.getElementById('gate-pw').value = '';
@@ -2062,12 +2067,14 @@ document.addEventListener('keydown', e => {
 // INIT
 // ═══════════════════════════════════════════════
 window.addEventListener('load', async () => {
+  // Always init Supabase — admin needs it too
+  await initSupabase();
+
   checkHash();
+
   if (location.hash !== ADMIN_HASH) {
-    await initSupabase();
     await loadCommunityPicks();
     checkPushPrompt();
-    // Register service worker for push
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(()=>{});
     }
