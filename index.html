@@ -1962,7 +1962,7 @@ function renderLeagueAccordions(data, containerId) {
             const edgePct = o.edge ? (o.edge*100).toFixed(1) : null;
             const edgeStr = edgePct ? (o.edge>0?`+${edgePct}%`:`${edgePct}%`) : '—';
             const edgeCls = o.edge>0.02?'edge-pos':o.edge<-0.02?'edge-neg':'edge-zero';
-            return `<div class="odds-cell${o.isBest?' best-val':''}">
+            return `<div class="odds-cell">
               <div class="odds-label">${o.label}</div>
               <div class="odds-price">${o.odds||'—'}</div>
               <div class="odds-book">${o.book||''}</div>
@@ -1978,7 +1978,7 @@ function renderLeagueAccordions(data, containerId) {
           <div class="fixture-header-row" onclick="toggleFixture('${fid}')">
             <div style="flex:1;min-width:0">
               <div class="fixture-matchup">${m.home_team} vs ${m.away_team}</div>
-              <div style="font-size:10px;color:var(--dim);margin-top:2px">${m.match_time||''} SAST · Tap for analysis</div>
+              <div style="font-size:10px;color:var(--dim);margin-top:2px">${m.match_time||''} SAST · <span style="color:var(--mg)">Tap for full FanatIQ analysis ▾</span></div>
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:10px">
               ${m.value_grade ? `<span class="value-badge value-${m.value_grade}">${m.value_grade}</span>` : ''}
@@ -2082,33 +2082,33 @@ function renderLeagueAccordions(data, containerId) {
               ${oddsHTML}
             </div>
 
-            <!-- FORM -->
-            <div class="detail-form-row">
+            <!-- FORM — 2 columns side by side -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
               <div class="detail-form-block">
                 <div class="detail-form-title">
                   <span>${m.home_team} — Last 5</span>
-                  <span style="color:var(--green);font-size:9px">${homeGoals} goals/game</span>
+                  <span style="color:var(--green);font-size:9px">${homeGoals} avg</span>
                 </div>
                 ${renderFormResults(m.home_form_5, m.home_form_results)}
               </div>
               <div class="detail-form-block" style="border-left:2px solid var(--green)">
                 <div class="detail-form-title">
-                  <span>${m.home_team} — Last 5 at Home</span>
-                  <span style="font-size:9px;color:var(--green)">🏠 Home only</span>
+                  <span>Last 5 at Home</span>
+                  <span style="font-size:9px;color:var(--green)">🏠</span>
                 </div>
                 ${renderFormResults(m.home_form_5, m.home_form_home_results || m.home_form_results)}
               </div>
               <div class="detail-form-block">
                 <div class="detail-form-title">
                   <span>${m.away_team} — Last 5</span>
-                  <span style="color:var(--mg);font-size:9px">${awayGoals} goals/game</span>
+                  <span style="color:var(--mg);font-size:9px">${awayGoals} avg</span>
                 </div>
                 ${renderFormResults(m.away_form_5, m.away_form_results)}
               </div>
               <div class="detail-form-block" style="border-left:2px solid var(--mg)">
                 <div class="detail-form-title">
-                  <span>${m.away_team} — Last 5 Away</span>
-                  <span style="font-size:9px;color:var(--mg)">✈ Away only</span>
+                  <span>Last 5 Away</span>
+                  <span style="font-size:9px;color:var(--mg)">✈</span>
                 </div>
                 ${renderFormResults(m.away_form_5, m.away_form_away_results || m.away_form_results)}
               </div>
@@ -2139,11 +2139,7 @@ function renderLeagueAccordions(data, containerId) {
               })()}
             </div>` : ''}
 
-            <!-- FanatIQ Analysis text -->
-            <div class="detail-signal-box" style="background:rgba(0,0,0,0.2);border-color:var(--border2)">
-              <strong style="color:var(--mg)">FanatIQ Analysis</strong>
-              ${m.trend_signal || m.prediction || 'Run Soccer Engine to generate analysis.'}
-            </div>
+
           </div>
         </div>`;
       }).join('');
