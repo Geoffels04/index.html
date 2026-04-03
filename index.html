@@ -2786,43 +2786,72 @@ async function processSlip(file) {
       const base64 = dataUrl.split(',')[1];
       await parseSlip(base64, file.type||'image/jpeg');
     } catch(err) {
-      document.getElementById('slip-overlay-label').textContent = 'Auto-parse failed — fill in manually';
-      setTimeout(()=>document.getElementById('slip-overlay').style.display='none',2000);
+      console.error('Slip parse error:', err);
+      document.getElementById('slip-overlay-label').textContent = 'Could not read slip — please fill in manually';
+      setTimeout(()=>document.getElementById('slip-overlay').style.display='none',3000);
     }
   };
   reader.readAsDataURL(file);
 }
 
 async function parseSlip(base64, mimeType) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:1000,
-      messages:[{ role:'user', content:[
-        { type:'image', source:{ type:'base64', media_type:mimeType, data:base64 } },
-        { type:'text', text:`Read this bet slip and return ONLY valid JSON, no other text: {"sport":"racing|soccer|golf|efc","event":"description","time":"time if visible","bookmaker":"name","totalOdds":"","selections":[{"type":"best|next|value|place|treble","name":"","odds":"","detail":""}]}` }
-      ]}]
-    })
-  });
+  // Route through the iq-chat Supabase edge function which proxies to Claude
+  // Send image as a content block in the messages array
+  const res = await fetch(
+    'https://nzxjbzgxdokbppchattt.supabase.co/functions/v1/iq-chat',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
+            { type: 'text', text: `You are a bet slip reader. Analyse this betting slip screenshot carefully and return ONLY a raw JSON object with no markdown, no backticks, no explanation. Extract every single selection/leg you can see.
+
+Return exactly this structure:
+{"sport":"soccer","event":"Multi Bet - X picks","time":"time or date if visible","bookmaker":"bookmaker name","totalOdds":"combined odds","selections":[{"type":"treble","name":"selection name or team","odds":"individual odds if shown","detail":"match or event name"}]}
+
+Rules:
+- sport: use "soccer" for football, "racing" for horse racing, "golf", "efc" for MMA/UFC
+- For multi-bets or accas: set event to "Multi Bet - N picks" where N is number of legs
+- Each leg/pick becomes one entry in selections array
+- type should be "treble" for each leg of a multi-bet acca
+- name: the actual selection (team name, horse name, fighter name)
+- detail: the match/race it is from
+- If individual odds not shown per leg, leave odds empty string
+- totalOdds: the combined/total odds shown (e.g. "53.91")
+- bookmaker: the betting site name` }
+          ]
+        }]
+      })
+    }
+  );
+
+  if (!res.ok) throw new Error('Edge function error: ' + res.status);
   const data = await res.json();
-  const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('No JSON');
+
+  // iq-chat returns { reply: "..." }
+  const raw = data.reply || '';
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No JSON in response: ' + raw.substring(0, 100));
+
   const parsed = JSON.parse(match[0]);
+
+  // Populate the form fields
   if (parsed.sport) document.getElementById('slip-sport').value = parsed.sport;
   if (parsed.event) document.getElementById('slip-event').value = parsed.event;
   if (parsed.time) document.getElementById('slip-time').value = parsed.time;
   if (parsed.totalOdds) document.getElementById('slip-odds').value = parsed.totalOdds;
   if (parsed.bookmaker) document.getElementById('slip-bookie').value = parsed.bookmaker;
-  slipSelections = parsed.selections||[];
+  slipSelections = parsed.selections || [];
   renderSlipRows(slipSelections);
   document.getElementById('slip-overlay').style.display = 'none';
   if (document.getElementById('slip-gen-code')?.checked) {
     document.getElementById('slip-share-code').value = autoGenCode();
   }
-  showToast('Slip parsed — review and publish','success');
+  const legCount = slipSelections.length;
+  showToast('✓ Slip parsed — ' + legCount + ' leg' + (legCount !== 1 ? 's' : '') + ' found. Review then publish.', 'success');
 }
 
 function renderSlipRows(sels) {
