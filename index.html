@@ -706,10 +706,10 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
       </div>
     </div>
   </div>
-  <div class="sport-sub-tabs">
-    <button class="stab on" id="stab-trends" onclick="switchSoccerTab('trends',this)">Market Trends</button>
-    <button class="stab" id="stab-tips" onclick="switchSoccerTab('tips',this)">Tips</button>
-    <button class="stab" id="stab-accas" onclick="switchSoccerTab('accas',this)">Accas</button>
+  <div style="display:flex;background:var(--black);border-bottom:1px solid var(--border);overflow:hidden">
+    <button class="stab on" id="stab-trends" onclick="switchSoccerTab('trends',this)" style="flex:1.6;text-align:center;padding:11px 8px;font-size:12px">Market Trends</button>
+    <button class="stab" id="stab-tips" onclick="switchSoccerTab('tips',this)" style="flex:1;text-align:center;padding:11px 8px;font-size:14px;font-weight:700;color:var(--mg);letter-spacing:.2px">Tips</button>
+    <button class="stab" id="stab-accas" onclick="switchSoccerTab('accas',this)" style="flex:1;text-align:center;padding:11px 8px;font-size:14px;font-weight:700;color:var(--mg);letter-spacing:.2px">Accas</button>
   </div>
   <div class="page-inner" style="padding-top:16px">
     <div id="soccer-feed"></div>
@@ -1725,8 +1725,19 @@ function renderSoccerPage() {
 
 function switchSoccerTab(tab, el) {
   currentSoccerTab = tab;
-  document.querySelectorAll('#page-soccer .stab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('#page-soccer .stab').forEach(t => {
+    t.classList.remove('on');
+    // restore muted color for Tips/Accas when not active
+    if (t.id === 'stab-tips' || t.id === 'stab-accas') {
+      t.style.color = 'var(--mg)';
+      t.style.opacity = '0.45';
+    }
+  });
   el.classList.add('on');
+  if (el.id === 'stab-tips' || el.id === 'stab-accas') {
+    el.style.color = 'var(--mg)';
+    el.style.opacity = '1';
+  }
   renderSoccerPage();
 }
 
@@ -1786,10 +1797,28 @@ function renderFormPills(formStr) {
 // Renders last 5 results as rows.
 // resultsArr: [{result:'W',opponent:'Arsenal',score:'2-1',competition:'EPL'}, ...]
 // Falls back to W/D/L string chars if no structured data.
+function getResultFromScore(score, explicitResult) {
+  // Try to infer result from score string (e.g. "1-1", "2-0", "0-0")
+  if (score) {
+    const parts = score.split(/[-–]/);
+    if (parts.length === 2) {
+      const g1 = parseInt(parts[0], 10);
+      const g2 = parseInt(parts[1], 10);
+      if (!isNaN(g1) && !isNaN(g2)) {
+        if (g1 === g2) return 'D';
+        if (g1 > g2) return 'W';
+        return 'L';
+      }
+    }
+  }
+  return (explicitResult||'').toUpperCase() || '?';
+}
+
 function renderFormResults(formStr, resultsArr) {
   if (resultsArr && Array.isArray(resultsArr) && resultsArr.length) {
     return resultsArr.slice(0,5).map(g => {
-      const r = (g.result||'').toUpperCase();
+      // Use score to determine result, fallback to explicit result field
+      const r = getResultFromScore(g.score, g.result);
       const badgeColor = r==='W'?'var(--green)':r==='D'?'var(--amber)':'var(--red)';
       const bgColor = r==='W'?'rgba(34,197,94,0.07)':r==='D'?'rgba(239,159,39,0.07)':'rgba(239,68,68,0.07)';
       return `<div class="form-result-row" style="background:${bgColor};border:1px solid ${badgeColor}25">
@@ -1812,7 +1841,7 @@ function renderFormResults(formStr, resultsArr) {
     return `<div class="form-result-row" style="background:${bgColor};border:1px solid ${badgeColor}25">
       <div class="form-result-badge ${r}" style="background:${badgeColor}">${r}</div>
       <div style="flex:1;font-size:11px;color:var(--muted)">Match ${i+1}</div>
-      <div style="font-size:10px;color:var(--dim);font-family:'DM Mono',monospace">score loading...</div>
+      <div style="font-size:10px;color:var(--dim);font-family:'DM Mono',monospace">—</div>
     </div>`;
   }).join('');
 }
@@ -1943,17 +1972,6 @@ function renderLeagueAccordions(data, containerId) {
             ⚡ Run <strong style="color:var(--mg)">Odds Sync</strong> in admin to load live market odds and value gaps
           </div>`;
         } else {
-          const grade = m.value_grade;
-          const gradeColor = grade==='A'?'var(--green)':grade==='B'?'var(--amber)':grade==='C'?'var(--blue)':'var(--muted)';
-          let valueBoxHTML = '';
-          if (grade) {
-            const evPct = m.value_ev ? (m.value_ev*100).toFixed(1) : '—';
-            valueBoxHTML = `<div class="value-box value-box-${grade}" style="margin-bottom:10px">
-              <div class="value-box-label" style="color:${gradeColor}">⚡ Grade ${grade} Value — ${m.value_market}</div>
-              <div class="value-box-market" style="color:${gradeColor}">${m.value_odds||''} @ ${m.value_book||'Best available'}</div>
-              <div class="value-box-detail">Model edge: +${((m.value_edge||0)*100).toFixed(1)}% · EV: +${evPct}% · ${m.bookmaker_count||0} books compared</div>
-            </div>`;
-          }
           const oddsRow = [
             {label:'Home', odds:m.best_home_odds, book:m.best_home_book, edge:m.home_edge, isBest:m.value_market==='Home Win'},
             {label:'Draw', odds:m.best_draw_odds, book:m.best_draw_book, edge:m.draw_edge, isBest:m.value_market==='Draw'},
@@ -1970,7 +1988,7 @@ function renderLeagueAccordions(data, containerId) {
             </div>`;
           }).join('');
           const marginNote = m.market_margin ? `<div class="market-margin">Market margin: ${m.market_margin}%</div>` : '';
-          oddsHTML = valueBoxHTML + `<div class="odds-row">${oddsRow}</div>${marginNote}`;
+          oddsHTML = `<div class="odds-row">${oddsRow}</div>${marginNote}`;
         }
 
         return `
@@ -2082,8 +2100,9 @@ function renderLeagueAccordions(data, containerId) {
               ${oddsHTML}
             </div>
 
-            <!-- FORM — 2 columns side by side -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+            <!-- FORM — HOME pair side by side, AWAY pair side by side -->
+            <!-- Row 1: Last 5 Overall | Last 5 at Home -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
               <div class="detail-form-block">
                 <div class="detail-form-title">
                   <span>${m.home_team} — Last 5</span>
@@ -2093,11 +2112,14 @@ function renderLeagueAccordions(data, containerId) {
               </div>
               <div class="detail-form-block" style="border-left:2px solid var(--green)">
                 <div class="detail-form-title">
-                  <span>Last 5 at Home</span>
-                  <span style="font-size:9px;color:var(--green)">🏠</span>
+                  <span>Last 5 at Home 🏠</span>
+                  <span style="color:var(--green);font-size:9px">${m.home_form_home_avg != null ? m.home_form_home_avg : homeGoals} avg</span>
                 </div>
                 ${renderFormResults(m.home_form_5, m.home_form_home_results || m.home_form_results)}
               </div>
+            </div>
+            <!-- Row 2: Last 5 Overall Away | Last 5 Away -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
               <div class="detail-form-block">
                 <div class="detail-form-title">
                   <span>${m.away_team} — Last 5</span>
@@ -2107,8 +2129,8 @@ function renderLeagueAccordions(data, containerId) {
               </div>
               <div class="detail-form-block" style="border-left:2px solid var(--mg)">
                 <div class="detail-form-title">
-                  <span>Last 5 Away</span>
-                  <span style="font-size:9px;color:var(--mg)">✈</span>
+                  <span>Last 5 Away ✈</span>
+                  <span style="color:var(--mg);font-size:9px">${m.away_form_away_avg != null ? m.away_form_away_avg : awayGoals} avg</span>
                 </div>
                 ${renderFormResults(m.away_form_5, m.away_form_away_results || m.away_form_results)}
               </div>
