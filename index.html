@@ -1491,7 +1491,7 @@ let allBets = [];
 let adminFilter = 'all';
 let currentRacingTab = 'all';
 let currentSoccerTab = 'trends';
-const adminPw = 'Poison@04';
+let adminPw = 'fanatiq2026';
 let editingBetId = null;
 let selectedPlan = 'monthly';
 let slipSelections = [];
@@ -2426,7 +2426,7 @@ async function sendPushNotification() {
   const title = document.getElementById('push-title')?.value.trim();
   const body = document.getElementById('push-body')?.value.trim();
   if (!title || !body) { showToast('Fill in title and message','error'); return; }
-  const adminSecret = localStorage.getItem('fiq_admin_pw') || 'Poison@04';
+const adminSecret = 'fanatiq2026';
   try {
     const res = await fetch(SB_URL + '/functions/v1/push-notify', {
       method:'POST',
