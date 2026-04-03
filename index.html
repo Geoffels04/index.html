@@ -1604,7 +1604,8 @@ const STATUS_LABEL = { won:'✓ Won', lost:'✗ Lost', pending:'⏳ Pending' };
 
 function renderBetCard(b, idx) {
   const cfg = SPORT_CONFIG[b.sport] || SPORT_CONFIG.efc;
-  const sels = (b.selections||[]).filter(s => s.type === 'best').map(s => `
+  const isAcca = (b.selections||[]).some(s => s.type === 'treble' || s.type === 'pick6') || (b.selections||[]).length > 3;
+  const sels = (b.selections||[]).filter(s => isAcca ? true : s.type === 'best').map(s => `
     <div class="sel-row ${s.type}-bet">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
@@ -2795,63 +2796,94 @@ async function processSlip(file) {
 }
 
 async function parseSlip(base64, mimeType) {
-  // Route through the iq-chat Supabase edge function which proxies to Claude
-  // Send image as a content block in the messages array
-  const res = await fetch(
-    'https://nzxjbzgxdokbppchattt.supabase.co/functions/v1/iq-chat',
-    {
+  // Use the slip-reader Supabase edge function that supports vision/image parsing
+  // Falls back to the soccer-predictions edge function pattern with image support
+  const SLIP_URL = 'https://nzxjbzgxdokbppchattt.supabase.co/functions/v1/slip-reader';
+  const IQ_URL   = 'https://nzxjbzgxdokbppchattt.supabase.co/functions/v1/iq-chat';
+
+  const prompt = `You are a bet slip reader. Analyse this betting slip image carefully and return ONLY a raw JSON object — no markdown, no backticks, no explanation text whatsoever.
+
+Return this exact JSON structure:
+{"sport":"soccer","event":"Multi Bet - 8 picks","time":"Sat 5 Apr","bookmaker":"Sportingbet","totalOdds":"53.91","selections":[{"type":"treble","name":"Gil Vicente FC","odds":"","detail":"Gil Vicente FC vs AVS Futebol"},{"type":"treble","name":"Paris Saint-Germain","odds":"","detail":"PSG vs Toulouse"}]}
+
+Critical rules:
+- sport: "soccer" for football/soccer, "racing" for horse racing, "golf", "efc" for MMA/UFC/boxing
+- event: "Multi Bet - N picks" for multi/acca bets (replace N with actual number of legs), or the event name for single bets
+- bookmaker: name of the betting site (e.g. "Sportingbet", "Betway", "Hollywoodbets")
+- totalOdds: the combined total odds shown on the slip
+- selections: array with ONE entry per leg/pick/selection
+- type: use "treble" for every leg in a multi-bet/acca
+- name: the WINNING SELECTION (team name, player name, horse, or "Yes"/"No" for specials)
+- detail: the full match or event context (e.g. "Antwerp vs Genk")
+- odds: individual leg odds if shown, otherwise empty string ""
+- Extract ALL legs visible — do not skip any`;
+
+  // Try the dedicated slip-reader function first, fall back to iq-chat with text prompt
+  let raw = '';
+  let usedFallback = false;
+
+  try {
+    const res = await fetch(SLIP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: base64, mimeType, prompt })
+    });
+    if (res.ok) {
+      const d = await res.json();
+      raw = d.reply || d.result || d.text || '';
+    } else {
+      usedFallback = true;
+    }
+  } catch(e) {
+    usedFallback = true;
+  }
+
+  // Fallback: use iq-chat with image embedded as data URI description
+  if (usedFallback || !raw) {
+    // Resize/compress the image first to reduce token load, then send via iq-chat
+    // Since iq-chat may not support image blocks, we send image as base64 in a special wrapper
+    const res2 = await fetch(IQ_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
-            { type: 'text', text: `You are a bet slip reader. Analyse this betting slip screenshot carefully and return ONLY a raw JSON object with no markdown, no backticks, no explanation. Extract every single selection/leg you can see.
-
-Return exactly this structure:
-{"sport":"soccer","event":"Multi Bet - X picks","time":"time or date if visible","bookmaker":"bookmaker name","totalOdds":"combined odds","selections":[{"type":"treble","name":"selection name or team","odds":"individual odds if shown","detail":"match or event name"}]}
-
-Rules:
-- sport: use "soccer" for football, "racing" for horse racing, "golf", "efc" for MMA/UFC
-- For multi-bets or accas: set event to "Multi Bet - N picks" where N is number of legs
-- Each leg/pick becomes one entry in selections array
-- type should be "treble" for each leg of a multi-bet acca
-- name: the actual selection (team name, horse name, fighter name)
-- detail: the match/race it is from
-- If individual odds not shown per leg, leave odds empty string
-- totalOdds: the combined/total odds shown (e.g. "53.91")
-- bookmaker: the betting site name` }
-          ]
-        }]
+        image_base64: base64,
+        image_mime: mimeType,
+        messages: [{ role: 'user', content: prompt }]
       })
-    }
-  );
+    });
+    if (!res2.ok) throw new Error('Parse failed: ' + res2.status);
+    const d2 = await res2.json();
+    raw = d2.reply || d2.result || '';
+  }
 
-  if (!res.ok) throw new Error('Edge function error: ' + res.status);
-  const data = await res.json();
+  if (!raw) throw new Error('Empty response from parser');
 
-  // iq-chat returns { reply: "..." }
-  const raw = data.reply || '';
+  // Extract JSON from response
   const match = raw.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('No JSON in response: ' + raw.substring(0, 100));
-
+  if (!match) throw new Error('No JSON found in: ' + raw.substring(0, 120));
   const parsed = JSON.parse(match[0]);
 
-  // Populate the form fields
-  if (parsed.sport) document.getElementById('slip-sport').value = parsed.sport;
-  if (parsed.event) document.getElementById('slip-event').value = parsed.event;
-  if (parsed.time) document.getElementById('slip-time').value = parsed.time;
-  if (parsed.totalOdds) document.getElementById('slip-odds').value = parsed.totalOdds;
-  if (parsed.bookmaker) document.getElementById('slip-bookie').value = parsed.bookmaker;
-  slipSelections = parsed.selections || [];
+  // Populate form fields
+  if (parsed.sport)      document.getElementById('slip-sport').value = parsed.sport;
+  if (parsed.event)      document.getElementById('slip-event').value = parsed.event;
+  if (parsed.time)       document.getElementById('slip-time').value  = parsed.time;
+  if (parsed.totalOdds)  document.getElementById('slip-odds').value  = parsed.totalOdds;
+  if (parsed.bookmaker)  document.getElementById('slip-bookie').value = parsed.bookmaker;
+
+  slipSelections = (parsed.selections || []).map(s => ({
+    type:   s.type   || 'treble',
+    name:   s.name   || '',
+    odds:   s.odds   || '',
+    detail: s.detail || ''
+  }));
+
   renderSlipRows(slipSelections);
   document.getElementById('slip-overlay').style.display = 'none';
   if (document.getElementById('slip-gen-code')?.checked) {
     document.getElementById('slip-share-code').value = autoGenCode();
   }
-  const legCount = slipSelections.length;
-  showToast('✓ Slip parsed — ' + legCount + ' leg' + (legCount !== 1 ? 's' : '') + ' found. Review then publish.', 'success');
+  const n = slipSelections.length;
+  showToast('\u2713 ' + n + ' leg' + (n !== 1 ? 's' : '') + ' parsed — review and publish', 'success');
 }
 
 function renderSlipRows(sels) {
