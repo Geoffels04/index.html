@@ -2952,26 +2952,41 @@ async function runOddsSync() {
   resultsEl.innerHTML = '';
 
   try {
-    const res = await fetch(SB_URL + '/functions/v1/odds-fetcher', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-admin-secret': adminPw,
-      },
-      body: JSON.stringify({ leagues, date }),
-    });
+    // Run in batches of 3 leagues to avoid timeout
+    const BATCH_SIZE = 3;
+    let totalUpdated = 0;
+    let totalRequests = 0;
+    const allResults = [];
+    const allErrors = [];
 
-    const data = await res.json();
+    for (let i = 0; i < leagues.length; i += BATCH_SIZE) {
+      const batch = leagues.slice(i, i + BATCH_SIZE);
+      status.textContent = `Fetching odds for ${batch.join(', ')}...`;
 
-    if (!res.ok) throw new Error(data.error || 'Odds sync failed');
+      const res = await fetch(SB_URL + '/functions/v1/odds-fetcher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': adminPw,
+        },
+        body: JSON.stringify({ leagues: batch, date }),
+      });
 
-    status.textContent = `✓ ${data.updated} fixtures updated`;
-    if (usageEl) usageEl.textContent = `${data.requests_used} API requests used this run`;
+      const data = await res.json();
+      if (!res.ok) { allErrors.push(data.error || 'Batch failed'); continue; }
 
-    showToast(`⚡ Odds synced — ${data.updated} fixtures updated`, 'success');
+      totalUpdated += data.updated || 0;
+      totalRequests += data.requests_used || 0;
+      if (data.results) allResults.push(...data.results);
+      if (data.errors) allErrors.push(...data.errors);
+    }
 
-    if (data.results?.length) {
-      resultsEl.innerHTML = data.results.map(r => {
+    status.textContent = `✓ ${totalUpdated} fixtures updated · ${totalRequests} API requests used`;
+    if (usageEl) usageEl.textContent = `${totalRequests} API requests used this run`;
+    showToast(`⚡ Odds synced — ${totalUpdated} fixtures updated`, 'success');
+
+    if (allResults.length) {
+      resultsEl.innerHTML = allResults.map(r => {
         const isValue = r.includes('[') && r.includes('VALUE');
         return `<div style="font-size:11px;padding:5px 10px;border-radius:6px;font-family:'DM Mono',monospace;${
           isValue
@@ -2981,13 +2996,12 @@ async function runOddsSync() {
       }).join('');
     }
 
-    if (data.errors?.length) {
-      resultsEl.innerHTML += data.errors.map(e =>
+    if (allErrors.length) {
+      resultsEl.innerHTML += allErrors.map(e =>
         `<div style="font-size:11px;color:var(--red);padding:5px 10px;background:var(--red-dim);border-radius:6px">${e}</div>`
       ).join('');
     }
 
-    // Reload trends so subscriber view updates
     await loadTrends();
 
   } catch(e) {
