@@ -1176,6 +1176,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
           <button class="btn btn-green" onclick="runPredictionsEngine()" id="pred-btn" style="padding:9px 22px;font-size:13px">Run Predictions Engine →</button>
           <button class="btn btn-ghost btn-sm" onclick="clearOldTrends()">Clear old trends</button>
+          <button class="btn btn-ghost btn-sm" onclick="runResultsUpdater()" id="results-btn" title="Fetch final scores for today's fixtures">⚡ Update Results</button>
           <span id="pred-status" style="font-size:12px;color:var(--muted)"></span>
         </div>
         <div id="pred-results" style="margin-top:14px;display:flex;flex-direction:column;gap:6px;max-width:600px"></div>
@@ -1624,7 +1625,10 @@ function renderBetCard(b, idx) {
         <div class="sel-name" style="${isAcca ? 'font-size:13px;' : ''}">${s.name}</div>
         ${s.detail ? `<div class="sel-detail">${s.detail}</div>` : ''}
       </div>
-      ${s.odds ? `<div class="sel-odds">${s.odds}</div>` : ''}
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+        ${s.odds ? `<div class="sel-odds">${s.odds}</div>` : ''}
+        ${b.status === 'won' ? `<div style="font-size:16px;font-weight:800;color:var(--green);letter-spacing:.5px;font-family:'Syne',sans-serif">✓ WON</div>` : b.status === 'lost' ? `<div style="font-size:16px;font-weight:800;color:var(--red);font-family:'Syne',sans-serif">✗ LOST</div>` : b.status === 'pending' ? `<div style="font-size:12px;color:var(--amber);font-weight:700;letter-spacing:.3px">PENDING</div>` : ''}
+      </div>
     </div>`).join('');
 
   // Acca summary header
@@ -1662,18 +1666,10 @@ function renderBetCard(b, idx) {
       <div class="bet-selections" style="${isAcca ? 'gap:0;' : ''}">${sels}</div>
       ${b.note ? `<div class="bet-note" style="${isAcca ? 'margin:8px 14px 4px;' : ''}"><strong>FanatIQ Analysis:</strong> ${b.note}</div>` : ''}
     </div>
-    ${b.status === 'won' || b.status === 'pending' ? `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:${b.status==='won'?'rgba(34,197,94,0.08)':'rgba(239,159,39,0.06)'};border-top:1px solid ${b.status==='won'?'var(--green-b)':'var(--amber-b)'}">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="sdot" style="background:${sc};width:7px;height:7px"></div>
-        <span style="font-size:13px;font-weight:700;color:${sc}">${sl}</span>
-      </div>
-      <div style="font-size:9px;color:var(--dim)">${b.id}</div>
-    </div>` : `
     <div class="bet-footer">
       <div class="bet-status-row"><div class="sdot" style="background:${sc}"></div><span style="color:${sc};font-family:monospace;font-size:10px">${sl}</span></div>
       <div class="watermark">${b.id}</div>
-    </div>`}`;
+    </div>`;
 
   const isLocked = b.tier === 'gold' || b.tier === 'silver';
   const delay = `animation-delay:${(idx||0)*0.04}s`;
@@ -3072,6 +3068,31 @@ async function runPredictionsEngine() {
 
   btn.textContent = 'Run Predictions Engine →'; btn.disabled = false;
 }
+
+async function runResultsUpdater() {
+  const btn = document.getElementById('results-btn');
+  if (btn) { btn.textContent = 'Updating...'; btn.disabled = true; }
+  const date = document.getElementById('pred-date1')?.value || new Date().toISOString().split('T')[0];
+  try {
+    const res = await fetch(SB_URL + '/functions/v1/results-updater', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-secret': adminPw },
+      body: JSON.stringify({ date })
+    });
+    const data = await res.json();
+    if (data.updated > 0) {
+      showToast('\u2713 ' + data.updated + ' result' + (data.updated !== 1 ? 's' : '') + ' updated', 'success');
+      await loadAllData();
+    } else {
+      showToast('No finished fixtures found for ' + date, 'error');
+    }
+    if (data.errors?.length) console.log('Results errors:', data.errors);
+  } catch(e) {
+    showToast('Results update failed: ' + e.message, 'error');
+  }
+  if (btn) { btn.textContent = '\u26a1 Update Results'; btn.disabled = false; }
+}
+
 
 // ═══════════════════════════════════════════════
 // ODDS SYNC
