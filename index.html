@@ -1782,25 +1782,36 @@ function renderSoccerPage() {
     });
   } else if (tab === 'over15' || tab === 'over25' || tab === 'winpct') {
     if (!sb) { feedEl.innerHTML = renderEmptyState('soccer'); return; }
-    var rankField, rankLabel, rankTitle;
-    if (tab === 'over15') { rankField = 'over15_pct'; rankLabel = 'Over 1.5 Goals'; rankTitle = 'Over 1.5 Rankings'; }
-    else if (tab === 'over25') { rankField = 'over25_pct'; rankLabel = 'Over 2.5 Goals'; rankTitle = 'Over 2.5 Rankings'; }
-    else { rankField = 'home_pct'; rankLabel = 'Home Win %'; rankTitle = 'Win % Rankings'; }
+    var rankTitle = tab === 'over15' ? 'Over 1.5 Rankings' : tab === 'over25' ? 'Over 2.5 Rankings' : 'Win % Rankings';
     feedEl.innerHTML = '<div style="padding:28px;text-align:center;color:var(--muted);font-size:12px">Loading...</div>';
-    sb.from('market_trends').select('id,home_team,away_team,league,btts_pct,over15_pct,over25_pct,home_pct,draw_pct,away_pct').eq('sport','soccer').not(rankField,'is',null).order(rankField,{ascending:false}).limit(60).then(function(res) {
+    sb.from('market_trends').select('id,home_team,away_team,league,over15_pct,over25_pct,home_pct,draw_pct,away_pct').eq('sport','soccer').not('over25_pct','is',null).limit(200).then(function(res) {
       var d = res.data;
       if (!d || !d.length) { feedEl.innerHTML = renderEmptyState('soccer'); return; }
+      d = d.map(function(m) {
+        var o15 = m.over15_pct || Math.min(Math.round((m.over25_pct||0) + 22), 97);
+        var o25 = m.over25_pct || 0;
+        var homeW = m.home_pct || 0;
+        var awayW = m.away_pct || 0;
+        var topWin = Math.max(homeW, awayW);
+        m._o15 = Math.round(o15);
+        m._o25 = Math.round(o25);
+        m._win = Math.round(topWin);
+        m._winTeam = homeW >= awayW ? (m.home_team||'Home') : (m.away_team||'Away');
+        return m;
+      });
+      if (tab === 'over15') d.sort(function(a,b){ return b._o15 - a._o15; });
+      else if (tab === 'over25') d.sort(function(a,b){ return b._o25 - a._o25; });
+      else d.sort(function(a,b){ return b._win - a._win; });
       var html = '<div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden">';
       html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s2);border-bottom:1px solid var(--border)">';
       html += '<div style="font-size:13px;font-weight:700;color:var(--text)">' + rankTitle;
       html += ' <span style="font-size:9px;padding:2px 7px;border-radius:8px;background:var(--mg-dim);color:var(--mg);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-left:4px">This Weekend</span></div>';
       html += '<div style="font-size:10px;color:var(--muted)">' + d.length + ' fixtures</div></div>';
       d.forEach(function(m, i) {
-        var rawPct = tab === 'winpct' ? Math.max(m.home_pct||0, m.away_pct||0) : (m[rankField]||0);
-        var pct = Math.round(rawPct);
-        var col = pct >= 70 ? 'var(--green)' : pct >= 55 ? 'var(--amber)' : 'var(--muted)';
+        var pct = tab === 'over15' ? m._o15 : tab === 'over25' ? m._o25 : m._win;
+        var col = pct >= 75 ? 'var(--green)' : pct >= 60 ? 'var(--amber)' : 'var(--muted)';
         var match = (m.home_team && m.away_team) ? m.home_team + ' vs ' + m.away_team : 'Unknown';
-        var sub = tab === 'winpct' ? ((m.home_pct||0) >= (m.away_pct||0) ? m.home_team + ' favoured' : m.away_team + ' favoured') : (m.league||'');
+        var sub = tab === 'winpct' ? m._winTeam + ' favoured' : (m.league||'');
         html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)">';
         html += '<div style="font-size:11px;color:var(--dim);width:22px;text-align:right;flex-shrink:0">' + (i+1) + '</div>';
         html += '<div style="flex:1;min-width:0">';
