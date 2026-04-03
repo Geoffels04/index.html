@@ -20,13 +20,13 @@
   --purple:#8B5CF6;--purple-dim:rgba(139,92,246,0.1);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-size:14px;line-height:1.6;min-height:100vh;overflow-x:hidden}
 
 /* ── TOPBAR ── */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:52px;border-bottom:1px solid var(--border);background:rgba(11,11,11,0.97);position:sticky;top:0;z-index:300;backdrop-filter:blur(16px)}
 .brand{display:flex;align-items:center;gap:9px;cursor:pointer;text-decoration:none}
 .brand-mark{width:30px;height:30px;border-radius:7px;background:var(--s2);border:1px solid var(--mg-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.brand-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.5px;color:var(--text)}
+.brand-name{font-family:sans-serif;font-weight:700;font-size:17px;font-weight:800;letter-spacing:-.5px;color:var(--text)}
 .brand-name em{color:var(--mg);font-style:normal}
 .topbar-right{display:flex;align-items:center;gap:8px}
 .pill-live{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:500;color:var(--green);background:var(--green-dim);border:1px solid var(--green-b);border-radius:20px;padding:3px 10px;letter-spacing:.5px}
@@ -34,7 +34,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* ── BUTTONS ── */
-.btn{border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .18s;display:inline-flex;align-items:center;gap:5px;line-height:1}
+.btn{border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:sans-serif;transition:all .18s;display:inline-flex;align-items:center;gap:5px;line-height:1}
 .btn-mg{background:var(--mg);color:#fff}.btn-mg:hover{background:var(--mg2)}
 .btn-ghost{background:var(--s3);color:var(--muted);border:1px solid var(--border2)}.btn-ghost:hover{color:var(--text)}
 .btn-green{background:var(--green);color:#000}.btn-amber{background:var(--amber);color:#000}
@@ -56,31 +56,31 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .mnav-item-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
 .mnav-label{font-size:9px;font-weight:600;letter-spacing:.2px;white-space:nowrap}
 .mnav-gold{flex:1;display:flex;align-items:center;justify-content:center;padding:4px 2px}
-.mobile-sub-btn{background:var(--mg);border:none;border-radius:20px;padding:9px 16px;color:#fff;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;line-height:1;transition:background .2s;white-space:nowrap}
+.mobile-sub-btn{background:var(--mg);border:none;border-radius:20px;padding:9px 16px;color:#fff;font-size:11px;font-weight:700;font-family:sans-serif;cursor:pointer;line-height:1;transition:background .2s;white-space:nowrap}
 .mobile-sub-btn:active{background:var(--mg2)}
 
 /* ── SPORT NAV (inside sport pages) ── */
 .sport-hero{padding:20px 16px 0;background:linear-gradient(180deg,var(--s1) 0%,var(--black) 100%);border-bottom:1px solid var(--border);margin-bottom:0}
 .sport-hero-inner{max-width:740px;margin:0 auto;display:flex;align-items:center;gap:14px;padding-bottom:16px}
 .sport-hero-icon{width:60px;height:60px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:visible;background:transparent}
-.sport-hero-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px}
+.sport-hero-title{font-family:sans-serif;font-weight:700;font-size:22px;font-weight:800;letter-spacing:-.5px}
 .sport-hero-sub{font-size:12px;color:var(--muted);margin-top:1px}
 .sport-sub-tabs{display:flex;gap:2px;padding:0 16px 0;background:var(--black);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;max-width:none}
 .sport-sub-tabs::-webkit-scrollbar{display:none}
-.stab{padding:10px 14px;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);border:none;background:none;font-family:'DM Sans',sans-serif;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.stab{padding:10px 14px;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);border:none;background:none;font-family:sans-serif;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
 .stab.on{color:var(--text);border-bottom-color:var(--mg)}
 
 /* ── STAT BAR ── */
 .stat-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
 .stat-c{background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
 .stat-l{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
-.stat-v{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;letter-spacing:-.5px}
+.stat-v{font-family:sans-serif;font-weight:700;font-size:19px;font-weight:700;letter-spacing:-.5px}
 .stat-s{font-size:10px;color:var(--dim);margin-top:1px}
 .c-mg{color:var(--mg)}.c-green{color:var(--green)}.c-amber{color:var(--amber)}
 
 /* ── SECTION HEADERS ── */
 .sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.sec-t{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px}
+.sec-t{font-family:sans-serif;font-weight:700;font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px}
 .sec-a{font-size:11px;color:var(--mg);cursor:pointer}
 .sec-a:hover{opacity:.7}
 .tag{font-size:8px;font-weight:700;padding:2px 7px;border-radius:8px;text-transform:uppercase;letter-spacing:.5px}
@@ -104,7 +104,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .bet-title{font-size:13px;font-weight:500;margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bet-sub{font-size:11px;color:var(--muted)}
 .bet-time-col{text-align:right;flex-shrink:0}
-.bet-time{font-family:'DM Mono',monospace;font-size:10px;color:var(--dim)}
+.bet-time{font-family:monospace;font-size:10px;color:var(--dim)}
 .bet-tier-badge{font-size:8px;font-weight:700;text-transform:uppercase}
 .bet-ago{font-size:9px;color:var(--dim);margin-top:1px}
 .bet-body{padding:12px 14px}
@@ -118,16 +118,16 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .value-bet .sel-type-pill{background:rgba(239,159,39,.2);color:var(--amber)}
 .place-bet .sel-type-pill{background:rgba(59,130,246,.2);color:var(--blue)}
 .next-bet .sel-type-pill,.treble-bet .sel-type-pill,.pick6-bet .sel-type-pill{background:var(--s3);color:var(--muted)}
-.sel-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex:1;min-width:0;word-break:break-word;line-height:1.3}
+.sel-name{font-family:sans-serif;font-weight:700;font-size:13px;font-weight:700;flex:1;min-width:0;word-break:break-word;line-height:1.3}
 .sel-detail{font-size:10px;color:var(--muted);margin-top:2px}
-.sel-odds{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--green);flex-shrink:0;margin-top:1px}
+.sel-odds{font-family:monospace;font-size:13px;font-weight:500;color:var(--green);flex-shrink:0;margin-top:1px}
 .bet-note{margin-top:8px;padding:9px 12px;background:var(--s2);border-radius:7px;font-size:11px;color:var(--muted);line-height:1.7;border-left:2px solid var(--mg)}
 .bet-note strong{color:var(--text);font-weight:500}
 .bet-footer{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-top:1px solid var(--border);background:rgba(255,255,255,0.015)}
 .bet-status-row{display:flex;align-items:center;gap:5px;font-size:10px;font-family:'DM Mono',monospace}
 .sdot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.watermark{font-family:'DM Mono',monospace;font-size:9px;color:var(--dim);opacity:.4}
-.share-code-badge{font-family:'DM Mono',monospace;font-size:10px;color:var(--mg);border:1px solid var(--mg-border);border-radius:5px;padding:2px 7px;background:var(--mg-dim);cursor:pointer;transition:all .15s}
+.watermark{font-family:monospace;font-size:9px;color:var(--dim);opacity:.4}
+.share-code-badge{font-family:monospace;font-size:10px;color:var(--mg);border:1px solid var(--mg-border);border-radius:5px;padding:2px 7px;background:var(--mg-dim);cursor:pointer;transition:all .15s}
 .share-code-badge:hover{background:var(--mg);color:#fff}
 
 /* ── LOCK OVERLAY ── */
@@ -140,7 +140,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 /* ── EMPTY STATE ── */
 .empty-state{text-align:center;padding:52px 20px;color:var(--muted)}
 .empty-icon{margin-bottom:14px;opacity:.3}
-.empty-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.empty-title{font-family:sans-serif;font-weight:700;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
 .empty-sub{font-size:12px;line-height:1.7;max-width:280px;margin:0 auto}
 
 /* ── SHIMMER ── */
@@ -159,14 +159,14 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .cp-strip-nick{font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px}
 .cp-strip-desc{font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cp-strip-bottom{padding:7px 11px;display:flex;align-items:center;justify-content:space-between}
-.cp-strip-code{font-family:'DM Mono',monospace;font-size:11px;color:var(--mg);font-weight:500}
+.cp-strip-code{font-family:monospace;font-size:11px;color:var(--mg);font-weight:500}
 .cp-strip-platform{font-size:9px;padding:1px 6px;border-radius:4px;font-weight:600;background:var(--s3);color:var(--dim)}
 .cp-strip-odds{font-size:10px;color:var(--green);font-family:'DM Mono',monospace}
 
 /* ── MARKET TRENDS ── */
 .trend-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
 .trend-header{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.trend-teams{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.trend-teams{font-family:sans-serif;font-weight:700;font-size:14px;font-weight:700}
 .trend-league{font-size:10px;color:var(--muted);margin-top:1px}
 .trend-conf{font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px}
 .conf-high{background:var(--green-dim);color:var(--green)}
@@ -178,7 +178,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .trend-bar-label{font-size:9px;color:var(--muted);margin-bottom:4px}
 .trend-bar-track{height:6px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:3px}
 .trend-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
-.trend-bar-pct{font-family:'DM Mono',monospace;font-size:11px;font-weight:500}
+.trend-bar-pct{font-family:monospace;font-size:11px;font-weight:500}
 .trend-prediction{padding:8px 10px;background:var(--s2);border-radius:7px;font-size:11px;color:var(--muted);line-height:1.6;border-left:2px solid var(--green)}
 .trend-extras{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .trend-extra-pill{font-size:10px;padding:3px 9px;border-radius:6px;background:var(--s2);color:var(--muted);border:1px solid var(--border)}
@@ -193,7 +193,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .odds-cell{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center}
 .odds-cell.best-val{border-color:var(--green);background:rgba(34,197,94,0.06)}
 .odds-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
-.odds-price{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--text)}
+.odds-price{font-family:monospace;font-size:16px;font-weight:700;color:var(--text)}
 .odds-book{font-size:9px;color:var(--mg);margin-top:2px}
 .odds-edge{font-size:10px;font-weight:600;margin-top:3px}
 .edge-pos{color:var(--green)}.edge-neg{color:var(--dim)}.edge-zero{color:var(--muted)}
@@ -202,7 +202,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .value-box-B{border-color:rgba(239,159,39,0.35);background:linear-gradient(135deg,rgba(239,159,39,0.08),rgba(11,11,11,0))}
 .value-box-C{border-color:rgba(59,130,246,0.3);background:linear-gradient(135deg,rgba(59,130,246,0.06),rgba(11,11,11,0))}
 .value-box-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
-.value-box-market{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:4px}
+.value-box-market{font-family:sans-serif;font-weight:700;font-size:15px;font-weight:800;margin-bottom:4px}
 .value-box-detail{font-size:11px;color:var(--muted);line-height:1.6}
 .market-margin{font-size:9px;color:var(--dim);text-align:right;margin-top:4px}
 
@@ -215,14 +215,14 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 /* ── SUGGESTED BET BLOCK ── */
 .suggested-bet-block{padding:10px 14px 11px;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .sb-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:3px}
-.sb-market{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px;line-height:1.1}
+.sb-market{font-family:sans-serif;font-weight:700;font-size:16px;font-weight:800;letter-spacing:-.3px;line-height:1.1}
 .sb-conf-pill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;flex-shrink:0;font-family:'DM Mono',monospace}
 
 /* ── FIXTURE CARD HEADER (new layout) ── */
 .fixture-header-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer}
-.fixture-matchup{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fixture-matchup{font-family:sans-serif;font-weight:700;font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fixture-meta-col{text-align:right;flex-shrink:0;margin-left:8px}
-.fixture-kickoff{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+.fixture-kickoff{font-family:monospace;font-size:10px;color:var(--muted)}
 .fixture-conf-pct{font-size:10px;font-weight:600;color:var(--green);margin-top:1px}
 
 /* ── SPORT SPORT CARDS (home page sport nav) ── */
@@ -230,7 +230,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .sport-nav-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;text-decoration:none;display:block}
 .sport-nav-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.3)}
 .sport-nav-icon{width:72px;height:72px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;overflow:visible;background:transparent}
-.sport-nav-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:2px}
+.sport-nav-name{font-family:sans-serif;font-weight:700;font-size:15px;font-weight:700;margin-bottom:2px}
 .sport-nav-count{font-size:11px;color:var(--muted)}
 .sport-nav-price{font-size:10px;font-weight:600;margin-top:6px;padding:2px 8px;border-radius:5px;width:fit-content}
 .tips-live-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#22C55E;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);border-radius:6px;padding:3px 9px;margin-top:6px;letter-spacing:.3px;animation:tipsPulse 2s ease-in-out infinite}
@@ -241,19 +241,19 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .vc-panel{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px}
 .vc-desc{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6}
 .vc-inputs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.vc-inputs input{flex:1;min-width:90px;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;outline:none;transition:border-color .2s}
+.vc-inputs input{flex:1;min-width:90px;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:monospace;outline:none;transition:border-color .2s}
 .vc-inputs input:focus{border-color:var(--mg-border)}
 .vc-inputs input::placeholder{color:var(--dim)}
 .vc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .vc-metric{background:var(--s2);border-radius:8px;padding:10px;text-align:center}
 .vc-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.vc-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:500}
+.vc-val{font-family:monospace;font-size:18px;font-weight:500}
 .pos{color:var(--green)}.neg{color:var(--red)}.neu{color:var(--amber)}
 
 /* ── CODE LOOKUP ── */
 .code-lookup-wrap{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:20px}
 .code-lookup-row{display:flex;gap:8px}
-.code-input-field{flex:1;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:10px 13px;color:var(--text);font-size:14px;font-family:'DM Mono',monospace;outline:none;letter-spacing:1.5px;text-transform:uppercase;transition:border-color .2s}
+.code-input-field{flex:1;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:10px 13px;color:var(--text);font-size:14px;font-family:monospace;outline:none;letter-spacing:1.5px;text-transform:uppercase;transition:border-color .2s}
 .code-input-field:focus{border-color:var(--mg-border)}
 .code-input-field::placeholder{letter-spacing:0;font-size:13px;text-transform:none;color:var(--dim)}
 .code-result-area{margin-top:12px;display:none}
@@ -261,7 +261,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 
 /* ── SUBSCRIBE BANNER ── */
 .sub-banner{background:linear-gradient(135deg,var(--mg-dim),rgba(11,11,11,0));border:1px solid var(--mg-border);border-radius:12px;padding:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}
-.sub-banner-text strong{font-family:'Syne',sans-serif;font-size:14px;color:var(--mg);display:block;margin-bottom:4px}
+.sub-banner-text strong{font-family:sans-serif;font-weight:700;font-size:14px;color:var(--mg);display:block;margin-bottom:4px}
 .sub-banner-text p{font-size:11px;color:var(--muted);line-height:1.6}
 
 /* ── MODAL ── */
@@ -272,26 +272,26 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 @media(min-width:520px){.modal{border-radius:16px}}
 @keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
 .modal-header{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700}
+.modal-title{font-family:sans-serif;font-weight:700;font-size:17px;font-weight:700}
 .modal-close{width:28px;height:28px;border-radius:6px;background:var(--s3);border:none;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
 .modal-close:hover{color:var(--text)}
 .modal-body{padding:18px;max-height:80vh;overflow-y:auto}
 .modal-footer{padding:14px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
-.modal-input{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:10px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:10px;transition:border-color .2s}
+.modal-input{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:10px 12px;color:var(--text);font-size:13px;font-family:sans-serif;outline:none;margin-bottom:10px;transition:border-color .2s}
 .modal-input:focus{border-color:var(--mg-border)}
 .modal-input::placeholder{color:var(--dim)}
 .plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
 .plan-card{background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s}
 .plan-card.on{border:2px solid var(--mg);background:var(--mg-dim)}
-.plan-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px}
-.plan-price{font-size:22px;font-weight:700;color:var(--mg);font-family:'Syne',sans-serif;line-height:1}
+.plan-name{font-family:sans-serif;font-weight:700;font-size:14px;font-weight:700;margin-bottom:4px}
+.plan-price{font-size:22px;font-weight:700;color:var(--mg);font-family:sans-serif;font-weight:700;line-height:1}
 .plan-price small{font-size:12px;color:var(--muted);font-weight:400}
 .plan-features{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.7}
 .tier-compare{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
 .tier-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--s2);border-radius:8px}
 .tier-row-name{font-size:12px;font-weight:500;width:60px;flex-shrink:0}
 .tier-row-desc{font-size:11px;color:var(--muted);flex:1}
-.tier-row-price{font-size:11px;font-family:'DM Mono',monospace;color:var(--amber)}
+.tier-row-price{font-size:11px;font-family:monospace;color:var(--amber)}
 
 /* ── ADMIN ── */
 #admin-page{display:none;min-height:100vh}
@@ -299,9 +299,9 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .admin-gate{position:fixed;inset:0;background:var(--black);z-index:500;display:flex;align-items:center;justify-content:center}
 .gate-box{background:var(--s1);border:1px solid var(--border2);border-radius:14px;padding:30px 24px;width:320px;text-align:center}
 .gate-icon{margin-bottom:14px;color:var(--mg)}
-.gate-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px}
+.gate-title{font-family:sans-serif;font-weight:700;font-size:20px;font-weight:700;margin-bottom:6px}
 .gate-sub{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6}
-.gate-input{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:11px 14px;color:var(--text);font-size:16px;font-family:'DM Mono',monospace;outline:none;text-align:center;letter-spacing:3px;margin-bottom:10px;transition:border-color .2s}
+.gate-input{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:11px 14px;color:var(--text);font-size:16px;font-family:monospace;outline:none;text-align:center;letter-spacing:3px;margin-bottom:10px;transition:border-color .2s}
 .gate-input:focus{border-color:var(--mg-border)}
 .gate-error{font-size:11px;color:var(--red);min-height:16px;margin-bottom:6px}
 .admin-layout{display:flex;min-height:calc(100vh - 52px)}
@@ -314,13 +314,13 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .admin-main{flex:1;overflow-y:auto}
 .admin-panel{display:none;padding:20px 22px}
 .admin-panel.on{display:block}
-.admin-page-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
+.admin-page-title{font-family:sans-serif;font-weight:700;font-size:20px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
 .admin-page-sub{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6}
 .pub-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 .form-group{display:flex;flex-direction:column;gap:5px}
 .form-group.full{grid-column:1/-1}
 .form-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}
-.form-input,.form-select,.form-textarea{background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:100%;transition:border-color .2s}
+.form-input,.form-select,.form-textarea{background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:9px 12px;color:var(--text);font-size:13px;font-family:sans-serif;outline:none;width:100%;transition:border-color .2s}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--mg-border)}
 .form-input::placeholder,.form-textarea::placeholder{color:var(--dim)}
 .form-select{cursor:pointer}.form-select option{background:var(--s2)}
@@ -328,7 +328,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .sel-builder{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
 .sel-builder-title{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px}
 .sel-builder-row{display:grid;grid-template-columns:110px 1fr 66px 66px 90px 30px;gap:6px;align-items:center;margin-bottom:7px}
-.sel-type-sel{background:var(--s2);border:1px solid var(--border2);border-radius:6px;padding:7px 8px;color:var(--text);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;width:100%}
+.sel-type-sel{background:var(--s2);border:1px solid var(--border2);border-radius:6px;padding:7px 8px;color:var(--text);font-size:11px;font-family:sans-serif;outline:none;cursor:pointer;width:100%}
 .sel-type-sel option{background:var(--s2)}
 .remove-sel{width:28px;height:28px;border-radius:6px;background:var(--red-dim);border:1px solid var(--red-b);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s}
 .remove-sel:hover{background:var(--red);color:#fff}
@@ -349,12 +349,12 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .bets-table tr:hover td{background:rgba(255,255,255,.02)}
 .inner-tabs{display:flex;gap:2px;background:var(--s2);border-radius:8px;padding:3px;margin-bottom:14px;width:fit-content;overflow-x:auto;scrollbar-width:none}
 .inner-tabs::-webkit-scrollbar{display:none}
-.inner-tab{padding:5px 13px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);border:none;background:none;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.inner-tab{padding:5px 13px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);border:none;background:none;font-family:sans-serif;transition:all .15s;white-space:nowrap}
 .inner-tab.on{background:var(--s4);color:var(--text)}
 .analytics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
 .an-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:13px}
 .an-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
-.an-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:2px}
+.an-val{font-family:sans-serif;font-weight:700;font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:2px}
 .an-sub{font-size:11px;color:var(--muted)}
 .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .settings-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px}
@@ -365,7 +365,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 /* ── SLIP UPLOADER ── */
 .slip-dropzone{background:var(--s1);border:2px dashed var(--border2);border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:18px}
 .slip-dropzone:hover,.slip-dropzone.drag-over{border-color:var(--mg-border);background:var(--mg-dim)}
-.slip-drop-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px;margin-top:12px}
+.slip-drop-title{font-family:sans-serif;font-weight:700;font-size:15px;font-weight:700;margin-bottom:4px;margin-top:12px}
 .slip-drop-sub{font-size:12px;color:var(--muted)}
 .slip-spinner{width:22px;height:22px;border:2px solid var(--border2);border-top-color:var(--mg);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -380,7 +380,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .cp-desc{font-size:12px;color:var(--text);margin-bottom:8px;line-height:1.5}
 .cp-code-link{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border2);border-radius:7px;padding:9px 12px;text-decoration:none;transition:all .2s}
 .cp-code-link:hover{border-color:var(--mg-border);background:var(--mg-dim)}
-.cp-code-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--mg);flex:1;letter-spacing:.5px}
+.cp-code-val{font-family:monospace;font-size:14px;font-weight:500;color:var(--mg);flex:1;letter-spacing:.5px}
 .cp-open-btn{font-size:10px;color:var(--muted);white-space:nowrap}
 .cp-footer{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-top:1px solid var(--border)}
 .cp-meta{display:flex;gap:12px;font-size:10px;color:var(--dim);font-family:'DM Mono',monospace}
@@ -430,7 +430,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .league-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--s1);cursor:pointer;transition:background .15s;user-select:none}
 .league-header:hover{background:var(--s2)}
 .league-header.open{background:var(--s2);border-bottom:1px solid var(--border)}
-.league-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.league-name{font-family:sans-serif;font-weight:700;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
 .league-count{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--s3);color:var(--muted)}
 .league-count.has-tips{background:var(--green-dim);color:var(--green)}
 .league-chevron{color:var(--dim);transition:transform .2s;font-size:12px}
@@ -446,7 +446,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .fixture-teams{flex:1;min-width:0}
 .fixture-home{font-size:13px;font-weight:500;color:var(--text)}
 .fixture-away{font-size:12px;color:var(--muted);margin-top:1px}
-.fixture-time{font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;white-space:nowrap;text-align:right}
+.fixture-time{font-size:10px;color:var(--dim);font-family:monospace;white-space:nowrap;text-align:right}
 .fixture-signal{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px;margin-top:3px;width:fit-content}
 .signal-BTTS{background:rgba(34,197,94,0.15);color:var(--green)}
 .signal-WIN_FORM{background:var(--mg-dim);color:var(--mg)}
@@ -466,11 +466,11 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .pct-bar-label{font-size:9px;color:var(--muted);margin-bottom:4px}
 .pct-bar-track{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;margin-bottom:3px}
 .pct-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
-.pct-bar-pct{font-family:'DM Mono',monospace;font-size:12px;font-weight:500}
+.pct-bar-pct{font-family:monospace;font-size:12px;font-weight:500}
 .detail-form-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
 .detail-form-block{background:var(--s1);border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
 .detail-form-title{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
-.detail-form-team{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--text);margin-bottom:7px}
+.detail-form-team{font-family:sans-serif;font-weight:700;font-size:12px;font-weight:700;color:var(--text);margin-bottom:7px}
 .form-result-row{display:flex;align-items:center;gap:8px;padding:5px 8px;margin-bottom:3px;border-radius:6px}
 .form-result-badge{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;color:#000}
 .form-result-badge.W{background:var(--green)}.form-result-badge.D{background:var(--amber)}.form-result-badge.L{background:var(--red)}
@@ -484,13 +484,13 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .detail-h2h-title{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .detail-h2h-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
 .detail-h2h-row:last-child{border-bottom:none}
-.detail-h2h-score{font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--text);min-width:40px;text-align:center;flex-shrink:0}
+.detail-h2h-score{font-family:monospace;font-size:11px;font-weight:700;color:var(--text);min-width:40px;text-align:center;flex-shrink:0}
 .detail-h2h-team{font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .detail-h2h-results{font-size:11px;color:var(--muted);line-height:1.7;font-family:'DM Mono',monospace}
 .detail-stats-row{display:flex;gap:8px;margin-bottom:10px}
 .detail-stat{flex:1;background:var(--s1);border-radius:8px;padding:8px 10px;text-align:center;border:1px solid var(--border)}
 .detail-stat-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-.detail-stat-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:500}
+.detail-stat-val{font-family:monospace;font-size:14px;font-weight:500}
 .detail-signal-box{padding:10px 12px;border-radius:8px;border-left:3px solid;font-size:12px;line-height:1.7;color:var(--muted)}
 .detail-signal-box strong{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px}
 
@@ -504,7 +504,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 @media(max-width:380px){.iq-chat-window{width:calc(100vw - 28px);right:14px}}
 .iq-chat-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--s2)}
 .iq-chat-avatar{width:32px;height:32px;border-radius:50%;background:var(--mg-dim);border:1px solid var(--mg-border);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.iq-chat-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex:1}
+.iq-chat-title{font-family:sans-serif;font-weight:700;font-size:13px;font-weight:700;flex:1}
 .iq-chat-subtitle{font-size:10px;color:var(--muted)}
 .iq-close-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px}
 .iq-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
@@ -513,7 +513,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .iq-msg-bot{background:var(--s2);border:1px solid var(--border);color:var(--text);align-self:flex-start;border-radius:10px 10px 10px 2px}
 .iq-msg-typing{opacity:.6;font-style:italic}
 .iq-input-row{display:flex;gap:6px;padding:10px;border-top:1px solid var(--border);background:var(--s2)}
-.iq-input{flex:1;background:var(--s3);border:1px solid var(--border2);border-radius:8px;padding:8px 11px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.iq-input{flex:1;background:var(--s3);border:1px solid var(--border2);border-radius:8px;padding:8px 11px;color:var(--text);font-size:12px;font-family:sans-serif;outline:none;transition:border-color .2s}
 .iq-input:focus{border-color:var(--mg-border)}
 .iq-input::placeholder{color:var(--dim)}
 .iq-send-btn{width:32px;height:32px;border-radius:8px;background:var(--mg);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
@@ -532,7 +532,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 .fx-tip-pill strong{color:var(--text);font-weight:600}
 .fx-suggested{padding:10px 16px 12px;border-top:1px solid var(--border)}
 .fx-suggested-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:4px}
-.fx-suggested-bet{font-family:"Syne",sans-serif;font-size:17px;font-weight:700;letter-spacing:-.3px}
+.fx-suggested-bet{font-family:sans-serif;font-weight:700;font-size:17px;font-weight:700;letter-spacing:-.3px}
 .fx-signal-tag{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 </style>
 </head>
@@ -776,7 +776,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <div><label class="form-label">Booking Code</label><input class="form-input" id="cp-code" placeholder="Paste code here" style="font-family:'DM Mono',monospace;letter-spacing:1px;font-size:13px" oninput="this.value=this.value.toUpperCase()"></div>
+        <div><label class="form-label">Booking Code</label><input class="form-input" id="cp-code" placeholder="Paste code here" style="font-family:monospace;letter-spacing:1px;font-size:13px" oninput="this.value=this.value.toUpperCase()"></div>
         <div><label class="form-label">Combined Odds</label><input class="form-input" id="cp-odds" placeholder="e.g. 12.50" style="font-size:13px"></div>
       </div>
       <div style="margin-bottom:8px"><label class="form-label">Describe your pick</label><input class="form-input" id="cp-desc" placeholder="e.g. 4-leg Saturday acca — City, Bayern, Dortmund, Arsenal" style="font-size:13px"></div>
@@ -844,7 +844,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
       <div style="width:72px;height:72px;border-radius:50%;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="11" r="5.5" stroke="var(--muted)" stroke-width="1.6"/><path d="M5 28c0-6.075 4.925-11 11-11s11 4.925 11 11" stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round"/></svg>
       </div>
-      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px">My Profile</div>
+      <div style="font-family:sans-serif;font-weight:700;font-size:20px;font-weight:700;margin-bottom:6px">My Profile</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6">Sign up or log in to track your membership, manage your details and see your active subscriptions.</div>
       <button class="btn btn-mg" style="margin:0 auto;padding:12px 28px;font-size:14px" onclick="openSignupModal()">Create Account →</button>
       <div style="margin-top:12px"><span style="font-size:12px;color:var(--muted)">Already a member? </span><span style="font-size:12px;color:var(--mg);cursor:pointer" onclick="openLoginModal()">Log in</span></div>
@@ -854,9 +854,9 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
     <div id="profile-member" style="display:none">
       <!-- Avatar + name header -->
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:22px;padding:18px;background:var(--s1);border:1px solid var(--border);border-radius:14px">
-        <div id="profile-avatar" style="width:56px;height:56px;border-radius:50%;background:var(--mg-dim);border:2px solid var(--mg-border);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--mg);flex-shrink:0">G</div>
+        <div id="profile-avatar" style="width:56px;height:56px;border-radius:50%;background:var(--mg-dim);border:2px solid var(--mg-border);display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-weight:700;font-size:20px;font-weight:700;color:var(--mg);flex-shrink:0">G</div>
         <div style="flex:1;min-width:0">
-          <div id="profile-name-display" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:2px">Member</div>
+          <div id="profile-name-display" style="font-family:sans-serif;font-weight:700;font-size:18px;font-weight:700;margin-bottom:2px">Member</div>
           <div id="profile-email-display" style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
           <div style="margin-top:6px"><span id="profile-tier-badge" style="font-size:9px;font-weight:700;padding:2px 9px;border-radius:5px;background:var(--green-dim);color:var(--green);text-transform:uppercase;letter-spacing:.5px">Free Member</span></div>
         </div>
@@ -885,7 +885,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 
       <!-- Upgrade section -->
       <div style="background:linear-gradient(135deg,var(--mg-dim),rgba(11,11,11,0));border:1px solid var(--mg-border);border-radius:12px;padding:16px;text-align:center">
-        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--mg);margin-bottom:6px">Unlock Sport Memberships</div>
+        <div style="font-family:sans-serif;font-weight:700;font-size:15px;font-weight:700;color:var(--mg);margin-bottom:6px">Unlock Sport Memberships</div>
         <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">Get full tips, predictions and analysis for the sports you follow. Monthly per sport.</div>
         <button class="btn btn-mg" style="width:100%;justify-content:center" onclick="openSignupModal()">View All Plans →</button>
       </div>
@@ -1167,7 +1167,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
         </div>
         <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;max-width:600px">
           <div style="font-size:11px;color:var(--muted);line-height:1.7">
-            <strong style="color:var(--text)">What this does:</strong> Calls the Flashscore API for every fixture in selected leagues on selected dates. Pulls win/draw/away percentages, BTTS, Over 2.5 predictions, and H2H context. Writes everything to your <span style="font-family:'DM Mono',monospace;color:var(--mg)">market_trends</span> table. Appears instantly on the Home page feed and Soccer → Market Trends tab.
+            <strong style="color:var(--text)">What this does:</strong> Calls the Flashscore API for every fixture in selected leagues on selected dates. Pulls win/draw/away percentages, BTTS, Over 2.5 predictions, and H2H context. Writes everything to your <span style="font-family:monospace;color:var(--mg)">market_trends</span> table. Appears instantly on the Home page feed and Soccer → Market Trends tab.
           </div>
         </div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
@@ -1312,7 +1312,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">Edit Bet <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)" id="edit-bet-id"></span></div>
+      <div class="modal-title">Edit Bet <span style="font-family:monospace;font-size:11px;color:var(--muted)" id="edit-bet-id"></span></div>
       <button class="modal-close" onclick="closeModal('edit-modal')">×</button>
     </div>
     <div class="modal-body">
@@ -1356,7 +1356,7 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
         <!-- Free tier -->
         <div style="background:var(--s2);border:1px solid var(--green-b);border-radius:10px;padding:14px;margin-bottom:8px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <div><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700">Free</div><div style="font-size:11px;color:var(--muted)">All members · No payment needed</div></div>
+            <div><div style="font-family:sans-serif;font-weight:700;font-size:14px;font-weight:700">Free</div><div style="font-size:11px;color:var(--muted)">All members · No payment needed</div></div>
             <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:5px;background:var(--green-dim);color:var(--green)">ACTIVE</span>
           </div>
           <div style="font-size:11px;color:var(--muted);line-height:1.8">✓ Market trends · Free tips across all sports · Member bet codes · ValueCheck tool</div>
@@ -1368,25 +1368,25 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
           <div style="background:var(--s1);border:1px solid var(--amber-b);border-radius:10px;padding:12px;opacity:0.8">
             <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:4px">🐎 Horse Racing</div>
-            <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--amber)">R149<span style="font-size:11px;color:var(--muted);font-weight:400">/mo</span></div>
+            <div style="font-family:sans-serif;font-weight:700;font-size:18px;font-weight:700;color:var(--amber)">R149<span style="font-size:11px;color:var(--muted);font-weight:400">/mo</span></div>
             <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.6">Full race card · Pick 6 · Bankers · Each-way plays</div>
             <div style="margin-top:8px"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--s3);color:var(--dim)">COMING SOON</span></div>
           </div>
           <div style="background:var(--s1);border:1px solid var(--green-b);border-radius:10px;padding:12px;opacity:0.8">
             <div style="font-size:11px;color:var(--green);font-weight:700;margin-bottom:4px">⚽ Soccer</div>
-            <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--green)">R99<span style="font-size:11px;color:var(--muted);font-weight:400">/mo</span></div>
+            <div style="font-family:sans-serif;font-weight:700;font-size:18px;font-weight:700;color:var(--green)">R99<span style="font-size:11px;color:var(--muted);font-weight:400">/mo</span></div>
             <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.6">Weekend tips · Accas · Market trends · BTTS plays</div>
             <div style="margin-top:8px"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--s3);color:var(--dim)">COMING SOON</span></div>
           </div>
           <div style="background:var(--s1);border:1px solid rgba(20,184,166,0.3);border-radius:10px;padding:12px;opacity:0.8">
             <div style="font-size:11px;color:#14B8A6;font-weight:700;margin-bottom:4px">⛳ Golf</div>
-            <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:#14B8A6">R99<span style="font-size:11px;color:var(--muted);font-weight:400">/mo</span></div>
+            <div style="font-family:sans-serif;font-weight:700;font-size:18px;font-weight:700;color:#14B8A6">R99<span style="font-size:11px;color:var(--muted);font-weight:400">/mo</span></div>
             <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.6">Major tournament tips · Tournament winner picks</div>
             <div style="margin-top:8px"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--s3);color:var(--dim)">COMING SOON</span></div>
           </div>
           <div style="background:var(--s1);border:1px solid var(--red-b);border-radius:10px;padding:12px;opacity:0.8">
             <div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:4px">🥊 EFC / UFC</div>
-            <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--red)">R99<span style="font-size:11px;color:var(--muted);font-weight:400">/mo</span></div>
+            <div style="font-family:sans-serif;font-weight:700;font-size:18px;font-weight:700;color:var(--red)">R99<span style="font-size:11px;color:var(--muted);font-weight:400">/mo</span></div>
             <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.6">Card breakdowns · Method of victory · Best value</div>
             <div style="margin-top:8px"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--s3);color:var(--dim)">COMING SOON</span></div>
           </div>
@@ -1633,7 +1633,7 @@ function renderBetCard(b, idx) {
         <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:2px 7px;border-radius:4px;background:var(--s3);color:var(--muted)">Multi Bet</span>
         <span style="font-size:11px;color:var(--muted)">${legCount} picks</span>
       </div>
-      ${totalOdds ? `<div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--green)">${totalOdds}</div>` : ''}
+      ${totalOdds ? `<div style="font-family:monospace;font-size:15px;font-weight:700;color:var(--green)">${totalOdds}</div>` : ''}
     </div>` : '';
 
   const sc = STATUS_COLOR[b.status]||STATUS_COLOR.pending;
@@ -1660,7 +1660,7 @@ function renderBetCard(b, idx) {
       ${b.note ? `<div class="bet-note" style="${isAcca ? 'margin:8px 14px 4px;' : ''}"><strong>FanatIQ Analysis:</strong> ${b.note}</div>` : ''}
     </div>
     <div class="bet-footer">
-      <div class="bet-status-row"><div class="sdot" style="background:${sc}"></div><span style="color:${sc};font-family:'DM Mono',monospace;font-size:10px">${sl}</span></div>
+      <div class="bet-status-row"><div class="sdot" style="background:${sc}"></div><span style="color:${sc};font-family:monospace;font-size:10px">${sl}</span></div>
       <div class="watermark">${b.id}</div>
     </div>`;
 
@@ -1738,34 +1738,38 @@ function renderSoccerPage() {
     const tips = bets.filter(b => !b.id?.includes('ACCA'));
     feedEl.innerHTML = tips.length ? tips.map((b,i) => renderBetCard(b,i)).join('') : renderEmptyState('soccer');
   } else if (tab === 'accas') {
-    if (!sb) { feedEl.innerHTML = renderEmptyState('soccer'); return; }
-    feedEl.innerHTML = '<div style="padding:28px;text-align:center;color:var(--muted);font-size:12px">Loading...</div>';
-    sb.from('market_trends').select('id,home_team,away_team,league,btts_pct').eq('sport','soccer').not('btts_pct','is',null).order('btts_pct',{ascending:false}).limit(60).then(function(res) {
-      var d = res.data;
-      if (!d || !d.length) { feedEl.innerHTML = renderEmptyState('soccer'); return; }
-      var html = '<div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden">';
-      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s2);border-bottom:1px solid var(--border)">';
-      html += '<div style="font-family:Syne,sans-serif;font-size:13px;font-weight:700">BTTS Rankings';
-      html += ' <span style="font-size:9px;padding:2px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.5px">This Weekend</span></div>';
-      html += '<div style="font-size:10px;color:var(--muted)">' + d.length + ' fixtures</div></div>';
-      d.forEach(function(m, i) {
+    // BTTS Rankings — pull from market_trends and rank by btts_pct
+    if (!sb) { feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">Not connected</div></div>'; return; }
+    feedEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:12px">Loading BTTS rankings...</div>';
+    sb.from('market_trends').select('id,home_team,away_team,league,match_date,match_time,btts_pct').eq('sport','soccer').not('btts_pct','is',null).order('btts_pct',{ascending:false}).limit(54).then(({data,error}) => {
+      if (error || !data || !data.length) {
+        feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">No BTTS data yet</div><div class="empty-sub">Run the Soccer Engine in admin to load this weekend&#39;s fixtures.</div></div>';
+        return;
+      }
+      const rows = data.map(function(m, i) {
         var pct = Math.round(m.btts_pct || 0);
         var col = pct >= 70 ? 'var(--green)' : pct >= 55 ? 'var(--amber)' : 'var(--muted)';
-        var match = (m.home_team && m.away_team) ? m.home_team + ' vs ' + m.away_team : 'Unknown';
-        html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)">';
-        html += '<div style="font-size:11px;color:var(--dim);width:22px;text-align:right;flex-shrink:0">' + (i+1) + '</div>';
-        html += '<div style="flex:1;min-width:0">';
-        html += '<div style="font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + match + '</div>';
-        html += '<div style="font-size:10px;color:var(--dim);margin-top:1px">' + (m.league||'') + '</div>';
-        html += '<div style="height:4px;background:var(--s3);border-radius:2px;margin-top:5px;overflow:hidden">';
-        html += '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:2px"></div></div>';
-        html += '</div>';
-        html += '<div style="font-size:16px;font-weight:700;color:' + col + ';flex-shrink:0;min-width:44px;text-align:right">' + pct + '%</div>';
-        html += '</div>';
-      });
-      html += '</div>';
-      feedEl.innerHTML = html;
+        var matchLabel = (m.home_team && m.away_team) ? m.home_team + ' vs ' + m.away_team : 'Unknown fixture';
+        var leagueLabel = m.league || '';
+        return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)">'
+          + '<div style="font-size:11px;color:var(--dim);width:22px;text-align:right;flex-shrink:0">' + (i+1) + '</div>'
+          + '<div style="flex:1;min-width:0">'
+          + '<div style="font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + matchLabel + '</div>'
+          + '<div style="font-size:10px;color:var(--dim);margin-top:1px">' + leagueLabel + '</div>'
+          + '<div style="height:4px;background:var(--s3);border-radius:2px;margin-top:5px;overflow:hidden">'
+          + '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:2px"></div></div>'
+          + '</div>'
+          + '<div style="font-family:monospace;font-size:16px;font-weight:700;color:' + col + ';flex-shrink:0;min-width:44px;text-align:right">' + pct + '%</div>'
+          + '</div>';
+      }).join('');
+      feedEl.innerHTML = '<div style="background:var(--s1);border-radius:12px;overflow:hidden;border:1px solid var(--border)">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--s2)">'
+        + '<div style="font-family:sans-serif;font-weight:700;font-size:13px;font-weight:700">BTTS Rankings '
+        + '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-left:4px">This Weekend</span></div>'
+        + '<div style="font-size:10px;color:var(--muted)">' + data.length + ' fixtures · best to worst</div>'
+        + '</div>' + rows + '</div>';
     });
+  }
 }
 
 function switchSoccerTab(tab, el) {
@@ -1865,7 +1869,7 @@ function renderFormResults(formStr, resultsArr) {
           <div style="font-size:11px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${g.opponent||'Opponent'}</div>
           ${g.competition ? `<div style="font-size:9px;color:var(--dim)">${g.competition}</div>` : ''}
         </div>
-        <div style="font-family:'DM Mono',monospace;font-size:12px;font-weight:700;color:${badgeColor};flex-shrink:0">${g.score||'—'}</div>
+        <div style="font-family:monospace;font-size:12px;font-weight:700;color:${badgeColor};flex-shrink:0">${g.score||'—'}</div>
       </div>`;
     }).join('');
   }
@@ -2122,11 +2126,11 @@ function renderLeagueAccordions(data, containerId) {
               <!-- Avg goals -->
               <div style="display:flex;gap:6px;margin-bottom:12px">
                 <div style="flex:1;background:var(--s2);border-radius:8px;padding:7px 10px;border:1px solid var(--border);text-align:center">
-                  <div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)">${homeGoals}</div>
+                  <div style="font-size:13px;font-weight:700;font-family:monospace;color:var(--text)">${homeGoals}</div>
                   <div style="font-size:9px;color:var(--dim)">${m.home_team} avg goals</div>
                 </div>
                 <div style="flex:1;background:var(--s2);border-radius:8px;padding:7px 10px;border:1px solid var(--border);text-align:center">
-                  <div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)">${awayGoals}</div>
+                  <div style="font-size:13px;font-weight:700;font-family:monospace;color:var(--text)">${awayGoals}</div>
                   <div style="font-size:9px;color:var(--dim)">${m.away_team} avg goals</div>
                 </div>
               </div>
@@ -2622,9 +2626,9 @@ function renderAdminTable(bets) {
   tbody.innerHTML = filtered.map(b => `
     <tr>
       <td>${{racing:'🐎',soccer:'⚽',golf:'⛳',efc:'🥊',ufc:'🥊'}[b.sport]||'🎯'} ${(b.sport||'').toUpperCase()}</td>
-      <td><div style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${b.event}</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--dim)">${b.id}</div></td>
+      <td><div style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${b.event}</div><div style="font-family:monospace;font-size:9px;color:var(--dim)">${b.id}</div></td>
       <td><span style="font-size:9px;padding:2px 7px;border-radius:4px;background:var(--s3);color:var(--muted);font-weight:600">${(b.tier||'free').toUpperCase()}</span></td>
-      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mg)">${b.share_code||'—'}</td>
+      <td style="font-family:monospace;font-size:10px;color:var(--mg)">${b.share_code||'—'}</td>
       <td>
         <select class="form-select" style="padding:3px 7px;font-size:11px;width:auto" onchange="updateStatus('${b.id}',this.value)">
           <option value="pending" ${b.status==='pending'?'selected':''}>⏳ Pending</option>
@@ -2695,7 +2699,7 @@ function loadReorderList(sport, btn) {
           <circle cx="9" cy="11" r="1.2" fill="currentColor"/>
         </svg>
       </div>
-      <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--dim);width:16px;flex-shrink:0">${i+1}</span>
+      <span style="font-family:monospace;font-size:10px;color:var(--dim);width:16px;flex-shrink:0">${i+1}</span>
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.event}</div>
         <div style="font-size:10px;color:var(--dim);font-family:'DM Mono',monospace">${b.id}</div>
@@ -3082,7 +3086,7 @@ async function runOddsSync() {
     if (allResults.length) {
       resultsEl.innerHTML = allResults.map(r => {
         const isValue = r.includes('[') && r.includes('VALUE');
-        return `<div style="font-size:11px;padding:5px 10px;border-radius:6px;font-family:'DM Mono',monospace;${
+        return `<div style="font-size:11px;padding:5px 10px;border-radius:6px;font-family:monospace;${
           isValue
             ? 'background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2)'
             : 'background:var(--s2);color:var(--muted)'
