@@ -706,10 +706,10 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
       </div>
     </div>
   </div>
-  <div style="display:flex;background:var(--black);border-bottom:1px solid var(--border);overflow:hidden">
-    <button class="stab on" id="stab-trends" onclick="switchSoccerTab('trends',this)" style="flex:1.6;text-align:center;padding:11px 8px;font-size:12px">Market Trends</button>
-    <button class="stab" id="stab-tips" onclick="switchSoccerTab('tips',this)" style="flex:1;text-align:center;padding:11px 8px;font-size:14px;font-weight:700;color:var(--mg);letter-spacing:.2px">Tips</button>
-    <button class="stab" id="stab-accas" onclick="switchSoccerTab('accas',this)" style="flex:1;text-align:center;padding:11px 8px;font-size:14px;font-weight:700;color:var(--mg);letter-spacing:.2px">Accas</button>
+  <div class="sport-sub-tabs">
+    <button class="stab on" id="stab-trends" onclick="switchSoccerTab('trends',this)">Market Trends</button>
+    <button class="stab" id="stab-tips" onclick="switchSoccerTab('tips',this)">Tips</button>
+    <button class="stab" id="stab-accas" onclick="switchSoccerTab('accas',this)">BTTS %</button>
   </div>
   <div class="page-inner" style="padding-top:16px">
     <div id="soccer-feed"></div>
@@ -1605,43 +1605,62 @@ const STATUS_LABEL = { won:'✓ Won', lost:'✗ Lost', pending:'⏳ Pending' };
 function renderBetCard(b, idx) {
   const cfg = SPORT_CONFIG[b.sport] || SPORT_CONFIG.efc;
   const isAcca = (b.selections||[]).some(s => s.type === 'treble' || s.type === 'pick6') || (b.selections||[]).length > 3;
-  const sels = (b.selections||[]).filter(s => isAcca ? true : s.type === 'best').map(s => `
-    <div class="sel-row ${s.type}-bet">
+
+  // For accas: show all legs cleanly; for single tips: show best bet only
+  const visibleSels = isAcca
+    ? (b.selections||[])
+    : (b.selections||[]).filter(s => s.type === 'best' || s.type === 'value');
+
+  const sels = visibleSels.map(s => `
+    <div class="sel-row ${isAcca ? 'treble-bet' : s.type+'-bet'}" style="${isAcca ? 'padding:10px 14px;' : ''}">
       <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+        ${!isAcca ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
           <span class="sel-type-pill">${s.type==='best'?'Best Bet':s.type==='value'?'Value':s.type==='next'?'Next Best':s.type==='place'?'Place':s.type==='treble'?'Treble':s.type==='pick6'?'Pick 6':s.type}</span>
           ${s.ar ? `<span style="font-size:9px;color:var(--dim)">${s.ar}</span>` : ''}
-        </div>
-        <div class="sel-name">${s.name}</div>
+        </div>` : ''}
+        <div class="sel-name" style="${isAcca ? 'font-size:13px;' : ''}">${s.name}</div>
         ${s.detail ? `<div class="sel-detail">${s.detail}</div>` : ''}
       </div>
       ${s.odds ? `<div class="sel-odds">${s.odds}</div>` : ''}
     </div>`).join('');
 
+  // Acca summary header
+  const legCount = (b.selections||[]).length;
+  const totalOdds = b.venue?.match(/Odds:\s*([\d.\/]+)/)?.[1] || '';
+  const accaHeader = isAcca ? `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:2px 7px;border-radius:4px;background:var(--s3);color:var(--muted)">Multi Bet</span>
+        <span style="font-size:11px;color:var(--muted)">${legCount} picks</span>
+      </div>
+      ${totalOdds ? `<div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--green)">${totalOdds}</div>` : ''}
+    </div>` : '';
+
   const sc = STATUS_COLOR[b.status]||STATUS_COLOR.pending;
   const sl = STATUS_LABEL[b.status]||STATUS_LABEL.pending;
   const ago = timeAgo(b.published_at);
+  const displayVenue = isAcca ? '' : (b.venue||'');
 
   const inner = `
     <div class="bet-header">
       <div class="bet-sport-icon icon-${b.sport}" style="background:${cfg.bg};color:${cfg.color}">${cfg.icon.replace('width="56px"','width="22px"').replace('height="56px"','height="22px"').replace('width="52px"','width="22px"').replace('height="52px"','height="22px"').replace('width="54px"','width="22px"').replace('height="54px"','height="22px"')}</div>
       <div class="bet-meta">
         <div class="bet-title">${b.event}</div>
-        <div class="bet-sub">${b.venue||''}</div>
+        <div class="bet-sub">${displayVenue}</div>
       </div>
       <div class="bet-time-col">
         <div class="bet-time">${b.time||''}</div>
-        <div class="bet-tier-badge" style="color:${b.tier==='gold'?'var(--amber)':b.tier==='silver'?'#a8a8b0':b.tier==='bronze'?'#cd7f32':'var(--green)'}">${(b.tier||'free').toUpperCase()}</div>
+        <div class="bet-tier-badge" style="color:${b.tier==='gold'?'var(--amber)':b.tier==='silver'?'#a8a8b0':b.tier==='bronze'?'#cd7f32':'var(--green)'}">${ (b.tier||'free').toUpperCase()}</div>
         <div class="bet-ago">${ago}</div>
       </div>
     </div>
-    <div class="bet-body">
-      <div class="bet-selections">${sels}</div>
-      ${b.note ? `<div class="bet-note"><strong>FanatIQ Analysis:</strong> ${b.note}</div>` : ''}
+    ${accaHeader}
+    <div class="bet-body" style="${isAcca ? 'padding:8px 0;' : ''}">
+      <div class="bet-selections" style="${isAcca ? 'gap:0;' : ''}">${sels}</div>
+      ${b.note ? `<div class="bet-note" style="${isAcca ? 'margin:8px 14px 4px;' : ''}"><strong>FanatIQ Analysis:</strong> ${b.note}</div>` : ''}
     </div>
     <div class="bet-footer">
       <div class="bet-status-row"><div class="sdot" style="background:${sc}"></div><span style="color:${sc};font-family:'DM Mono',monospace;font-size:10px">${sl}</span></div>
-
       <div class="watermark">${b.id}</div>
     </div>`;
 
@@ -1719,8 +1738,41 @@ function renderSoccerPage() {
     const tips = bets.filter(b => !b.id?.includes('ACCA'));
     feedEl.innerHTML = tips.length ? tips.map((b,i) => renderBetCard(b,i)).join('') : renderEmptyState('soccer');
   } else if (tab === 'accas') {
-    const accas = bets.filter(b => b.event?.toLowerCase().includes('acca') || b.selections?.length > 3);
-    feedEl.innerHTML = accas.length ? accas.map((b,i) => renderBetCard(b,i)).join('') : `<div class="empty-state"><div class="empty-title">No accas yet</div><div class="empty-sub">Weekend accumulator builds coming Saturday morning.</div></div>`;
+    // BTTS Rankings — pull from market_trends and rank by btts_pct
+    if (!sb) { feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">Not connected</div></div>'; return; }
+    feedEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:12px">Loading BTTS rankings...</div>';
+    sb.from('market_trends').select('id,home_team,away_team,league,match_date,match_time,btts_pct').eq('sport','soccer').not('btts_pct','is',null).order('btts_pct',{ascending:false}).limit(54).then(({data,error}) => {
+      if (error || !data || !data.length) {
+        feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">No BTTS data yet</div><div class="empty-sub">Run the Soccer Engine in admin to load this weekend's fixtures.</div></div>';
+        return;
+      }
+      const rows = data.map((m, i) => {
+        const pct = Math.round(m.btts_pct || 0);
+        const barW = pct;
+        const col = pct >= 70 ? 'var(--green)' : pct >= 55 ? 'var(--amber)' : 'var(--muted)';
+        const rank = i + 1;
+        const matchLabel = (m.home_team && m.away_team) ? `${m.home_team} vs ${m.away_team}` : 'Unknown fixture';
+        const leagueLabel = m.league || '';
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--s1)${i===0?';border-top:1px solid var(--border)':''}">
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);width:20px;text-align:right;flex-shrink:0">${rank}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${matchLabel}</div>
+            <div style="font-size:10px;color:var(--dim);margin-top:1px">${leagueLabel}</div>
+            <div style="height:4px;background:var(--s3);border-radius:2px;margin-top:5px;overflow:hidden">
+              <div style="height:100%;width:${barW}%;background:${col};border-radius:2px;transition:width .4s ease"></div>
+            </div>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:${col};flex-shrink:0;min-width:44px;text-align:right">${pct}%</div>
+        </div>`;
+      }).join('');
+      feedEl.innerHTML = `<div style="background:var(--s1);border-radius:12px;overflow:hidden;border:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--s2)">
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">BTTS Rankings <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-left:4px">Weekend</span></div>
+          <div style="font-size:10px;color:var(--muted)">${data.length} fixtures · best to worst</div>
+        </div>
+        ${rows}
+      </div>`;
+    });
   }
 }
 
@@ -1728,17 +1780,10 @@ function switchSoccerTab(tab, el) {
   currentSoccerTab = tab;
   document.querySelectorAll('#page-soccer .stab').forEach(t => {
     t.classList.remove('on');
-    // restore muted color for Tips/Accas when not active
-    if (t.id === 'stab-tips' || t.id === 'stab-accas') {
-      t.style.color = 'var(--mg)';
-      t.style.opacity = '0.45';
-    }
+    t.style.color = '';
+    t.style.opacity = '';
   });
   el.classList.add('on');
-  if (el.id === 'stab-tips' || el.id === 'stab-accas') {
-    el.style.color = 'var(--mg)';
-    el.style.opacity = '1';
-  }
   renderSoccerPage();
 }
 
@@ -2507,7 +2552,7 @@ async function edgeWrite(action, payload, id) {
 async function publishBet() {
   const sport  = document.getElementById('f-sport').value;
   const event  = document.getElementById('f-event').value.trim();
-  const time   = document.getElementById('f-time').value.trim();
+  const time   = document.getElementById('f-time').value.trim().replace(/\s*\([^)]*\)/g, '').trim();
   const venue  = document.getElementById('f-venue').value.trim();
   const note   = document.getElementById('f-note').value.trim();
   const tier   = document.querySelector('input[name="tier"]:checked')?.value||'free';
@@ -2912,7 +2957,7 @@ function clearSlip() {
 async function publishSlipBet() {
   const sport = document.getElementById('slip-sport').value;
   const event = document.getElementById('slip-event').value.trim();
-  const time = document.getElementById('slip-time').value.trim();
+  const time = document.getElementById('slip-time').value.trim().replace(/\s*\([^)]*\)/g, '').trim();
   const bookie = document.getElementById('slip-bookie').value.trim();
   const odds = document.getElementById('slip-odds').value.trim();
   const note = document.getElementById('slip-note').value.trim();
