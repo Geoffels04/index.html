@@ -1743,35 +1743,31 @@ function renderSoccerPage() {
     feedEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:12px">Loading BTTS rankings...</div>';
     sb.from('market_trends').select('id,home_team,away_team,league,match_date,match_time,btts_pct').eq('sport','soccer').not('btts_pct','is',null).order('btts_pct',{ascending:false}).limit(54).then(({data,error}) => {
       if (error || !data || !data.length) {
-        feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">No BTTS data yet</div><div class="empty-sub">Run the Soccer Engine in admin to load this weekend's fixtures.</div></div>';
+        feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">No BTTS data yet</div><div class="empty-sub">Run the Soccer Engine in admin to load this weekend&#39;s fixtures.</div></div>';
         return;
       }
-      const rows = data.map((m, i) => {
-        const pct = Math.round(m.btts_pct || 0);
-        const barW = pct;
-        const col = pct >= 70 ? 'var(--green)' : pct >= 55 ? 'var(--amber)' : 'var(--muted)';
-        const rank = i + 1;
-        const matchLabel = (m.home_team && m.away_team) ? `${m.home_team} vs ${m.away_team}` : 'Unknown fixture';
-        const leagueLabel = m.league || '';
-        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--s1)${i===0?';border-top:1px solid var(--border)':''}">
-          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);width:20px;text-align:right;flex-shrink:0">${rank}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${matchLabel}</div>
-            <div style="font-size:10px;color:var(--dim);margin-top:1px">${leagueLabel}</div>
-            <div style="height:4px;background:var(--s3);border-radius:2px;margin-top:5px;overflow:hidden">
-              <div style="height:100%;width:${barW}%;background:${col};border-radius:2px;transition:width .4s ease"></div>
-            </div>
-          </div>
-          <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:${col};flex-shrink:0;min-width:44px;text-align:right">${pct}%</div>
-        </div>`;
+      const rows = data.map(function(m, i) {
+        var pct = Math.round(m.btts_pct || 0);
+        var col = pct >= 70 ? 'var(--green)' : pct >= 55 ? 'var(--amber)' : 'var(--muted)';
+        var matchLabel = (m.home_team && m.away_team) ? m.home_team + ' vs ' + m.away_team : 'Unknown fixture';
+        var leagueLabel = m.league || '';
+        return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)">'
+          + '<div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);width:22px;text-align:right;flex-shrink:0">' + (i+1) + '</div>'
+          + '<div style="flex:1;min-width:0">'
+          + '<div style="font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + matchLabel + '</div>'
+          + '<div style="font-size:10px;color:var(--dim);margin-top:1px">' + leagueLabel + '</div>'
+          + '<div style="height:4px;background:var(--s3);border-radius:2px;margin-top:5px;overflow:hidden">'
+          + '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:2px"></div></div>'
+          + '</div>'
+          + '<div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:' + col + ';flex-shrink:0;min-width:44px;text-align:right">' + pct + '%</div>'
+          + '</div>';
       }).join('');
-      feedEl.innerHTML = `<div style="background:var(--s1);border-radius:12px;overflow:hidden;border:1px solid var(--border)">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--s2)">
-          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">BTTS Rankings <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-left:4px">Weekend</span></div>
-          <div style="font-size:10px;color:var(--muted)">${data.length} fixtures · best to worst</div>
-        </div>
-        ${rows}
-      </div>`;
+      feedEl.innerHTML = '<div style="background:var(--s1);border-radius:12px;overflow:hidden;border:1px solid var(--border)">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--s2)">'
+        + '<div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">BTTS Rankings '
+        + '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-left:4px">This Weekend</span></div>'
+        + '<div style="font-size:10px;color:var(--muted)">' + data.length + ' fixtures · best to worst</div>'
+        + '</div>' + rows + '</div>';
     });
   }
 }
@@ -2841,85 +2837,32 @@ async function processSlip(file) {
 }
 
 async function parseSlip(base64, mimeType) {
-  // Use the slip-reader Supabase edge function that supports vision/image parsing
-  // Falls back to the soccer-predictions edge function pattern with image support
   const SLIP_URL = 'https://nzxjbzgxdokbppchattt.supabase.co/functions/v1/slip-reader';
-  const IQ_URL   = 'https://nzxjbzgxdokbppchattt.supabase.co/functions/v1/iq-chat';
+  const prompt = 'You are a bet slip reader. Analyse this betting slip image and return ONLY a raw JSON object with no markdown, no explanation.'
+    + ' Return this exact structure: {"sport":"soccer","event":"Multi Bet - 8 picks","time":"","bookmaker":"","totalOdds":"","selections":[{"type":"treble","name":"","odds":"","detail":""}]}'
+    + ' Rules: sport is soccer/racing/golf/efc. For multi bets set event to "Multi Bet - N picks". type is treble for every leg in a multi-bet. name is the winning selection. detail is the match. Extract ALL legs.';
 
-  const prompt = `You are a bet slip reader. Analyse this betting slip image carefully and return ONLY a raw JSON object — no markdown, no backticks, no explanation text whatsoever.
+  const res = await fetch(SLIP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: base64, mimeType: mimeType || 'image/jpeg', prompt })
+  });
 
-Return this exact JSON structure:
-{"sport":"soccer","event":"Multi Bet - 8 picks","time":"Sat 5 Apr","bookmaker":"Sportingbet","totalOdds":"53.91","selections":[{"type":"treble","name":"Gil Vicente FC","odds":"","detail":"Gil Vicente FC vs AVS Futebol"},{"type":"treble","name":"Paris Saint-Germain","odds":"","detail":"PSG vs Toulouse"}]}
-
-Critical rules:
-- sport: "soccer" for football/soccer, "racing" for horse racing, "golf", "efc" for MMA/UFC/boxing
-- event: "Multi Bet - N picks" for multi/acca bets (replace N with actual number of legs), or the event name for single bets
-- bookmaker: name of the betting site (e.g. "Sportingbet", "Betway", "Hollywoodbets")
-- totalOdds: the combined total odds shown on the slip
-- selections: array with ONE entry per leg/pick/selection
-- type: use "treble" for every leg in a multi-bet/acca
-- name: the WINNING SELECTION (team name, player name, horse, or "Yes"/"No" for specials)
-- detail: the full match or event context (e.g. "Antwerp vs Genk")
-- odds: individual leg odds if shown, otherwise empty string ""
-- Extract ALL legs visible — do not skip any`;
-
-  // Try the dedicated slip-reader function first, fall back to iq-chat with text prompt
-  let raw = '';
-  let usedFallback = false;
-
-  try {
-    const res = await fetch(SLIP_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: base64, mimeType, prompt })
-    });
-    if (res.ok) {
-      const d = await res.json();
-      raw = d.reply || d.result || d.text || '';
-    } else {
-      usedFallback = true;
-    }
-  } catch(e) {
-    usedFallback = true;
-  }
-
-  // Fallback: use iq-chat with image embedded as data URI description
-  if (usedFallback || !raw) {
-    // Resize/compress the image first to reduce token load, then send via iq-chat
-    // Since iq-chat may not support image blocks, we send image as base64 in a special wrapper
-    const res2 = await fetch(IQ_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        image_base64: base64,
-        image_mime: mimeType,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    if (!res2.ok) throw new Error('Parse failed: ' + res2.status);
-    const d2 = await res2.json();
-    raw = d2.reply || d2.result || '';
-  }
-
-  if (!raw) throw new Error('Empty response from parser');
-
-  // Extract JSON from response
+  if (!res.ok) throw new Error('Slip reader error: ' + res.status);
+  const data = await res.json();
+  const raw = data.reply || data.result || '';
   const match = raw.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('No JSON found in: ' + raw.substring(0, 120));
+  if (!match) throw new Error('No JSON found');
   const parsed = JSON.parse(match[0]);
 
-  // Populate form fields
-  if (parsed.sport)      document.getElementById('slip-sport').value = parsed.sport;
-  if (parsed.event)      document.getElementById('slip-event').value = parsed.event;
-  if (parsed.time)       document.getElementById('slip-time').value  = parsed.time;
-  if (parsed.totalOdds)  document.getElementById('slip-odds').value  = parsed.totalOdds;
-  if (parsed.bookmaker)  document.getElementById('slip-bookie').value = parsed.bookmaker;
+  if (parsed.sport)     document.getElementById('slip-sport').value  = parsed.sport;
+  if (parsed.event)     document.getElementById('slip-event').value  = parsed.event;
+  if (parsed.time)      document.getElementById('slip-time').value   = parsed.time;
+  if (parsed.totalOdds) document.getElementById('slip-odds').value   = parsed.totalOdds;
+  if (parsed.bookmaker) document.getElementById('slip-bookie').value = parsed.bookmaker;
 
   slipSelections = (parsed.selections || []).map(s => ({
-    type:   s.type   || 'treble',
-    name:   s.name   || '',
-    odds:   s.odds   || '',
-    detail: s.detail || ''
+    type: s.type || 'treble', name: s.name || '', odds: s.odds || '', detail: s.detail || ''
   }));
 
   renderSlipRows(slipSelections);
@@ -2928,9 +2871,8 @@ Critical rules:
     document.getElementById('slip-share-code').value = autoGenCode();
   }
   const n = slipSelections.length;
-  showToast('\u2713 ' + n + ' leg' + (n !== 1 ? 's' : '') + ' parsed — review and publish', 'success');
+  showToast('\u2713 ' + n + ' leg' + (n !== 1 ? 's' : '') + ' parsed \u2014 review and publish', 'success');
 }
-
 function renderSlipRows(sels) {
   document.getElementById('slip-sel-rows').innerHTML = sels.map((s,i)=>`
     <div class="sel-builder-row">
