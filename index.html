@@ -1059,7 +1059,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
         <div class="admin-page-title">Upload Bet Slip</div>
         <div class="admin-page-sub">Drop a screenshot — AI reads and pre-fills the details. Review then publish.</div>
         <div class="slip-dropzone" id="slip-dropzone" onclick="document.getElementById('slip-file').click()" ondragover="slipDragOver(event)" ondragleave="slipDragLeave(event)" ondrop="slipDrop(event)">
-          <input type="file" id="slip-file" accept="image/*" style="display:none" onchange="slipFileChosen(event)">
+          <input type="file" id="slip-file" accept="image/*" multiple style="display:none" onchange="slipFileChosen(event)">
           <div style="color:var(--dim);display:flex;justify-content:center">
             <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><rect x="3" y="3" width="30" height="30" rx="6" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M18 10v12M12 16l6-6 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
@@ -2647,7 +2647,7 @@ async function publishBet() {
     const name = inputs[0]?.value.trim();
     if (name) selections.push({ type, name, odds:inputs[1]?.value.trim(), ar:inputs[2]?.value.trim(), detail:inputs[3]?.value.trim() });
   });
-  if (!selections.length) { showToast('Add at least one selection','error'); return; }
+  if (!selections.length && !isLive) { showToast('Add at least one selection','error'); return; }
   const btn = document.getElementById('pub-btn');
   btn.textContent = 'Publishing...'; btn.disabled = true;
   const pfx = localStorage.getItem('fiq_watermark')||'FIQ';
@@ -2898,8 +2898,26 @@ async function renderAnalytics(bets) {
 // ═══════════════════════════════════════════════
 function slipDragOver(e) { e.preventDefault(); document.getElementById('slip-dropzone').classList.add('drag-over'); }
 function slipDragLeave() { document.getElementById('slip-dropzone').classList.remove('drag-over'); }
-function slipDrop(e) { e.preventDefault(); document.getElementById('slip-dropzone').classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) processSlip(f); }
-function slipFileChosen(e) { const f=e.target.files[0]; if(f) processSlip(f); }
+function slipDrop(e) {
+  e.preventDefault();
+  document.getElementById('slip-dropzone').classList.remove('drag-over');
+  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+  if (files.length) processSlipsSequentially(files);
+}
+function slipFileChosen(e) {
+  const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+  if (!files.length) return;
+  processSlipsSequentially(files);
+  // Reset input so same files can be added again if needed
+  e.target.value = '';
+}
+
+async function processSlipsSequentially(files) {
+  for (var i = 0; i < files.length; i++) {
+    showToast((slipSelections.length > 0 ? 'Reading screenshot ' + (i+1) + '...' : 'Reading slip...'), 'success');
+    await processSlip(files[i]);
+  }
+}
 
 async function processSlip(file) {
   const reader = new FileReader();
@@ -2923,9 +2941,20 @@ async function processSlip(file) {
 
 async function parseSlip(base64, mimeType) {
   const SLIP_URL = 'https://nzxjbzgxdokbppchattt.supabase.co/functions/v1/slip-reader';
-  const prompt = 'You are a bet slip reader. Analyse this betting slip image and return ONLY a raw JSON object with no markdown, no explanation.'
-    + ' Return this exact structure: {"sport":"soccer","event":"Multi Bet - 8 picks","time":"","bookmaker":"","totalOdds":"","selections":[{"type":"treble","name":"","odds":"","detail":""}]}'
-    + ' Rules: sport is soccer/racing/golf/efc. For multi bets set event to "Multi Bet - N picks". type is treble for every leg in a multi-bet. name is the winning selection. detail is the match. Extract ALL legs.';
+  const prompt = 'You are reading a Sportingbet or similar bookmaker bet slip screenshot. '
+    + 'Extract every single selection/leg visible and return ONLY a raw JSON object. No markdown, no explanation, no backticks. '
+    + 'JSON structure: {"sport":"soccer","event":"Multi Bet - 8 picks","time":"Fri/Sat 3-5 Apr","bookmaker":"Sportingbet","totalOdds":"53.91","selections":['
+    + '{"type":"treble","name":"Gil Vicente FC","odds":"","detail":"Gil Vicente FC vs AVS Futebol","status":"won"},'
+    + '{"type":"treble","name":"BTTS Yes","odds":"","detail":"Coventry vs Derby","status":"pending"}'
+    + ']} '
+    + 'Rules: '
+    + '1. Each row in the slip is one leg - extract ALL of them '
+    + '2. name = the selection (team name, BTTS Yes, Over 2.5, etc) '
+    + '3. detail = the match it belongs to '
+    + '4. status = won if green tick shown, lost if red cross, pending if empty circle '
+    + '5. totalOdds = the combined odds shown at bottom '
+    + '6. event = Multi Bet - N picks where N is total legs '
+    + '7. Return ALL legs you can see, do not skip any';
 
   const res = await fetch(SLIP_URL, {
     method: 'POST',
@@ -3019,7 +3048,7 @@ async function publishSlipBet() {
     const name = inputs[0]?.value.trim();
     if (name) selections.push({type, name, odds:inputs[1]?.value.trim(), ar:inputs[2]?.value.trim(), detail:inputs[3]?.value.trim(), status:'pending'});
   });
-  if (!selections.length) { showToast('Add at least one selection','error'); return; }
+  if (!selections.length && !isLive) { showToast('Add at least one selection','error'); return; }
   const btn = document.getElementById('slip-pub-btn');
   btn.textContent = 'Publishing...'; btn.disabled = true;
 
