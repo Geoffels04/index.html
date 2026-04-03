@@ -1748,23 +1748,31 @@ const LEAGUE_FLAGS = {
 };
 
 const SIGNAL_LABELS = {
-  BTTS:       'BTTS',
-  WIN_FORM:   'Win Form',
-  HANDICAP:   'Handicap',
-  TEAM_GOALS: 'Goals',
-  TWO_UP:     '2-Up',
-  OVER_25:    'Over 2.5',
-  CONSENSUS:  'Trend',
+  BTTS:           'BTTS',
+  BTTS_OVER:      'BTTS & Over 2.5',
+  WIN_FORM:       'Win',
+  WIN_OVER:       'Win & Over 2.5',
+  WIN_UNDER:      'Win & Under 4.5',
+  WIN_DRAW_UNDER: 'Win or Draw & Under 4.5',
+  HANDICAP:       'Handicap',
+  TEAM_GOALS:     'Goals',
+  OVER_25:        'Over 2.5',
+  UNDER_25:       'Under 2.5',
+  CONSENSUS:      'Trend',
 };
 
 const SIGNAL_COLORS = {
-  BTTS:       'var(--green)',
-  WIN_FORM:   'var(--mg)',
-  HANDICAP:   'var(--amber)',
-  TEAM_GOALS: 'var(--blue)',
-  TWO_UP:     'var(--purple)',
-  OVER_25:    'var(--amber)',
-  CONSENSUS:  'var(--muted)',
+  BTTS:           'var(--green)',
+  BTTS_OVER:      'var(--green)',
+  WIN_FORM:       'var(--mg)',
+  WIN_OVER:       'var(--mg)',
+  WIN_UNDER:      'var(--blue)',
+  WIN_DRAW_UNDER: 'var(--blue)',
+  HANDICAP:       'var(--amber)',
+  TEAM_GOALS:     'var(--blue)',
+  OVER_25:        'var(--amber)',
+  UNDER_25:       'var(--purple)',
+  CONSENSUS:      'var(--muted)',
 };
 
 function renderFormPills(formStr) {
@@ -1809,6 +1817,15 @@ function renderFormResults(formStr, resultsArr) {
   }).join('');
 }
 
+function toggleDate(id) {
+  const body = document.getElementById('db-' + id);
+  const chev = document.getElementById('dc-' + id);
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (chev) chev.textContent = isOpen ? '▾' : '▴';
+}
+
 function toggleLeague(id) {
   const header = document.getElementById('lh-' + id);
   const body   = document.getElementById('lb-' + id);
@@ -1828,8 +1845,8 @@ function renderLeagueAccordions(data, containerId) {
   if (!container) return;
   if (!data || !data.length) {
     container.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:12px">
-      <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px">No market trends yet</div>
-      Tell me "run soccer predictions for today" and I will pull all 10 leagues from Flashscore and API-Football instantly.
+      <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px">No fixtures yet</div>
+      Go to Admin → Soccer Engine to load this weekend's fixtures.
     </div>`;
     return;
   }
@@ -1855,221 +1872,225 @@ function renderLeagueAccordions(data, containerId) {
     return ai - bi;
   });
 
+  function formatDate(dateStr) {
+    if (!dateStr) return 'TBC';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-ZA', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
   container.innerHTML = sorted.map(league => {
     const fixtures = byLeague[league];
     const flag = LEAGUE_FLAGS[league] || '⚽';
     const leagueId = league.replace(/\s+/g, '_');
 
-    const fixtureCards = fixtures.map((m, fi) => {
-      const fid = leagueId + '_' + fi;
-      const max = Math.max(m.home_pct||0, m.draw_pct||0, m.away_pct||0);
+    // Group fixtures by date
+    const byDate = {};
+    fixtures.forEach(m => {
+      const d = m.match_date || 'TBC';
+      if (!byDate[d]) byDate[d] = [];
+      byDate[d].push(m);
+    });
+    const dates = Object.keys(byDate).sort();
 
-      // ── SUGGESTED BET ALGORITHM ──────────────────────────
-      const btts      = m.btts_pct || 0;
-      const h2hBtts   = m.btts_pct_h2h || 0;
-      const homeGoals = m.home_goals_avg || 0;
-      const awayGoals = m.away_goals_avg || 0;
-      const goalsAvg  = homeGoals + awayGoals;
-      const homePct   = m.home_pct || 0;
-      const awayPct   = m.away_pct || 0;
-      const over25    = m.over25_pct || 0;
+    const dateGroups = dates.map(date => {
+      const dayFixtures = byDate[date];
+      const dateId = leagueId + '_' + date.replace(/-/g,'');
+      const dateLabel = formatDate(date);
 
-      const homeWins5 = (m.home_form_5||'').split('').filter(c=>c==='W').length;
-      const awayWins5 = (m.away_form_5||'').split('').filter(c=>c==='W').length;
-      const domPct    = Math.max(homePct, awayPct);
-      const domWins5  = homePct >= awayPct ? homeWins5 : awayWins5;
-      const domTeam   = homePct >= awayPct ? m.home_team : m.away_team;
-      const domGoals  = homePct >= awayPct ? homeGoals : awayGoals;
+      const fixtureCards = dayFixtures.map((m, fi) => {
+        const fid = dateId + '_' + fi;
+        const homePct = m.home_pct || 0;
+        const drawPct = m.draw_pct || 0;
+        const awayPct = m.away_pct || 0;
+        const bttsPct = m.btts_pct || 0;
+        const over25  = m.over25_pct || 0;
+        const under25 = 100 - over25;
+        const bttsNo  = 100 - bttsPct;
+        const over15  = Math.round(Math.min(over25 + 22, 95));
+        const under15 = 100 - over15;
+        const over35  = Math.round(Math.max(over25 - 20, 5));
+        const under35 = 100 - over35;
+        const homeGoals = m.home_goals_avg || 0;
+        const awayGoals = m.away_goals_avg || 0;
+        const max = Math.max(homePct, drawPct, awayPct);
 
-      // ── ALGORITHM: score each market, no soft defaults ──────────
-      // BTTS gets bonus only when BOTH btts_pct AND h2h_btts are strong
-      const scores = {
-        WIN_FORM:   (domPct>=65 && domWins5>=4) ? 3 : (domPct>=70 && domWins5>=3) ? 2 : 0,
-        TEAM_GOALS: (domGoals>=2.8) ? 3 : (domGoals>=2.5 && domWins5>=3) ? 2 : 0,
-        BTTS:       (btts>=65 && h2hBtts>=55) ? 3 : (btts>=60 && h2hBtts>=50) ? 2 : (btts>=55) ? 1 : 0,
-        OVER_25:    (goalsAvg>=3.2 && over25>=65) ? 3 : (goalsAvg>=3.0 && over25>=60) ? 2 : 0,
-        HANDICAP:   (domPct>=72 && goalsAvg>=2.0 && domWins5>=4) ? 3 : (domPct>=70 && goalsAvg>=2.0) ? 2 : 0,
-        TWO_UP:     (domPct>=65 && domWins5>=4 && goalsAvg>=2.5) ? 3 : (domPct>=60 && domWins5>=4 && goalsAvg>=2.2) ? 2 : 0,
-      };
-      // Tie-break priority: WIN_FORM > OVER_25 > HANDICAP > TEAM_GOALS > TWO_UP > BTTS
-      const TIE_PRIORITY = ['WIN_FORM','OVER_25','HANDICAP','TEAM_GOALS','TWO_UP','BTTS'];
-      let bestMarket = null, bestScore = 0;
-      TIE_PRIORITY.forEach(k => {
-        if (scores[k] > bestScore) { bestScore = scores[k]; bestMarket = k; }
-        else if (scores[k] === bestScore && bestScore > 0 && bestMarket === null) { bestMarket = k; }
-      });
-      if (!bestMarket) bestMarket = 'CONSENSUS'; // only if all scores are 0
-
-      const BET_LABELS = {
-        BTTS:       'BTTS — Both Teams to Score',
-        WIN_FORM:   `${domTeam} to Win`,
-        HANDICAP:   `${domTeam} Asian Handicap`,
-        TEAM_GOALS: `${domTeam} Over 1.5 Goals`,
-        OVER_25:    'Over 2.5 Goals',
-        TWO_UP:     `${domTeam} 2-Up`,
-        CONSENSUS:  m.trend_signal || 'See full analysis',
-      };
-      const BET_COLORS = {
-        BTTS:'var(--green)', WIN_FORM:'var(--mg)', HANDICAP:'var(--amber)',
-        TEAM_GOALS:'var(--blue)', OVER_25:'var(--amber)', TWO_UP:'var(--purple)', CONSENSUS:'var(--muted)'
-      };
-      const suggestedLabel = BET_LABELS[bestMarket];
-      const suggestedColor = BET_COLORS[bestMarket];
-      const conf = m.confidence || Math.min(95, 50 + bestScore * 8);
-
-      // ── TIPSTER SOURCE PILLS ──────────────────────────────
-      let tipsterHTML = '';
-      const makePill = (src, tip) =>
-        `<div class="tipster-pill"><span class="tipster-name">${src}</span><span style="color:var(--dim);margin:0 3px">→</span><span class="tipster-tip">${tip}</span></div>`;
-
-      // Try structured tipster_sources first (object or array from DB)
-      if (m.tipster_sources) {
-        let pills = '';
-        try {
-          let ts = m.tipster_sources;
-          if (typeof ts === 'string') ts = JSON.parse(ts);
-          if (Array.isArray(ts)) {
-            pills = ts.map(t => makePill(t.source || t.name || 'Source', t.tip || t.pick || t.prediction || '')).join('');
-          } else if (typeof ts === 'object' && ts !== null) {
-            pills = Object.entries(ts).map(([src, tip]) => makePill(src, typeof tip === 'string' ? tip : JSON.stringify(tip))).join('');
-          }
-        } catch(e) {
-          pills = makePill('Sources', String(m.tipster_sources));
+        // Tipster pills
+        let tipsterHTML = '';
+        const makePill = (src, tip) =>
+          `<div class="tipster-pill"><span class="tipster-name">${src}</span><span style="color:var(--dim);margin:0 3px">→</span><span class="tipster-tip">${tip}</span></div>`;
+        if (m.tipster_sources) {
+          let pills = '';
+          try {
+            let ts = m.tipster_sources;
+            if (typeof ts === 'string') ts = JSON.parse(ts);
+            if (Array.isArray(ts)) {
+              pills = ts.map(t => makePill(t.source || t.name || 'Source', t.tip || t.pick || '')).join('');
+            } else if (typeof ts === 'object' && ts !== null) {
+              pills = Object.entries(ts).map(([src, tip]) => makePill(src, typeof tip === 'string' ? tip : JSON.stringify(tip))).join('');
+            }
+          } catch(e) { pills = makePill('Sources', String(m.tipster_sources)); }
+          if (pills) tipsterHTML = `<div class="tipster-row">${pills}</div>`;
         }
-        if (pills) tipsterHTML = `<div class="tipster-row">${pills}</div>`;
-      }
+        if (!tipsterHTML) {
+          tipsterHTML = `<div class="tipster-row" style="opacity:0.5">${makePill('Sources', 'Run Soccer Engine to load predictions')}</div>`;
+        }
 
-      // Fall back to tipster_consensus text — parse known source names out of it
-      if (!tipsterHTML && m.tipster_consensus) {
-        const txt = m.tipster_consensus;
-        // Known tipster name patterns to look for in the text
-        const KNOWN_SOURCES = ['Forebet','WinDrawWin','Sportskeeda','TalkSport','PredictZ','Windrawwin','Betensured','FootyStats','SoccerWay','BettingExpert','Tips180'];
-        const found = KNOWN_SOURCES.filter(s => txt.toLowerCase().includes(s.toLowerCase()));
-        if (found.length >= 2) {
-          // Try to extract per-source tips from the text
-          const pills = found.map(src => {
-            // Look for patterns like "Forebet: BTTS" or "Forebet says BTTS"
-            const re = new RegExp(src + '[:\s]+([\w\s\.]+?)(?:\.|,|;|$)', 'i');
-            const m2 = txt.match(re);
-            const tip = m2 ? m2[1].trim() : 'See analysis';
-            return makePill(src, tip);
-          }).join('');
-          tipsterHTML = `<div class="tipster-row">${pills}</div>`;
+        // Odds section
+        const hasOdds = m.best_home_odds && m.best_home_odds > 1;
+        let oddsHTML = '';
+        if (!hasOdds) {
+          oddsHTML = `<div style="font-size:10px;color:var(--dim);padding:8px 10px;background:var(--s2);border-radius:8px;border:1px solid var(--border);margin-bottom:10px">
+            ⚡ Run <strong style="color:var(--mg)">Odds Sync</strong> in admin to load live market odds and value gaps
+          </div>`;
         } else {
-          // Just show the consensus text as a single pill
-          tipsterHTML = `<div class="tipster-row">${makePill('Tipster consensus', txt.length > 60 ? txt.slice(0,60)+'…' : txt)}</div>`;
+          const grade = m.value_grade;
+          const gradeColor = grade==='A'?'var(--green)':grade==='B'?'var(--amber)':grade==='C'?'var(--blue)':'var(--muted)';
+          let valueBoxHTML = '';
+          if (grade) {
+            const evPct = m.value_ev ? (m.value_ev*100).toFixed(1) : '—';
+            valueBoxHTML = `<div class="value-box value-box-${grade}" style="margin-bottom:10px">
+              <div class="value-box-label" style="color:${gradeColor}">⚡ Grade ${grade} Value — ${m.value_market}</div>
+              <div class="value-box-market" style="color:${gradeColor}">${m.value_odds||''} @ ${m.value_book||'Best available'}</div>
+              <div class="value-box-detail">Model edge: +${((m.value_edge||0)*100).toFixed(1)}% · EV: +${evPct}% · ${m.bookmaker_count||0} books compared</div>
+            </div>`;
+          }
+          const oddsRow = [
+            {label:'Home', odds:m.best_home_odds, book:m.best_home_book, edge:m.home_edge, isBest:m.value_market==='Home Win'},
+            {label:'Draw', odds:m.best_draw_odds, book:m.best_draw_book, edge:m.draw_edge, isBest:m.value_market==='Draw'},
+            {label:'Away', odds:m.best_away_odds, book:m.best_away_book, edge:m.away_edge, isBest:m.value_market==='Away Win'},
+          ].map(o => {
+            const edgePct = o.edge ? (o.edge*100).toFixed(1) : null;
+            const edgeStr = edgePct ? (o.edge>0?`+${edgePct}%`:`${edgePct}%`) : '—';
+            const edgeCls = o.edge>0.02?'edge-pos':o.edge<-0.02?'edge-neg':'edge-zero';
+            return `<div class="odds-cell${o.isBest?' best-val':''}">
+              <div class="odds-label">${o.label}</div>
+              <div class="odds-price">${o.odds||'—'}</div>
+              <div class="odds-book">${o.book||''}</div>
+              <div class="odds-edge ${edgeCls}">${edgeStr}</div>
+            </div>`;
+          }).join('');
+          const marginNote = m.market_margin ? `<div class="market-margin">Market margin: ${m.market_margin}%</div>` : '';
+          oddsHTML = valueBoxHTML + `<div class="odds-row">${oddsRow}</div>${marginNote}`;
         }
-      }
 
-      // Last resort: show a "no sources loaded" indicator
-      if (!tipsterHTML) {
-        tipsterHTML = `<div class="tipster-row" style="opacity:0.5">${makePill('Sources', 'Not loaded — run predictions engine')}</div>`;
-      }
-
-      return `
+        return `
         <div class="fixture-card" id="fc-${fid}">
-          <!-- Header row: Matchup + time + tap affordance -->
           <div class="fixture-header-row" onclick="toggleFixture('${fid}')">
             <div style="flex:1;min-width:0">
               <div class="fixture-matchup">${m.home_team} vs ${m.away_team}</div>
-              <div style="font-size:10px;color:var(--dim);margin-top:2px">${m.match_time || m.match_date || ''} SAST · Tap for analysis</div>
+              <div style="font-size:10px;color:var(--dim);margin-top:2px">${m.match_time||''} SAST · Tap for analysis</div>
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:10px">
               ${m.value_grade ? `<span class="value-badge value-${m.value_grade}">${m.value_grade}</span>` : ''}
-              <div style="font-size:10px;font-weight:600;color:var(--green);font-family:'DM Mono',monospace">${conf}%</div>
               <div style="width:26px;height:26px;border-radius:6px;background:var(--s3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px" class="fixture-chevron">▾</div>
             </div>
           </div>
 
-          <!-- Tipster source pills (always visible) -->
           ${tipsterHTML}
 
-          <!-- Expandable detail (includes suggested bet) -->
           <div class="fixture-detail">
-            <!-- FanatIQ Suggested Bet -->
-            <div class="suggested-bet-block" style="border-bottom:1px solid var(--border);margin:-12px -14px 14px;padding:12px 14px">
-              <div>
-                <div class="sb-label">FanatIQ Suggested Bet</div>
-                <div class="sb-market" style="color:${suggestedColor}">${suggestedLabel}</div>
+            <!-- MARKET PROBABILITIES DASHBOARD -->
+            <div style="margin-bottom:14px">
+              <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Market Probabilities</div>
+
+              <!-- Win / Draw / Win bars -->
+              <div class="detail-pct-bars" style="margin-bottom:10px">
+                ${[['Home',homePct,'var(--blue)'],['Draw',drawPct,'var(--muted)'],['Away',awayPct,'var(--mg)']].map(([label,pct,color]) => `
+                  <div class="pct-bar-item">
+                    <div class="pct-bar-label">${label}</div>
+                    <div class="pct-bar-track"><div class="pct-bar-fill" style="width:${pct||0}%;background:${(pct||0)===max?color:'var(--s4)'}"></div></div>
+                    <div class="pct-bar-pct" style="color:${(pct||0)===max?color:'var(--muted)'}">${pct||0}%</div>
+                  </div>`).join('')}
               </div>
-              <div class="sb-conf-pill" style="background:${suggestedColor}20;color:${suggestedColor};border:1px solid ${suggestedColor}40">${conf}%</div>
+
+              <!-- Goals markets grid -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+                <div style="background:var(--s2);border-radius:8px;padding:8px 10px;border:1px solid var(--border)">
+                  <div style="font-size:9px;color:var(--dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Both Teams to Score</div>
+                  <div style="display:flex;justify-content:space-between">
+                    <div style="text-align:center">
+                      <div style="font-size:15px;font-weight:700;color:${bttsPct>=55?'var(--green)':'var(--text)'};font-family:'DM Mono',monospace">${bttsPct}%</div>
+                      <div style="font-size:9px;color:var(--dim)">Yes</div>
+                    </div>
+                    <div style="width:1px;background:var(--border)"></div>
+                    <div style="text-align:center">
+                      <div style="font-size:15px;font-weight:700;color:${bttsNo>=55?'var(--mg)':'var(--text)'};font-family:'DM Mono',monospace">${bttsNo}%</div>
+                      <div style="font-size:9px;color:var(--dim)">No</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="background:var(--s2);border-radius:8px;padding:8px 10px;border:1px solid var(--border)">
+                  <div style="font-size:9px;color:var(--dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Over / Under 2.5</div>
+                  <div style="display:flex;justify-content:space-between">
+                    <div style="text-align:center">
+                      <div style="font-size:15px;font-weight:700;color:${over25>=55?'var(--amber)':'var(--text)'};font-family:'DM Mono',monospace">${over25}%</div>
+                      <div style="font-size:9px;color:var(--dim)">Over</div>
+                    </div>
+                    <div style="width:1px;background:var(--border)"></div>
+                    <div style="text-align:center">
+                      <div style="font-size:15px;font-weight:700;color:${under25>=55?'var(--blue)':'var(--text)'};font-family:'DM Mono',monospace">${under25}%</div>
+                      <div style="font-size:9px;color:var(--dim)">Under</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="background:var(--s2);border-radius:8px;padding:8px 10px;border:1px solid var(--border)">
+                  <div style="font-size:9px;color:var(--dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Over / Under 1.5</div>
+                  <div style="display:flex;justify-content:space-between">
+                    <div style="text-align:center">
+                      <div style="font-size:15px;font-weight:700;color:${over15>=65?'var(--amber)':'var(--text)'};font-family:'DM Mono',monospace">${over15}%</div>
+                      <div style="font-size:9px;color:var(--dim)">Over</div>
+                    </div>
+                    <div style="width:1px;background:var(--border)"></div>
+                    <div style="text-align:center">
+                      <div style="font-size:15px;font-weight:700;color:${under15>=55?'var(--blue)':'var(--text)'};font-family:'DM Mono',monospace">${under15}%</div>
+                      <div style="font-size:9px;color:var(--dim)">Under</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="background:var(--s2);border-radius:8px;padding:8px 10px;border:1px solid var(--border)">
+                  <div style="font-size:9px;color:var(--dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Over / Under 3.5</div>
+                  <div style="display:flex;justify-content:space-between">
+                    <div style="text-align:center">
+                      <div style="font-size:15px;font-weight:700;color:${over35>=45?'var(--amber)':'var(--text)'};font-family:'DM Mono',monospace">${over35}%</div>
+                      <div style="font-size:9px;color:var(--dim)">Over</div>
+                    </div>
+                    <div style="width:1px;background:var(--border)"></div>
+                    <div style="text-align:center">
+                      <div style="font-size:15px;font-weight:700;color:${under35>=65?'var(--blue)':'var(--text)'};font-family:'DM Mono',monospace">${under35}%</div>
+                      <div style="font-size:9px;color:var(--dim)">Under</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Avg goals -->
+              <div style="display:flex;gap:6px;margin-bottom:12px">
+                <div style="flex:1;background:var(--s2);border-radius:8px;padding:7px 10px;border:1px solid var(--border);text-align:center">
+                  <div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)">${homeGoals}</div>
+                  <div style="font-size:9px;color:var(--dim)">${m.home_team} avg goals</div>
+                </div>
+                <div style="flex:1;background:var(--s2);border-radius:8px;padding:7px 10px;border:1px solid var(--border);text-align:center">
+                  <div style="font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text)">${awayGoals}</div>
+                  <div style="font-size:9px;color:var(--dim)">${m.away_team} avg goals</div>
+                </div>
+              </div>
             </div>
-            <!-- ═══ VALUE / ODDS SECTION ═══ -->
-            ${(()=>{
-              const grade = m.value_grade;
-              const gradeColor = grade==='A'?'var(--green)':grade==='B'?'var(--amber)':grade==='C'?'var(--blue)':'var(--muted)';
-              const hasOdds = m.best_home_odds && m.best_home_odds > 1;
 
-              if (!hasOdds) return `<div style="font-size:10px;color:var(--dim);padding:6px 0;margin-bottom:10px;border-bottom:1px solid var(--border)">
-                ⚡ Run <strong style="color:var(--mg)">Odds Sync</strong> in admin to load live market odds and value gaps
-              </div>`;
-
-              // Best odds row
-              const oddsHTML = [
-                {label:'Home', odds:m.best_home_odds, book:m.best_home_book, edge:m.home_edge, isBest: m.value_market==='Home Win'},
-                {label:'Draw', odds:m.best_draw_odds, book:m.best_draw_book, edge:m.draw_edge, isBest: m.value_market==='Draw'},
-                {label:'Away', odds:m.best_away_odds, book:m.best_away_book, edge:m.away_edge, isBest: m.value_market==='Away Win'},
-              ].map(o => {
-                const edgePct = o.edge ? (o.edge*100).toFixed(1) : null;
-                const edgeStr = edgePct ? (o.edge>0?`+${edgePct}%`:` ${edgePct}%`) : '—';
-                const edgeCls = o.edge>0.02?'edge-pos':o.edge<-0.02?'edge-neg':'edge-zero';
-                return '<div class="odds-cell' + (o.isBest?' best-val':'') + '">'
-                  + '<div class="odds-label">' + o.label + '</div>'
-                  + '<div class="odds-price">' + (o.odds||'—') + '</div>'
-                  + '<div class="odds-book">' + (o.book||'') + '</div>'
-                  + '<div class="odds-edge ' + edgeCls + '">' + edgeStr + '</div>'
-                  + '</div>';
-              }).join('');
-
-              // Value callout box
-              let valueBoxHTML = '';
-              if (grade) {
-                const evPct = m.value_ev ? (m.value_ev*100).toFixed(1) : '—';
-                valueBoxHTML = '<div class="value-box value-box-'+grade+'">'
-                  + '<div class="value-box-label" style="color:'+gradeColor+'">⚡ Grade ' + grade + ' Value — ' + m.value_market + '</div>'
-                  + '<div class="value-box-market" style="color:'+gradeColor+'">' + (m.value_odds||'') + ' @ ' + (m.value_book||'Best available') + '</div>'
-                  + '<div class="value-box-detail">Model edge: +' + ((m.value_edge||0)*100).toFixed(1) + '% · Expected value: +' + evPct + '% · '+(m.bookmaker_count||0)+' books compared</div>'
-                  + '</div>';
-              } else {
-                valueBoxHTML = '<div style="padding:8px 10px;background:var(--s2);border-radius:8px;border:1px solid var(--border);font-size:11px;color:var(--dim);margin-bottom:10px">No significant value identified in current market prices</div>';
-              }
-
-              const marginNote = m.market_margin ? '<div class="market-margin">Market margin: '+m.market_margin+'%</div>' : '';
-
-              return '<div style="margin-bottom:12px">'
-                + valueBoxHTML
-                + '<div class="odds-row">' + oddsHTML + '</div>'
-                + marginNote
-                + '</div>';
-            })()}
-
-            <!-- Win/Draw/Away bars -->
-            <div class="detail-pct-bars">
-              ${[['Home',m.home_pct,'var(--blue)'],['Draw',m.draw_pct,'var(--muted)'],['Away',m.away_pct,'var(--mg)']].map(([label,pct,color]) => `
-                <div class="pct-bar-item">
-                  <div class="pct-bar-label">${label}</div>
-                  <div class="pct-bar-track"><div class="pct-bar-fill" style="width:${pct||0}%;background:${(pct||0)===max?color:'var(--s4)'}"></div></div>
-                  <div class="pct-bar-pct" style="color:${(pct||0)===max?color:'var(--muted)'}">${pct||0}%</div>
-                </div>`).join('')}
+            <!-- ODDS & VALUE -->
+            <div style="margin-bottom:14px">
+              <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Best Available Odds</div>
+              ${oddsHTML}
             </div>
-            <!-- Stats row -->
-            <div class="detail-stats-row">
-              <div class="detail-stat"><div class="detail-stat-label">BTTS</div><div class="detail-stat-val" style="color:${btts>=60?'var(--green)':'var(--text)'}">${btts}%</div></div>
-              <div class="detail-stat"><div class="detail-stat-label">H2H BTTS</div><div class="detail-stat-val" style="color:${h2hBtts>=60?'var(--green)':'var(--text)'}">${h2hBtts}%</div></div>
-              <div class="detail-stat"><div class="detail-stat-label">Avg Goals</div><div class="detail-stat-val">${goalsAvg.toFixed(1)}</div></div>
-              <div class="detail-stat"><div class="detail-stat-label">Over 2.5</div><div class="detail-stat-val">${over25}%</div></div>
-            </div>
-            <!-- Form: 4 blocks — home all, home at home, away all, away away -->
+
+            <!-- FORM -->
             <div class="detail-form-row">
-              <!-- Home team last 5 overall -->
               <div class="detail-form-block">
                 <div class="detail-form-title">
                   <span>${m.home_team} — Last 5</span>
-                  <span style="color:var(--green);font-size:9px">${homeGoals} goals/game avg</span>
+                  <span style="color:var(--green);font-size:9px">${homeGoals} goals/game</span>
                 </div>
                 ${renderFormResults(m.home_form_5, m.home_form_results)}
               </div>
-              <!-- Home team last 5 at home -->
               <div class="detail-form-block" style="border-left:2px solid var(--green)">
                 <div class="detail-form-title">
                   <span>${m.home_team} — Last 5 at Home</span>
@@ -2077,15 +2098,13 @@ function renderLeagueAccordions(data, containerId) {
                 </div>
                 ${renderFormResults(m.home_form_5, m.home_form_home_results || m.home_form_results)}
               </div>
-              <!-- Away team last 5 overall -->
               <div class="detail-form-block">
                 <div class="detail-form-title">
                   <span>${m.away_team} — Last 5</span>
-                  <span style="color:var(--mg);font-size:9px">${awayGoals} goals/game avg</span>
+                  <span style="color:var(--mg);font-size:9px">${awayGoals} goals/game</span>
                 </div>
                 ${renderFormResults(m.away_form_5, m.away_form_results)}
               </div>
-              <!-- Away team last 5 away -->
               <div class="detail-form-block" style="border-left:2px solid var(--mg)">
                 <div class="detail-form-title">
                   <span>${m.away_team} — Last 5 Away</span>
@@ -2094,39 +2113,52 @@ function renderLeagueAccordions(data, containerId) {
                 ${renderFormResults(m.away_form_5, m.away_form_away_results || m.away_form_results)}
               </div>
             </div>
-            <!-- H2H: each result as its own row -->
+
+            <!-- H2H -->
             ${m.h2h_last5 && m.h2h_last5 !== 'No H2H data' ? `
             <div class="detail-h2h">
               <div class="detail-h2h-title">Head to Head — Last 5 meetings</div>
               ${(()=>{
-                // h2h_last5 is a pipe-separated string like "Charleroi 2-1 Westerlo | Westerlo 0-1 Charleroi | ..."
-                const raw = m.h2h_last5 || '';
-                const matches = raw.split('|').map(s=>s.trim()).filter(Boolean);
-                if (!matches.length) return '<div style="font-size:11px;color:var(--muted)">'+raw+'</div>';
+                const matches = (m.h2h_last5||'').split('|').map(s=>s.trim()).filter(Boolean);
                 return matches.map(match => {
-                  // Try to parse "Team1 X-Y Team2" or "Team1 X-X Team2"
                   const scoreMatch = match.match(/^(.+?)\s+(\d+[-–]\d+)\s+(.+)$/);
                   if (scoreMatch) {
                     const [,home,score,away] = scoreMatch;
                     const [g1,g2] = score.split(/[-–]/).map(Number);
-                    const homeWon = g1 > g2, draw = g1 === g2;
+                    const homeWon = g1>g2, draw = g1===g2;
                     const homeColor = homeWon?'var(--green)':draw?'var(--amber)':'var(--muted)';
-                    const awayColor = g2 > g1?'var(--mg)':draw?'var(--amber)':'var(--muted)';
+                    const awayColor = g2>g1?'var(--mg)':draw?'var(--amber)':'var(--muted)';
                     return '<div class="detail-h2h-row">'
-                      + '<div class="detail-h2h-team" style="text-align:right;color:'+homeColor+';font-weight:'+(homeWon?'600':'400')+'">' + home.trim() + '</div>'
-                      + '<div class="detail-h2h-score">' + score + '</div>'
-                      + '<div class="detail-h2h-team" style="color:'+awayColor+';font-weight:'+(g2>g1?'600':'400')+'">' + away.trim() + '</div>'
+                      + '<div class="detail-h2h-team" style="text-align:right;color:'+homeColor+';font-weight:'+(homeWon?'600':'400')+'">'+home.trim()+'</div>'
+                      + '<div class="detail-h2h-score">'+score+'</div>'
+                      + '<div class="detail-h2h-team" style="color:'+awayColor+';font-weight:'+(g2>g1?'600':'400')+'">'+away.trim()+'</div>'
                       + '</div>';
                   }
-                  return '<div class="detail-h2h-row"><div style="font-size:11px;color:var(--muted);flex:1">' + match + '</div></div>';
+                  return '<div class="detail-h2h-row"><div style="font-size:11px;color:var(--muted);flex:1">'+match+'</div></div>';
                 }).join('');
               })()}
             </div>` : ''}
-            <!-- Algorithm breakdown -->
-            <div class="detail-signal-box" style="background:rgba(0,0,0,0.2);border-color:${suggestedColor}">
-              <strong style="color:${suggestedColor}">FanatIQ Analysis</strong>
-              ${m.trend_signal || m.prediction || `Scored across 6 markets. Top signal: ${SIGNAL_LABELS[bestMarket]||'Consensus'} (${bestScore} pts).`}
+
+            <!-- FanatIQ Analysis text -->
+            <div class="detail-signal-box" style="background:rgba(0,0,0,0.2);border-color:var(--border2)">
+              <strong style="color:var(--mg)">FanatIQ Analysis</strong>
+              ${m.trend_signal || m.prediction || 'Run Soccer Engine to generate analysis.'}
             </div>
+          </div>
+        </div>`;
+      }).join('');
+
+      return `
+        <div style="margin-bottom:4px">
+          <div onclick="toggleDate('${dateId}')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--s2);border-radius:8px;cursor:pointer;border:1px solid var(--border);margin-bottom:2px">
+            <div style="font-size:11px;font-weight:600;color:var(--text);font-family:'Syne',sans-serif">📅 ${dateLabel}</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:10px;color:var(--dim)">${dayFixtures.length} fixture${dayFixtures.length!==1?'s':''}</span>
+              <span style="color:var(--dim);font-size:12px" id="dc-${dateId}">▾</span>
+            </div>
+          </div>
+          <div id="db-${dateId}" style="display:none">
+            ${fixtureCards}
           </div>
         </div>`;
     }).join('');
@@ -2142,7 +2174,7 @@ function renderLeagueAccordions(data, containerId) {
           <div class="league-chevron">▾</div>
         </div>
         <div class="league-body" id="lb-${leagueId}">
-          ${fixtureCards}
+          ${dateGroups}
         </div>
       </div>`;
   }).join('');
@@ -3442,7 +3474,6 @@ async function sendIQMessage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + SB_KEY
         },
         body: JSON.stringify({ messages })
       }
