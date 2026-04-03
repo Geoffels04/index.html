@@ -2969,7 +2969,13 @@ async function parseSlip(base64, mimeType) {
   if (!match) throw new Error('No JSON found');
   const parsed = JSON.parse(match[0]);
 
-  if (parsed.sport)     document.getElementById('slip-sport').value  = parsed.sport;
+  // Smart sport detection — if legs look like soccer teams, force soccer
+  var detectedSport = parsed.sport || 'soccer';
+  var legNames = (parsed.selections||[]).map(function(s){ return (s.name||'').toLowerCase() + ' ' + (s.detail||'').toLowerCase(); }).join(' ');
+  var soccerKeywords = ['fc','united','city','sporting','paris','psg','btts','both teams','over 2','over 1','goals'];
+  var looksLikeSoccer = soccerKeywords.some(function(k){ return legNames.includes(k); });
+  if (looksLikeSoccer) detectedSport = 'soccer';
+  document.getElementById('slip-sport').value = detectedSport;
   if (parsed.event)     document.getElementById('slip-event').value  = parsed.event;
   if (parsed.time)      document.getElementById('slip-time').value   = parsed.time;
   if (parsed.totalOdds) document.getElementById('slip-odds').value   = parsed.totalOdds;
