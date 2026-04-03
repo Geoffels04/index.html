@@ -1738,38 +1738,34 @@ function renderSoccerPage() {
     const tips = bets.filter(b => !b.id?.includes('ACCA'));
     feedEl.innerHTML = tips.length ? tips.map((b,i) => renderBetCard(b,i)).join('') : renderEmptyState('soccer');
   } else if (tab === 'accas') {
-    // BTTS Rankings — pull from market_trends and rank by btts_pct
-    if (!sb) { feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">Not connected</div></div>'; return; }
-    feedEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--muted);font-size:12px">Loading BTTS rankings...</div>';
-    sb.from('market_trends').select('id,home_team,away_team,league,match_date,match_time,btts_pct').eq('sport','soccer').not('btts_pct','is',null).order('btts_pct',{ascending:false}).limit(54).then(({data,error}) => {
-      if (error || !data || !data.length) {
-        feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">No BTTS data yet</div><div class="empty-sub">Run the Soccer Engine in admin to load this weekend&#39;s fixtures.</div></div>';
-        return;
-      }
-      const rows = data.map(function(m, i) {
+    if (!sb) { feedEl.innerHTML = renderEmptyState('soccer'); return; }
+    feedEl.innerHTML = '<div style="padding:28px;text-align:center;color:var(--muted);font-size:12px">Loading...</div>';
+    sb.from('market_trends').select('id,home_team,away_team,league,btts_pct').eq('sport','soccer').not('btts_pct','is',null).order('btts_pct',{ascending:false}).limit(60).then(function(res) {
+      var d = res.data;
+      if (!d || !d.length) { feedEl.innerHTML = renderEmptyState('soccer'); return; }
+      var html = '<div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s2);border-bottom:1px solid var(--border)">';
+      html += '<div style="font-family:Syne,sans-serif;font-size:13px;font-weight:700">BTTS Rankings';
+      html += ' <span style="font-size:9px;padding:2px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.5px">This Weekend</span></div>';
+      html += '<div style="font-size:10px;color:var(--muted)">' + d.length + ' fixtures</div></div>';
+      d.forEach(function(m, i) {
         var pct = Math.round(m.btts_pct || 0);
         var col = pct >= 70 ? 'var(--green)' : pct >= 55 ? 'var(--amber)' : 'var(--muted)';
-        var matchLabel = (m.home_team && m.away_team) ? m.home_team + ' vs ' + m.away_team : 'Unknown fixture';
-        var leagueLabel = m.league || '';
-        return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)">'
-          + '<div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--dim);width:22px;text-align:right;flex-shrink:0">' + (i+1) + '</div>'
-          + '<div style="flex:1;min-width:0">'
-          + '<div style="font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + matchLabel + '</div>'
-          + '<div style="font-size:10px;color:var(--dim);margin-top:1px">' + leagueLabel + '</div>'
-          + '<div style="height:4px;background:var(--s3);border-radius:2px;margin-top:5px;overflow:hidden">'
-          + '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:2px"></div></div>'
-          + '</div>'
-          + '<div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:' + col + ';flex-shrink:0;min-width:44px;text-align:right">' + pct + '%</div>'
-          + '</div>';
-      }).join('');
-      feedEl.innerHTML = '<div style="background:var(--s1);border-radius:12px;overflow:hidden;border:1px solid var(--border)">'
-        + '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--s2)">'
-        + '<div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">BTTS Rankings '
-        + '<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--green-dim);color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-left:4px">This Weekend</span></div>'
-        + '<div style="font-size:10px;color:var(--muted)">' + data.length + ' fixtures · best to worst</div>'
-        + '</div>' + rows + '</div>';
+        var match = (m.home_team && m.away_team) ? m.home_team + ' vs ' + m.away_team : 'Unknown';
+        html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)">';
+        html += '<div style="font-size:11px;color:var(--dim);width:22px;text-align:right;flex-shrink:0">' + (i+1) + '</div>';
+        html += '<div style="flex:1;min-width:0">';
+        html += '<div style="font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + match + '</div>';
+        html += '<div style="font-size:10px;color:var(--dim);margin-top:1px">' + (m.league||'') + '</div>';
+        html += '<div style="height:4px;background:var(--s3);border-radius:2px;margin-top:5px;overflow:hidden">';
+        html += '<div style="height:100%;width:' + pct + '%;background:' + col + ';border-radius:2px"></div></div>';
+        html += '</div>';
+        html += '<div style="font-size:16px;font-weight:700;color:' + col + ';flex-shrink:0;min-width:44px;text-align:right">' + pct + '%</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+      feedEl.innerHTML = html;
     });
-  }
 }
 
 function switchSoccerTab(tab, el) {
