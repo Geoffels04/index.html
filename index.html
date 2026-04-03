@@ -2967,7 +2967,6 @@ async function runOddsSync() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + SB_KEY,
           'x-admin-secret': adminPw,
         },
         body: JSON.stringify({ leagues: batch, date }),
