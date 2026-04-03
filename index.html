@@ -570,23 +570,13 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
       </div>
       <span class="mnav-label">Sign Up</span>
     </div>
-    <div class="mnav-item" id="mn-codes" onclick="goPage('community',this)">
-      <div class="mnav-item-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="5" width="16" height="12" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 10h4M7 13h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M15 9l2 2-2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <span class="mnav-label">Bet Codes</span>
-    </div>
-    <div class="mnav-item" id="mn-valuecheck" onclick="goPage('tools',this)">
-      <div class="mnav-item-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 19L11 4l8 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 14h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      </div>
-      <span class="mnav-label">ValueCheck</span>
-    </div>
+
+
     <div class="mnav-item" id="mn-slips" onclick="goPage('slips',this)" style="flex:1.4">
       <div class="mnav-item-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
       </div>
-      <span style="font-size:10px;font-weight:700;color:var(--mg)">Live Slips</span>
+      <span class="mnav-label" style="font-size:10px;font-weight:700;color:var(--mg)">Live Slips</span>
     </div>
     <div class="mnav-item" id="mn-profile" onclick="goPage('profile',this)">
       <div class="mnav-item-icon">
@@ -3020,7 +3010,7 @@ async function publishSlipBet() {
   const note = document.getElementById('slip-note').value.trim();
   const tier = document.querySelector('input[name="slip-tier"]:checked')?.value||'free';
   const isLive = document.getElementById('slip-is-live')?.checked;
-  if (!event) { showToast('Enter event description','error'); return; }
+  if (!event && !isLive) { showToast('Enter event description','error'); return; }
   const rows = document.querySelectorAll('#slip-sel-rows .sel-builder-row');
   const selections = [];
   rows.forEach(row => {
@@ -3038,9 +3028,10 @@ async function publishSlipBet() {
       // Write to live_slips table
       const legCount = selections.length;
       const wonCount = selections.filter(s => s.status === 'won').length;
+      const autoTitle = event || ('Multi Bet ' + selections.length + ' picks');
       const { error } = await sb.from('live_slips').insert([{
-        title: event,
-        subtitle: legCount + '-leg acca · ' + (time || new Date().toLocaleDateString('en-ZA')),
+        title: autoTitle,
+        subtitle: selections.length + '-leg acca · ' + (time || new Date().toLocaleDateString('en-ZA')),
         total_odds: odds || '',
         potential_win: '',
         sport: sport,
@@ -3620,14 +3611,18 @@ function logoutMember() {
 
 function updateProfileNav() {
   const profileBtn = document.getElementById('mn-profile');
+  const signupBtn = document.getElementById('mn-signup');
   if (!profileBtn) return;
   const icon = profileBtn.querySelector('.mnav-item-icon');
   if (currentMember) {
-    // Show avatar initial
+    // Logged in — hide Sign Up, show avatar
+    if (signupBtn) signupBtn.style.display = 'none';
     const initial = (currentMember.name||'M').charAt(0).toUpperCase();
-    icon.innerHTML = `<div style="width:24px;height:24px;border-radius:50%;background:var(--mg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:'Syne',sans-serif">${initial}</div>`;
+    icon.innerHTML = `<div style="width:24px;height:24px;border-radius:50%;background:var(--mg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">${initial}</div>`;
     profileBtn.querySelector('.mnav-label').textContent = currentMember.name.split(' ')[0];
   } else {
+    // Logged out — show Sign Up
+    if (signupBtn) signupBtn.style.display = '';
     icon.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M4 19c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
     profileBtn.querySelector('.mnav-label').textContent = 'Profile';
   }
