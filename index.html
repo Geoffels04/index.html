@@ -1197,16 +1197,21 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
           <div class="form-group">
             <label class="form-label">Date to sync</label>
             <input class="form-input" id="odds-date" type="date">
-            <div style="font-size:10px;color:var(--dim);margin-top:4px">Leave blank for today</div>
+            <div style="font-size:10px;color:var(--dim);margin-top:4px">Leave blank for today. Set multiple dates by running sync once per date.</div>
           </div>
           <div class="form-group">
             <label class="form-label">Leagues</label>
             <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px">
               <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-epl" checked style="accent-color:var(--mg)"> Premier League</label>
               <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-bun" checked style="accent-color:var(--mg)"> Bundesliga</label>
-              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-lla" style="accent-color:var(--mg)"> La Liga</label>
-              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-ser" style="accent-color:var(--mg)"> Serie A</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-bun2" style="accent-color:var(--mg)"> 2. Bundesliga</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-lla" checked style="accent-color:var(--mg)"> La Liga</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-ser" checked style="accent-color:var(--mg)"> Serie A</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-ligue" checked style="accent-color:var(--mg)"> Ligue 1</label>
               <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-bel" checked style="accent-color:var(--mg)"> Belgian Pro League</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-ere" style="accent-color:var(--mg)"> Eredivisie</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-por" style="accent-color:var(--mg)"> Liga Portugal</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="odds-lg-tur" style="accent-color:var(--mg)"> Super Lig (Turkey)</label>
             </div>
           </div>
         </div>
@@ -2925,11 +2930,16 @@ async function runOddsSync() {
   const date = document.getElementById('odds-date')?.value || new Date().toISOString().split('T')[0];
 
   const leagueMap = {
-    'odds-lg-epl': 'English Premier League',
-    'odds-lg-bun': 'German Bundesliga',
-    'odds-lg-lla': 'Spanish La Liga',
-    'odds-lg-ser': 'Italian Serie A',
-    'odds-lg-bel': 'Belgian Jupiler Pro League',
+    'odds-lg-epl':   'English Premier League',
+    'odds-lg-bun':   'German Bundesliga',
+    'odds-lg-bun2':  'German 2. Bundesliga',
+    'odds-lg-lla':   'Spanish La Liga',
+    'odds-lg-ser':   'Italian Serie A',
+    'odds-lg-ligue': 'French Ligue 1',
+    'odds-lg-bel':   'Belgian Jupiler Pro League',
+    'odds-lg-ere':   'Netherlands Eredivisie',
+    'odds-lg-por':   'Portugal Liga Portugal',
+    'odds-lg-tur':   'Turkish Super Lig',
   };
   const leagues = Object.entries(leagueMap)
     .filter(([id]) => document.getElementById(id)?.checked)
