@@ -991,7 +991,6 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
         </div>
         <div class="sel-builder">
           <div class="sel-builder-title">Selections</div>
-          <div style="font-size:10px;color:var(--muted);margin-bottom:6px">⚠️ Each row below = one block on the published bet card. Only add rows you want visible.</div>
           <div id="sel-rows">
             <div class="sel-builder-row">
               <select class="sel-type-sel"><option value="best">Best Bet</option><option value="next">Next Best</option><option value="value">Value Bet</option><option value="place">Place Bet</option><option value="treble">Treble Leg</option><option value="pick6">Pick 6 Leg</option></select>
@@ -1321,8 +1320,6 @@ html,body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-s
         <div><label class="form-label" style="display:block;margin-bottom:4px">Event</label><input class="modal-input" id="edit-event" style="margin-bottom:0"></div>
         <div><label class="form-label" style="display:block;margin-bottom:4px">Time</label><input class="modal-input" id="edit-time" style="margin-bottom:0"></div>
       </div>
-      <label class="form-label" style="display:block;margin-bottom:4px">Selections on Card</label>
-      <div id="edit-sel-list" style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px"></div>
       <label class="form-label" style="display:block;margin-bottom:4px">Analysis</label>
       <textarea class="modal-input" id="edit-note" style="min-height:80px;resize:vertical;margin-bottom:8px"></textarea>
       <label class="form-label" style="display:block;margin-bottom:4px">Bet / Pick</label>
@@ -1491,7 +1488,7 @@ let allBets = [];
 let adminFilter = 'all';
 let currentRacingTab = 'all';
 let currentSoccerTab = 'trends';
-let adminPw = 'fanatiq2026';
+let adminPw = localStorage.getItem('fiq_admin_pw') || 'Poison@04';
 let editingBetId = null;
 let selectedPlan = 'monthly';
 let slipSelections = [];
@@ -2426,7 +2423,7 @@ async function sendPushNotification() {
   const title = document.getElementById('push-title')?.value.trim();
   const body = document.getElementById('push-body')?.value.trim();
   if (!title || !body) { showToast('Fill in title and message','error'); return; }
-const adminSecret = 'fanatiq2026';
+  const adminSecret = localStorage.getItem('fiq_admin_pw') || 'Poison@04';
   try {
     const res = await fetch(SB_URL + '/functions/v1/push-notify', {
       method:'POST',
@@ -2758,40 +2755,7 @@ function openEditModal(id) {
   document.getElementById('edit-pick').value = bet.pick || (firstSel ? firstSel.name : '') || '';
   document.getElementById('edit-odds').value = bet.odds || (firstSel ? firstSel.odds : '') || '';
   document.getElementById('edit-status').value = bet.status||'pending';
-  // Render selections list so you can delete individual ones
-  const selList = document.getElementById('edit-sel-list');
-  const sels = bet.selections||[];
-  if (sels.length) {
-    selList.innerHTML = sels.map((s,i) => `
-      <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:7px 10px" id="edit-sel-${i}">
-        <span style="font-size:9px;font-weight:700;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:var(--s3);color:var(--muted);flex-shrink:0">${s.type==='best'?'Best Bet':s.type==='value'?'Value':s.type==='next'?'Next Best':s.type==='place'?'Place':s.type||s.type}</span>
-        <span style="flex:1;font-size:12px;font-weight:600">${s.name||''}</span>
-        ${s.odds?`<span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--green)">${s.odds}</span>`:''}
-        <button onclick="removeEditSel(${i})" style="background:var(--red-dim);border:1px solid var(--red-b);color:var(--red);border-radius:5px;padding:2px 8px;font-size:11px;cursor:pointer;flex-shrink:0">✕ Remove</button>
-      </div>`).join('');
-  } else {
-    selList.innerHTML = '<div style="font-size:11px;color:var(--dim);padding:6px 0">No selections saved.</div>';
-  }
   openModal('edit-modal');
-}
-
-function removeEditSel(idx) {
-  const bet = allBets.find(b => b.id === editingBetId);
-  if (!bet || !bet.selections) return;
-  bet.selections.splice(idx, 1);
-  // Re-render the list
-  const selList = document.getElementById('edit-sel-list');
-  if (bet.selections.length) {
-    selList.innerHTML = bet.selections.map((s,i) => `
-      <div style="display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:7px 10px" id="edit-sel-${i}">
-        <span style="font-size:9px;font-weight:700;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:var(--s3);color:var(--muted);flex-shrink:0">${s.type==='best'?'Best Bet':s.type==='value'?'Value':s.type==='next'?'Next Best':s.type==='place'?'Place':s.type||s.type}</span>
-        <span style="flex:1;font-size:12px;font-weight:600">${s.name||''}</span>
-        ${s.odds?`<span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--green)">${s.odds}</span>`:''}
-        <button onclick="removeEditSel(${i})" style="background:var(--red-dim);border:1px solid var(--red-b);color:var(--red);border-radius:5px;padding:2px 8px;font-size:11px;cursor:pointer;flex-shrink:0">✕ Remove</button>
-      </div>`).join('');
-  } else {
-    selList.innerHTML = '<div style="font-size:11px;color:var(--dim);padding:6px 0">No selections — all removed.</div>';
-  }
 }
 
 async function saveEdit() {
@@ -2802,11 +2766,8 @@ async function saveEdit() {
   const pick = document.getElementById('edit-pick').value.trim();
   const odds = document.getElementById('edit-odds').value.trim();
   const status = document.getElementById('edit-status').value;
-  // Get the (possibly modified) selections from the in-memory bet object
-  const bet = allBets.find(b => b.id === editingBetId);
-  const selections = bet ? (bet.selections||[]) : [];
-  try { await edgeWrite('update',{event,time,note,pick,odds,status,selections},editingBetId); }
-  catch(e) { if (sb) await sb.from('bets').update({event,time,note,pick,odds,status,selections}).eq('id',editingBetId); }
+  try { await edgeWrite('update',{event,time,note,pick,odds,status},editingBetId); }
+  catch(e) { if (sb) await sb.from('bets').update({event,time,note,pick,odds,status}).eq('id',editingBetId); }
   showToast('Bet updated','success');
   closeModal('edit-modal');
   await loadAllData();
