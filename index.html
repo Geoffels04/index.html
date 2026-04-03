@@ -1604,7 +1604,7 @@ const STATUS_LABEL = { won:'✓ Won', lost:'✗ Lost', pending:'⏳ Pending' };
 
 function renderBetCard(b, idx) {
   const cfg = SPORT_CONFIG[b.sport] || SPORT_CONFIG.efc;
-  const sels = (b.selections||[]).map(s => `
+  const sels = (b.selections||[]).filter(s => s.type === 'best').map(s => `
     <div class="sel-row ${s.type}-bet">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
