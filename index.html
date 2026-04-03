@@ -3036,6 +3036,15 @@ function clearSlip() {
   slipSelections = [];
 }
 
+async function deleteLiveSlip(id) {
+  if (!sb || !id) return;
+  if (!confirm('Delete this slip?')) return;
+  await sb.from('live_slips').delete().eq('id', id);
+  renderLiveSlips();
+  showToast('Slip deleted', 'success');
+}
+
+
 async function publishSlipBet() {
   const sport = document.getElementById('slip-sport').value;
   const event = document.getElementById('slip-event').value.trim();
@@ -3234,9 +3243,7 @@ function renderLiveSlips() {
 
   if (sb) {
     sb.from('live_slips').select('*').order('published_at',{ascending:false}).limit(20).then(function(res) {
-      const dbSlips = res.data || [];
-      // Merge DB slips with hardcoded ones, DB takes priority
-      const allSlips = dbSlips.length ? dbSlips.map(function(row) {
+      const dbSlips = (res.data || []).map(function(row) {
         return {
           id: row.id,
           title: row.title,
@@ -3245,7 +3252,9 @@ function renderLiveSlips() {
           potentialWin: row.potential_win,
           legs: Array.isArray(row.legs) ? row.legs : []
         };
-      }) : LIVE_SLIPS;
+      });
+      // Always show hardcoded slip PLUS any DB slips
+      const allSlips = dbSlips.concat(LIVE_SLIPS);
       renderSlipCards(feed, allSlips);
     });
   } else {
@@ -3264,10 +3273,14 @@ function renderSlipCards(feed, slips) {
     var total = slip.legs.length;
     var pending = total - wonCount - lostCount;
     var isAlive = lostCount === 0;
-    var progressPct = Math.round((wonCount / total) * 100);
+    var progressPct = total > 0 ? Math.round((wonCount / total) * 100) : 0;
     var progressCol = lostCount > 0 ? 'var(--red)' : wonCount === total ? 'var(--green)' : 'var(--amber)';
 
-    var legsHtml = slip.legs.map(function(leg, i) {
+    var legsHtml = '';
+    if (!slip.legs || !slip.legs.length) {
+      legsHtml = '<div style="padding:16px;text-align:center;color:var(--muted);font-size:12px">No legs detected — AI could not read the slip. Delete and try again with a clearer screenshot.</div>';
+    } else {
+    legsHtml = slip.legs.map(function(leg, i) {
       var sc = leg.status === 'won' ? 'var(--green)' : leg.status === 'lost' ? 'var(--red)' : 'var(--amber)';
       var icon = leg.status === 'won' ? '✓' : leg.status === 'lost' ? '✗' : '⏳';
       var label = leg.status === 'won' ? 'WON' : leg.status === 'lost' ? 'LOST' : 'PENDING';
@@ -3281,6 +3294,7 @@ function renderSlipCards(feed, slips) {
         + '<div style="font-size:12px;font-weight:800;color:' + sc + ';letter-spacing:.3px;font-family:Syne,sans-serif;flex-shrink:0">' + label + '</div>'
         + '</div>';
     }).join('');
+    } // end else
 
     return '<div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px">'
       + '<div style="padding:14px 16px 12px;background:var(--s2);border-bottom:1px solid var(--border)">'
@@ -3308,6 +3322,7 @@ function renderSlipCards(feed, slips) {
       + '</div>'
       + '</div>'
       + legsHtml
+      + (typeof slip.id === 'number' ? '<div style="padding:6px 14px;border-top:1px solid var(--border);text-align:right"><button onclick="deleteLiveSlip(' + slip.id + ')" style="font-size:11px;color:var(--red);background:none;border:none;cursor:pointer;padding:4px 0">× Delete</button></div>' : '')
       + '</div>';
   }).join('');
 
