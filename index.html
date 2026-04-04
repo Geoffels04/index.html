@@ -4183,20 +4183,57 @@ async function mmaFetchUrl() {
   if (!url) { showToast('Enter a URL','error'); return; }
   const btn = document.getElementById('mma-fetch-btn');
   btn.disabled = true; btn.textContent = '⏳ Fetching...';
-  mmaStatus('Fetching page...','var(--muted)');
+  mmaStatus('Fetching and parsing card from URL...','var(--muted)');
   try {
+    // Ask Claude to search for the card and return structured JSON directly
+    const prompt = `You are an MMA data assistant. Look up this MMA event URL and extract the full fight card: ${url}
+
+Return ONLY valid JSON — no markdown, no explanation, no code fences:
+{"promotion":"UFC","card_name":"UFC Fight Night","date":"5 Apr 2025","fights":[{"fighter_a":"Renato Moicano","fighter_b":"Chris Duncan","division":"Lightweight","position":"main","rounds":5}]}
+
+Rules:
+- promotion: UFC, EFC, PFL, Bellator, or ONE
+- position values: main, co-main, main-card, prelim, early-prelim
+- rounds: 5 for main event and title fights, 3 for all others
+- Order fights from main event (first) down to early prelims (last)
+- Include ALL fights on the card`;
+
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2000,
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:3000,
         tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user', content:'Fetch this MMA event page and extract ONLY the fight card. Return plain text: event name and date on line 1, then each fight as "Fighter A vs Fighter B (Weight Class) - Card Position". Card positions: Main Event, Co-Main Event, Main Card, Prelim, Early Prelim. URL: ' + url}]
+        messages:[{role:'user', content: prompt}]
       })
     });
     const data = await resp.json();
-    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
-    document.getElementById('mma-raw-text').value = text;
-    mmaStatus('✓ Fetched — click Parse Card','var(--green)');
-  } catch(e) { mmaStatus('Fetch failed — paste text manually','var(--red)'); }
+    // Find the text block with JSON in it
+    const textBlocks = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text);
+    const fullText = textBlocks.join('');
+    // Try to extract JSON from the response
+    const jsonMatch = fullText.match(/\{[\s\S]*"fights"[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No structured card data found');
+    const parsed = JSON.parse(jsonMatch[0]);
+    // Directly populate the card
+    MMA.promo = parsed.promotion||'UFC';
+    MMA.cardNum = parsed.card_name||'';
+    MMA.date = parsed.date||'';
+    MMA.fights = (parsed.fights||[]).map((f,i)=>({
+      id:i+1, fighterA:f.fighter_a, fighterB:f.fighter_b,
+      division:f.division||'Unknown', position:f.position||'main-card',
+      rounds:f.rounds||3, prediction:null
+    }));
+    const promoSel = document.getElementById('mma-promo');
+    if (promoSel) { for(let o of promoSel.options) o.selected = o.value===MMA.promo; }
+    const numEl = document.getElementById('mma-card-num'); if (numEl) numEl.value = MMA.cardNum;
+    const dateEl = document.getElementById('mma-card-date'); if (dateEl) dateEl.value = MMA.date;
+    mmaRenderFights();
+    mmaClearPredictions();
+    mmaStatus('✓ ' + MMA.fights.length + ' fights loaded from URL','var(--green)');
+    showToast(MMA.fights.length + ' fights loaded','success');
+  } catch(e) {
+    mmaStatus('Could not auto-parse URL — try pasting the card text manually below','var(--red)');
+  }
   btn.disabled = false; btn.textContent = '⬇ Fetch URL';
 }
 
@@ -4205,30 +4242,61 @@ async function mmaParseCard() {
   if (!raw) { showToast('Paste card text first','error'); return; }
   const btn = document.getElementById('mma-parse-btn');
   btn.disabled = true; btn.textContent = '⏳ Parsing...';
-  mmaStatus('Parsing card...','var(--muted)');
-  const prompt = 'Parse this MMA fight card and return ONLY valid JSON, no markdown:\n{"promotion":"UFC","card_name":"UFC 314","date":"12 Apr 2025","fights":[{"fighter_a":"name","fighter_b":"name","division":"Lightweight","position":"main","rounds":5}]}\nPositions: main, co-main, main-card, prelim, early-prelim. Rounds: 5 for main/title, 3 otherwise. Order main event first.\n\nCard text:\n' + raw;
+  mmaStatus('Parsing pasted text...','var(--muted)');
+
+  // Smart prompt that handles messy, structured, or raw copy-paste from any source
+  const prompt = `You are an MMA data parser. The text below is a fight card pasted from a website — it may be messy, structured, or raw.
+
+Extract every fight and return ONLY valid JSON — no markdown, no explanation:
+{"promotion":"UFC","card_name":"UFC Fight Night","date":"5 Apr 2025","fights":[{"fighter_a":"full name","fighter_b":"full name","division":"Lightweight","position":"main","rounds":5}]}
+
+Rules:
+- promotion: UFC, EFC, PFL, Bellator, ONE — detect from text
+- position: main (main event), co-main (co-main event), main-card, prelim, early-prelim
+- rounds: 5 for main event and title fights, 3 for all others
+- Order fights from main event first to early prelims last
+- Include EVERY matchup you can identify — even if format is inconsistent
+- fighter_a is the first/left/home fighter, fighter_b is the second/right/away
+
+Card text:
+${raw}`;
+
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:2000,
-        messages:[{role:'user', content: prompt}] })
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:3000,
+        messages:[{role:'user', content: prompt}]
+      })
     });
     const data = await resp.json();
     const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    // Robust JSON extraction — handles code fences or inline JSON
+    const jsonMatch = text.match(/\{[\s\S]*"fights"[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No fight data found in response');
+    const parsed = JSON.parse(jsonMatch[0]);
+    if (!parsed.fights || !parsed.fights.length) throw new Error('No fights in parsed data');
+
     MMA.promo = parsed.promotion||'UFC';
     MMA.cardNum = parsed.card_name||'';
     MMA.date = parsed.date||'';
-    MMA.fights = (parsed.fights||[]).map((f,i)=>({id:i+1,fighterA:f.fighter_a,fighterB:f.fighter_b,division:f.division,position:f.position,rounds:f.rounds||3,prediction:null}));
+    MMA.fights = parsed.fights.map((f,i)=>({
+      id:i+1, fighterA:f.fighter_a||'Fighter A', fighterB:f.fighter_b||'Fighter B',
+      division:f.division||'Unknown', position:f.position||'main-card',
+      rounds:f.rounds||3, prediction:null
+    }));
     const promoSel = document.getElementById('mma-promo');
     if (promoSel) { for(let o of promoSel.options) o.selected = o.value===MMA.promo; }
     const numEl = document.getElementById('mma-card-num'); if (numEl) numEl.value = MMA.cardNum;
     const dateEl = document.getElementById('mma-card-date'); if (dateEl) dateEl.value = MMA.date;
     mmaRenderFights();
     mmaClearPredictions();
-    mmaStatus('✓ ' + MMA.fights.length + ' fights parsed — generate predictions when ready','var(--green)');
+    mmaStatus('✓ ' + MMA.fights.length + ' fights parsed','var(--green)');
     showToast(MMA.fights.length + ' fights parsed','success');
-  } catch(e) { mmaStatus('Parse error — check text contains fight info','var(--red)'); showToast('Parse failed','error'); }
+  } catch(e) {
+    mmaStatus('Parse failed: ' + e.message + ' — try tidying the text or use Fetch URL','var(--red)');
+    showToast('Parse failed','error');
+  }
   btn.disabled = false; btn.textContent = '⚡ Parse Card';
 }
 
@@ -4432,5 +4500,3 @@ function mmaPublishFullCard() {
 </script>
 </body>
 </html>
-
-  
