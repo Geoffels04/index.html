@@ -2554,12 +2554,6 @@ async function loadCommunityStrip() {
     </a>`;
   }).join('');
 }
-What was wrong: The catch(e) { block was never closed before renderCurrentPage and loadCommunityStrip started, so both functions were defined inside the catch and JavaScript was likely throwing a syntax error that silently broke the whole script — including Supabase loading and the sport nav cards.
-
-In your file, find this block and replace it entirely with the clean version above. The sport cards and community codes should load immediately after.
-
-
-
 
 async function submitCommunityPick() {
   const nick = document.getElementById('cp-nick')?.value.trim();
