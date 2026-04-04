@@ -1356,7 +1356,11 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
         <div><label class="form-label" style="display:block;margin-bottom:4px">Time</label><input class="modal-input" id="edit-time" style="margin-bottom:0"></div>
       </div>
       <label class="form-label" style="display:block;margin-bottom:4px">Analysis</label>
-      <textarea class="modal-input" id="edit-note" style="min-height:80px;resize:vertical"></textarea>
+      <textarea class="modal-input" id="edit-note" style="min-height:60px;resize:vertical;margin-bottom:10px"></textarea>
+      <div id="edit-legs-section" style="display:none">
+        <label class="form-label" style="display:block;margin-bottom:6px">Selection Results</label>
+        <div id="edit-legs-rows" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost btn-sm" onclick="closeModal('edit-modal')">Cancel</button>
@@ -1647,21 +1651,27 @@ function renderBetCard(b, idx) {
     ? (b.selections||[])
     : (b.selections||[]).filter(s => s.type === 'best' || s.type === 'value');
 
-  const sels = visibleSels.map(s => `
-    <div class="sel-row ${isAcca ? 'treble-bet' : s.type+'-bet'}" style="${isAcca ? 'padding:10px 14px;' : ''}">
+  const sels = visibleSels.map(s => {
+    // Per-leg status: s.status takes priority over card-level b.status
+    const ls = s.status || (visibleSels.length === 1 ? b.status : null);
+    const lc = ls==='won'?'var(--green)':ls==='lost'?'var(--red)':ls==='pending'?'var(--amber)':null;
+    const li = ls==='won'?'\u2713 WON':ls==='lost'?'\u2717 LOST':ls==='pending'?'PENDING':null;
+    return `
+    <div class="sel-row ${isAcca ? 'treble-bet' : s.type+'-bet'}" style="${isAcca?'padding:10px 14px;':''}${ls==='won'?'background:rgba(34,197,94,0.05);':ls==='lost'?'background:rgba(239,68,68,0.05);':''}">
       <div style="flex:1;min-width:0">
         ${!isAcca ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-          <span class="sel-type-pill">${s.type==='best'?'Best Bet':s.type==='value'?'Value':s.type==='next'?'Next Best':s.type==='place'?'Place':s.type==='treble'?'Treble':s.type==='pick6'?'Pick 6':s.type}</span>
+          <span class="sel-type-pill">${s.type==='best'?'Best Bet':s.type==='value'?'Value':s.type==='next'?'Next Best':s.type==='place'?'Place Bet':s.type==='treble'?'Treble':s.type==='pick6'?'Pick 6':s.type}</span>
           ${s.ar ? `<span style="font-size:9px;color:var(--dim)">${s.ar}</span>` : ''}
         </div>` : ''}
-        <div class="sel-name" style="${isAcca ? 'font-size:13px;' : ''}">${s.name}</div>
+        <div class="sel-name" style="${isAcca?'font-size:13px;':''}">${s.name}</div>
         ${s.detail ? `<div class="sel-detail">${s.detail}</div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
         ${s.odds ? `<div class="sel-odds">${s.odds}</div>` : ''}
-        ${b.status === 'won' ? `<div style="font-size:16px;font-weight:800;color:var(--green);letter-spacing:.5px;font-family:'Syne',sans-serif">✓ WON</div>` : b.status === 'lost' ? `<div style="font-size:16px;font-weight:800;color:var(--red);font-family:'Syne',sans-serif">✗ LOST</div>` : b.status === 'pending' ? `<div style="font-size:12px;color:var(--amber);font-weight:700;letter-spacing:.3px">PENDING</div>` : ''}
+        ${li ? `<div style="font-size:${ls==='pending'?'11':'14'}px;font-weight:800;color:${lc};letter-spacing:.4px;font-family:Syne,sans-serif">${li}</div>` : ''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   // Acca summary header
   const legCount = (b.selections||[]).length;
@@ -2630,6 +2640,58 @@ async function edgeWrite(action, payload, id) {
   return data;
 }
 
+async function updateLegStatus(betId, legIndex, newStatus) {
+  const bet = allBets.find(b => b.id === betId);
+  if (!bet) return;
+  const selections = (bet.selections||[]).map(function(s,i) {
+    if (i === legIndex) { var n = Object.assign({},s); n.status = newStatus; return n; }
+    return s;
+  });
+  try {
+    await edgeWrite('update', {selections}, betId);
+    await loadAllData();
+    showToast('Leg ' + (legIndex+1) + ' — ' + newStatus, 'success');
+    if (currentPage === 'racing' || currentPage === 'soccer') renderCurrentPage();
+  } catch(e) { showToast('Failed: ' + e.message, 'error'); }
+}
+
+function openLegStatusEditor(betId) {
+  const bet = allBets.find(b => b.id === betId);
+  if (!bet || !(bet.selections||[]).length) { showToast('No legs on this bet','error'); return; }
+  window._legBetId = betId;
+  var html = '<div style="padding:16px">';
+  html += '<div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text)">' + bet.event + '</div>';
+  (bet.selections||[]).forEach(function(s,i) {
+    var cur = s.status || 'pending';
+    var gCol = cur==='won'?'var(--green)':'transparent';
+    var gTxt = cur==='won'?'#000':'var(--green)';
+    var rCol = cur==='lost'?'var(--red)':'transparent';
+    var rTxt = cur==='lost'?'#fff':'var(--red)';
+    var aCol = cur==='pending'?'var(--amber)':'transparent';
+    var aTxt = cur==='pending'?'#000':'var(--amber)';
+    html += '<div style="display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--border)">';
+    html += '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text)">' + (s.name||'Leg '+(i+1)) + '</div>';
+    if (s.detail) html += '<div style="font-size:10px;color:var(--muted)">' + s.detail + '</div>';
+    html += '</div>';
+    html += '<button data-bid="' + betId + '" data-idx="' + i + '" data-st="won" class="leg-st-btn" style="font-size:11px;padding:4px 8px;border-radius:6px;border:1.5px solid var(--green);color:' + gTxt + ';background:' + gCol + ';cursor:pointer;font-weight:700">Won</button>';
+    html += '<button data-bid="' + betId + '" data-idx="' + i + '" data-st="lost" class="leg-st-btn" style="font-size:11px;padding:4px 8px;border-radius:6px;border:1.5px solid var(--red);color:' + rTxt + ';background:' + rCol + ';cursor:pointer;font-weight:700">Lost</button>';
+    html += '<button data-bid="' + betId + '" data-idx="' + i + '" data-st="pending" class="leg-st-btn" style="font-size:11px;padding:4px 8px;border-radius:6px;border:1.5px solid var(--amber);color:' + aTxt + ';background:' + aCol + ';cursor:pointer">⏳</button>';
+    html += '</div>';
+  });
+  html += '</div>';
+  var body = document.getElementById('edit-modal-body');
+  body.innerHTML = html;
+  body.querySelectorAll('.leg-st-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      updateLegStatus(this.dataset.bid, parseInt(this.dataset.idx), this.dataset.st);
+      setTimeout(function(){ openLegStatusEditor(betId); }, 600);
+    });
+  });
+  var footer = document.getElementById('edit-modal-footer');
+  if (footer) footer.style.display = 'none';
+  openModal('edit-modal');
+}
+
 async function publishBet() {
   const sport  = document.getElementById('f-sport').value;
   const event  = document.getElementById('f-event').value.trim();
@@ -2860,6 +2922,28 @@ function openEditModal(id) {
   document.getElementById('edit-event').value = bet.event||'';
   document.getElementById('edit-time').value = bet.time||'';
   document.getElementById('edit-note').value = bet.note||'';
+
+  // Populate per-leg status dropdowns
+  const sels = bet.selections||[];
+  const legsSection = document.getElementById('edit-legs-section');
+  const legsRows = document.getElementById('edit-legs-rows');
+  if (sels.length && legsRows) {
+    legsSection.style.display = 'block';
+    legsRows.innerHTML = sels.map((s, i) => {
+      const st = s.status||'pending';
+      const label = s.name || ('Leg ' + (i+1));
+      const detail = s.detail ? ' — ' + s.detail : '';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--s2);border-radius:7px;border:1px solid var(--border)">'
+        + '<div style="flex:1;font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + label + '<span style="color:var(--muted);font-size:10px">' + detail + '</span></div>'
+        + '<select class="form-select" data-leg="' + i + '" style="padding:3px 7px;font-size:11px;width:100px;flex-shrink:0">'
+        + '<option value="pending"' + (st==='pending'?' selected':'') + '>⏳ Pending</option>'
+        + '<option value="won"' + (st==='won'?' selected':'') + '>✅ Won</option>'
+        + '<option value="lost"' + (st==='lost'?' selected':'') + '>❌ Lost</option>'
+        + '</select></div>';
+    }).join('');
+  } else if (legsSection) {
+    legsSection.style.display = 'none';
+  }
   openModal('edit-modal');
 }
 
@@ -2868,9 +2952,27 @@ async function saveEdit() {
   const event = document.getElementById('edit-event').value.trim();
   const time = document.getElementById('edit-time').value.trim();
   const note = document.getElementById('edit-note').value.trim();
-  try { await edgeWrite('update',{event,time,note},editingBetId); }
-  catch(e) { if (sb) await sb.from('bets').update({event,time,note}).eq('id',editingBetId); }
-  showToast('Bet updated','success');
+
+  // Collect updated leg statuses
+  const bet = allBets.find(b => b.id === editingBetId);
+  let selections = bet ? (bet.selections||[]) : [];
+  const legDropdowns = document.querySelectorAll('#edit-legs-rows select[data-leg]');
+  if (legDropdowns.length && selections.length) {
+    legDropdowns.forEach(sel => {
+      const idx = parseInt(sel.getAttribute('data-leg'));
+      if (selections[idx]) selections[idx] = Object.assign({}, selections[idx], { status: sel.value });
+    });
+    // Auto-set card status based on leg results
+    const allWon = selections.every(s => s.status === 'won');
+    const anyLost = selections.some(s => s.status === 'lost');
+    const cardStatus = allWon ? 'won' : anyLost ? 'lost' : 'pending';
+    try { await edgeWrite('update',{event,time,note,selections,status:cardStatus},editingBetId); }
+    catch(e) { if (sb) await sb.from('bets').update({event,time,note,selections,status:cardStatus}).eq('id',editingBetId); }
+  } else {
+    try { await edgeWrite('update',{event,time,note},editingBetId); }
+    catch(e) { if (sb) await sb.from('bets').update({event,time,note}).eq('id',editingBetId); }
+  }
+  showToast('\u2713 Bet updated','success');
   closeModal('edit-modal');
   await loadAllData();
 }
