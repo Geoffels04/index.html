@@ -1665,6 +1665,7 @@ function renderBetCard(b, idx) {
         </div>` : ''}
         <div class="sel-name" style="${isAcca?'font-size:13px;':''}">${s.name}</div>
         ${s.detail ? `<div class="sel-detail">${s.detail}</div>` : ''}
+        ${s.position ? `<div style="font-size:10px;color:var(--amber);font-weight:600;margin-top:2px">${s.position==='1'?'🥇 1st':s.position==='2'?'🥈 2nd':s.position==='3'?'🥉 3rd':s.position==='4'?'4th finished':s.position==='NP'?'Not Placed':s.position}</div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
         ${s.odds ? `<div class="sel-odds">${s.odds}</div>` : ''}
@@ -2914,6 +2915,27 @@ async function swapBetOrder(srcId, destId) {
 // ═══════════════════════════════════════════════
 // EDIT BET MODAL
 // ═══════════════════════════════════════════════
+function autoSetLegStatus(posSelect) {
+  const pos = posSelect.value;
+  const legIdx = posSelect.getAttribute('data-pos');
+  const betType = posSelect.getAttribute('data-type') || 'best';
+  const statusSel = document.querySelector('#edit-legs-rows select[data-leg="' + legIdx + '"]');
+  if (!statusSel || !pos) return;
+  // Win bet: only 1st wins
+  // Place/EW: 1st-3rd wins
+  // Pick6/Treble: any finish = won (user decides)
+  if (pos === 'NP') {
+    statusSel.value = 'lost';
+  } else if (pos === '1') {
+    statusSel.value = 'won';
+  } else if (pos === '2' || pos === '3') {
+    statusSel.value = betType === 'place' || betType === 'ew' ? 'won' : 'lost';
+  } else if (pos === '4') {
+    statusSel.value = 'lost';
+  }
+}
+
+
 function openEditModal(id) {
   const bet = allBets.find(b => b.id === id);
   if (!bet) return;
@@ -2929,12 +2951,26 @@ function openEditModal(id) {
   const legsRows = document.getElementById('edit-legs-rows');
   if (sels.length && legsRows) {
     legsSection.style.display = 'block';
+    const isRacing = bet.sport === 'racing';
     legsRows.innerHTML = sels.map((s, i) => {
       const st = s.status||'pending';
+      const pos = s.position||'';
       const label = s.name || ('Leg ' + (i+1));
       const detail = s.detail ? ' — ' + s.detail : '';
-      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--s2);border-radius:7px;border:1px solid var(--border)">'
+            var posSelect = '';
+      if (isRacing) {
+        var betType = s.type||'best';
+        posSelect = '<select class="form-select" data-pos="' + i + '" data-type="' + betType + '" style="padding:3px 7px;font-size:11px;width:75px;flex-shrink:0" onchange="autoSetLegStatus(this)">'
+          + '<option value=""' + (!pos?' selected':'') + '>Pos</option>'
+          + '<option value="1"' + (pos==='1'?' selected':'') + '>1st</option>'
+          + '<option value="2"' + (pos==='2'?' selected':'') + '>2nd</option>'
+          + '<option value="3"' + (pos==='3'?' selected':'') + '>3rd</option>'
+          + '<option value="4"' + (pos==='4'?' selected':'') + '>4th</option>'
+          + '<option value="NP"' + (pos==='NP'?' selected':'') + '>NP</option>'
+          + '</select>';
+      }      return '<div style="display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--s2);border-radius:7px;border:1px solid var(--border)">'
         + '<div style="flex:1;font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + label + '<span style="color:var(--muted);font-size:10px">' + detail + '</span></div>'
+        + posSelect
         + '<select class="form-select" data-leg="' + i + '" style="padding:3px 7px;font-size:11px;width:100px;flex-shrink:0">'
         + '<option value="pending"' + (st==='pending'?' selected':'') + '>⏳ Pending</option>'
         + '<option value="won"' + (st==='won'?' selected':'') + '>✅ Won</option>'
@@ -2960,7 +2996,11 @@ async function saveEdit() {
   if (legDropdowns.length && selections.length) {
     legDropdowns.forEach(sel => {
       const idx = parseInt(sel.getAttribute('data-leg'));
-      if (selections[idx]) selections[idx] = Object.assign({}, selections[idx], { status: sel.value });
+      if (selections[idx]) {
+        const posSel = document.querySelector('#edit-legs-rows select[data-pos="' + idx + '"]');
+        const pos = posSel ? posSel.value : (selections[idx].position||'');
+        selections[idx] = Object.assign({}, selections[idx], { status: sel.value, position: pos });
+      }
     });
     // Auto-set card status based on leg results
     const allWon = selections.every(s => s.status === 'won');
