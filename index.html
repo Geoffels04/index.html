@@ -4265,9 +4265,7 @@ function mmaDivFromText(t) {
 }
 
 function mmaLocalParse(raw) {
-  const lines = raw.split(/
-?
-/).map(l => l.trim()).filter(Boolean);
+const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   const fights = [];
   const JUNK = /^(manage_search|unranked|#\s*\d+|ufc\s|bellator|pfl|efc|one\s|early prelim|prelim|main card|co-main|main event|\d+-\d+(-\d+)?$|\d+\s*x\s*\d+$)/i;
   const VS_RE = /^(.+?)\s+vs\.?\s+(.+)$/i;
