@@ -959,6 +959,10 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
         <svg viewBox="0 0 13 13" fill="none"><rect x="1.5" y="1.5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 4.5h5M4 6.5h5M4 8.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         Upload Slip
       </div>
+      <div class="admin-nav-item" onclick="switchAdmin('editslips',this)">
+        <svg viewBox="0 0 13 13" fill="none"><path d="M2 10l2-2 5-5 1.5 1.5-5 5L2 10z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 3.5L9.5 2.5 11 4l-1 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Edit Live Slips
+      </div>
       <div class="admin-sep"></div>
       <div class="admin-nav-item" onclick="switchAdmin('bets',this)">
         <svg viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4 5h5M4 7.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
@@ -1375,6 +1379,19 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
           <div id="mma-pub-status" style="font-size:11px;color:var(--green);margin-top:8px;display:none">✓ Published</div>
         </div>
       </div><!-- panel-mma -->
+
+      <!-- EDIT LIVE SLIPS -->
+      <div class="admin-panel" id="panel-editslips">
+        <div class="admin-page-title">Edit Live Slips</div>
+        <div class="admin-page-sub">Update leg results and slip status in real time. Changes go live instantly.</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+          <button class="btn btn-ghost btn-sm" onclick="adminLoadSlips()">↻ Refresh</button>
+          <span id="edit-slips-count" style="font-size:11px;color:var(--muted);align-self:center"></span>
+        </div>
+        <div id="edit-slips-feed">
+          <div style="font-size:12px;color:var(--dim);text-align:center;padding:32px 0">Click Refresh to load live slips.</div>
+        </div>
+      </div><!-- panel-editslips -->
 
     </div><!-- admin-main -->
   </div><!-- admin-layout -->
@@ -2706,6 +2723,7 @@ function exitAdmin() {
 
 function switchAdmin(panel, el) {
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('on'));
+  if (panel === 'editslips') { const p = document.getElementById('panel-editslips'); if(p){p.classList.add('on');} adminLoadSlips(); return; }
   document.getElementById('panel-'+panel).classList.add('on');
   document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('on'));
   if (el) el.classList.add('on');
@@ -4237,64 +4255,163 @@ Rules:
   btn.disabled = false; btn.textContent = '⬇ Fetch URL';
 }
 
+// ── Local Tapology/any-format fight card parser ──
+const MMA_WEIGHT_MAP = {
+  '265':'Heavyweight','205':'Light Heavyweight','185':'Middleweight',
+  '170':'Welterweight','155':'Lightweight','145':'Featherweight',
+  '135':'Bantamweight','125':'Flyweight','115':"Women's Strawweight",
+  '105':"Women's Atomweight"
+};
+const MMA_DIV_WORDS = {
+  'heavyweight':'Heavyweight','light heavyweight':'Light Heavyweight','lightheavy':'Light Heavyweight',
+  'middleweight':'Middleweight','welterweight':'Welterweight','lightweight':'Lightweight',
+  'featherweight':'Featherweight','bantamweight':'Bantamweight','flyweight':'Flyweight',
+  'strawweight':"Women's Strawweight",'atomweight':"Women's Atomweight",
+  'heavyw':'Heavyweight','light hw':'Light Heavyweight','middlew':'Middleweight',
+  'welterw':'Welterweight','lightw':'Lightweight','featherw':'Featherweight',
+  'bantamw':'Bantamweight','flyw':'Flyweight','straww':"Women's Strawweight"
+};
+
+function mmaDivFromWeight(w) { return MMA_WEIGHT_MAP[String(w)] || 'Unknown'; }
+function mmaDivFromText(t) {
+  const lower = t.toLowerCase();
+  for (const [key,val] of Object.entries(MMA_DIV_WORDS)) {
+    if (lower.includes(key)) return val;
+  }
+  return null;
+}
+
+function mmaLocalParse(raw) {
+  const lines = raw.split(/
+?
+/).map(l => l.trim()).filter(Boolean);
+  const fights = [];
+  const JUNK = /^(manage_search|unranked|#\s*\d+|ufc\s|bellator|pfl|efc|one\s|early prelim|prelim|main card|co-main|main event|\d+-\d+(-\d+)?$|\d+\s*x\s*\d+$)/i;
+  const VS_RE = /^(.+?)\s+vs\.?\s+(.+)$/i;
+  const LBS_RE = /^(\d{3})\s*lbs?$/i;
+
+  // Strategy 1: look for "X vs. Y" lines (Tapology compact format)
+  let i = 0;
+  while (i < lines.length) {
+    const vsMatch = lines[i].match(VS_RE);
+    if (vsMatch) {
+      const fa = vsMatch[1].replace(/\s+/g,' ').trim();
+      const fb = vsMatch[2].replace(/\s+/g,' ').trim();
+      // look ahead for weight
+      let weight = null, div = null;
+      for (let j = i+1; j < Math.min(i+4, lines.length); j++) {
+        const lbs = lines[j].match(LBS_RE);
+        if (lbs) { weight = lbs[1]; div = mmaDivFromWeight(weight); break; }
+        const dd = mmaDivFromText(lines[j]);
+        if (dd) { div = dd; break; }
+      }
+      if (!div) div = 'Lightweight';
+      const idx = fights.length;
+      const pos = idx===0?'main':idx===1?'co-main':idx<=5?'main-card':'prelim';
+      fights.push({fighter_a:fa, fighter_b:fb, division:div, position:pos, rounds:idx<=1?5:3});
+    }
+    i++;
+  }
+
+  if (fights.length >= 2) return fights;
+
+  // Strategy 2: Tapology verbose paste — names appear twice, dedupe pairs
+  const cleanLines = lines.filter(l => !JUNK.test(l));
+  const names = [];
+  for (const line of cleanLines) {
+    // Skip weight/round lines
+    if (/^\d+$/.test(line)) continue;
+    if (/^\d{3}\s*lbs?$/i.test(line)) continue;
+    names.push(line.replace(/\s+/g,' ').trim());
+  }
+
+  // Find consecutive duplicate pairs — Tapology repeats fighter name after division info
+  const seen = [];
+  let j = 0;
+  while (j < names.length - 1) {
+    const a = names[j];
+    // Look for next occurrence of same name (the duplicate)
+    let dupIdx = -1;
+    for (let k = j+1; k < Math.min(j+6, names.length); k++) {
+      if (names[k].toLowerCase() === a.toLowerCase()) { dupIdx = k; break; }
+    }
+    if (dupIdx > -1) {
+      // Fighter B is the name right before the duplicate
+      const fb = names[dupIdx - 1];
+      if (fb && fb !== a) {
+        seen.push([a, fb]);
+        j = dupIdx + 1;
+      } else { j++; }
+    } else { j++; }
+  }
+
+  // Convert pairs to fights with alternating weight from original lines
+  const lbsAll = lines.map(l => { const m = l.match(LBS_RE); return m ? m[1] : null; }).filter(Boolean);
+  seen.forEach((pair, idx) => {
+    const weight = lbsAll[idx] || '155';
+    const pos = idx===0?'main':idx===1?'co-main':idx<=5?'main-card':'prelim';
+    fights.push({fighter_a:pair[0], fighter_b:pair[1], division:mmaDivFromWeight(weight), position:pos, rounds:idx<=1?5:3});
+  });
+
+  return fights;
+}
+
 async function mmaParseCard() {
   const raw = document.getElementById('mma-raw-text').value.trim();
   if (!raw) { showToast('Paste card text first','error'); return; }
   const btn = document.getElementById('mma-parse-btn');
   btn.disabled = true; btn.textContent = '⏳ Parsing...';
-  mmaStatus('Parsing pasted text...','var(--muted)');
+  mmaStatus('Parsing...','var(--muted)');
 
-  // Smart prompt that handles messy, structured, or raw copy-paste from any source
-  const prompt = `You are an MMA data parser. The text below is a fight card pasted from a website — it may be messy, structured, or raw.
+  // Detect promo from text
+  const promoDetect = raw.match(/\b(UFC|EFC|PFL|Bellator|ONE)\b/i);
+  const detectedPromo = promoDetect ? promoDetect[1].toUpperCase() : 'UFC';
 
-Extract every fight and return ONLY valid JSON — no markdown, no explanation:
-{"promotion":"UFC","card_name":"UFC Fight Night","date":"5 Apr 2025","fights":[{"fighter_a":"full name","fighter_b":"full name","division":"Lightweight","position":"main","rounds":5}]}
+  // Try local parser first — instant, no API call needed
+  const localFights = mmaLocalParse(raw);
 
-Rules:
-- promotion: UFC, EFC, PFL, Bellator, ONE — detect from text
-- position: main (main event), co-main (co-main event), main-card, prelim, early-prelim
-- rounds: 5 for main event and title fights, 3 for all others
-- Order fights from main event first to early prelims last
-- Include EVERY matchup you can identify — even if format is inconsistent
-- fighter_a is the first/left/home fighter, fighter_b is the second/right/away
+  if (localFights.length >= 2) {
+    // Local parse succeeded
+    MMA.promo = detectedPromo;
+    MMA.fights = localFights.map((f,i) => ({id:i+1, fighterA:f.fighter_a, fighterB:f.fighter_b, division:f.division, position:f.position, rounds:f.rounds, prediction:null}));
+    const promoSel = document.getElementById('mma-promo');
+    if (promoSel) { for(let o of promoSel.options) o.selected = o.value===MMA.promo; }
+    mmaRenderFights();
+    mmaClearPredictions();
+    mmaStatus('✓ ' + MMA.fights.length + ' fights parsed instantly','var(--green)');
+    showToast(MMA.fights.length + ' fights parsed','success');
+    btn.disabled = false; btn.textContent = '⚡ Parse Card';
+    return;
+  }
 
-Card text:
-${raw}`;
-
+  // Fallback: send to Claude for anything unusual
+  mmaStatus('Sending to Claude for parsing...','var(--muted)');
+  const prompt = 'Parse this MMA fight card. Return ONLY valid JSON, no markdown, no explanation:\n{"promotion":"UFC","card_name":"UFC Fight Night","date":"5 Apr 2025","fights":[{"fighter_a":"full name","fighter_b":"full name","division":"Lightweight","position":"main","rounds":5}]}\nPositions: main, co-main, main-card, prelim, early-prelim. Rounds: 5 for main/title, 3 for others. Order main event first. Include ALL fights.\n\nCard text:\n' + raw;
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:3000,
-        messages:[{role:'user', content: prompt}]
-      })
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:3000, messages:[{role:'user',content:prompt}] })
     });
     const data = await resp.json();
     const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    // Robust JSON extraction — handles code fences or inline JSON
-    const jsonMatch = text.match(/\{[\s\S]*"fights"[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No fight data found in response');
-    const parsed = JSON.parse(jsonMatch[0]);
-    if (!parsed.fights || !parsed.fights.length) throw new Error('No fights in parsed data');
-
-    MMA.promo = parsed.promotion||'UFC';
+    const jsonStr = text.replace(/```json|```/g,'').trim();
+    const jsonStart = jsonStr.indexOf('{');
+    const parsed = JSON.parse(jsonStr.slice(jsonStart));
+    if (!parsed.fights?.length) throw new Error('No fights found');
+    MMA.promo = parsed.promotion||detectedPromo;
     MMA.cardNum = parsed.card_name||'';
     MMA.date = parsed.date||'';
-    MMA.fights = parsed.fights.map((f,i)=>({
-      id:i+1, fighterA:f.fighter_a||'Fighter A', fighterB:f.fighter_b||'Fighter B',
-      division:f.division||'Unknown', position:f.position||'main-card',
-      rounds:f.rounds||3, prediction:null
-    }));
+    MMA.fights = parsed.fights.map((f,i)=>({id:i+1,fighterA:f.fighter_a,fighterB:f.fighter_b,division:f.division||'Unknown',position:f.position||'main-card',rounds:f.rounds||3,prediction:null}));
     const promoSel = document.getElementById('mma-promo');
     if (promoSel) { for(let o of promoSel.options) o.selected = o.value===MMA.promo; }
-    const numEl = document.getElementById('mma-card-num'); if (numEl) numEl.value = MMA.cardNum;
-    const dateEl = document.getElementById('mma-card-date'); if (dateEl) dateEl.value = MMA.date;
+    const numEl = document.getElementById('mma-card-num'); if(numEl) numEl.value = MMA.cardNum;
+    const dateEl = document.getElementById('mma-card-date'); if(dateEl) dateEl.value = MMA.date;
     mmaRenderFights();
     mmaClearPredictions();
     mmaStatus('✓ ' + MMA.fights.length + ' fights parsed','var(--green)');
     showToast(MMA.fights.length + ' fights parsed','success');
   } catch(e) {
-    mmaStatus('Parse failed: ' + e.message + ' — try tidying the text or use Fetch URL','var(--red)');
+    mmaStatus('Could not parse — tip: use the "Renato Moicano vs. Chris Duncan / 155 lbs" format from Tapology','var(--red)');
     showToast('Parse failed','error');
   }
   btn.disabled = false; btn.textContent = '⚡ Parse Card';
@@ -4496,6 +4613,158 @@ function mmaPublishFullCard() {
   inner.innerHTML=html;
   showToast('Full card published — '+sorted.length+' fights live','success');
 }
+
+
+// ══════════════════════════════════════════════════
+// EDIT LIVE SLIPS — admin panel
+// ══════════════════════════════════════════════════
+
+async function adminLoadSlips() {
+  const feed = document.getElementById('edit-slips-feed');
+  const cnt  = document.getElementById('edit-slips-count');
+  if (!feed) return;
+  feed.innerHTML = '<div style="padding:28px;text-align:center;color:var(--muted);font-size:12px">Loading...</div>';
+
+  if (!_supabase) { feed.innerHTML = '<div style="font-size:12px;color:var(--red);padding:20px;text-align:center">Not connected to Supabase.</div>'; return; }
+
+  const { data, error } = await _supabase.from('live_slips').select('*').order('published_at',{ascending:false}).limit(50);
+  if (error || !data || !data.length) {
+    feed.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:32px">No live slips found.</div>';
+    if (cnt) cnt.textContent = '';
+    return;
+  }
+  if (cnt) cnt.textContent = data.length + ' slip' + (data.length!==1?'s':'') + ' loaded';
+  feed.innerHTML = data.map(slip => adminRenderEditSlip(slip)).join('');
+}
+
+function adminRenderEditSlip(slip) {
+  const legs = Array.isArray(slip.legs) ? slip.legs : [];
+  const pubDate = slip.published_at ? new Date(slip.published_at).toLocaleDateString('en-ZA',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+
+  const statusColor = {won:'var(--green)',lost:'var(--red)',pending:'var(--amber)',placed:'var(--blue)',scratched:'var(--dim)'};
+  const statusLabel = {won:'✓ Won',lost:'✗ Lost',pending:'⏳ Pending',placed:'Placed',scratched:'Scratched'};
+  const slipStatus = slip.status || 'pending';
+
+  const legsHtml = legs.map((leg,i) => {
+    const ls = leg.status || 'pending';
+    const lc = statusColor[ls] || 'var(--amber)';
+    const name = leg.name || leg.sel || 'Leg ' + (i+1);
+    const detail = leg.detail || leg.match || '';
+    const odds = leg.odds ? parseFloat(leg.odds).toFixed(2) : '';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--s1)" id="slip-leg-row-${slip.id}-${i}">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px">${name}</div>
+        <div style="font-size:10px;color:var(--muted)">${detail}${odds?' · @'+odds:''}</div>
+      </div>
+      <select onchange="adminUpdateLeg(${slip.id},${i},this.value)" style="background:var(--s2);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;color:${lc};font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;flex-shrink:0">
+        <option value="pending" ${ls==='pending'?'selected':''} style="color:var(--amber)">⏳ Pending</option>
+        <option value="won" ${ls==='won'?'selected':''} style="color:var(--green)">✓ Won</option>
+        <option value="lost" ${ls==='lost'?'selected':''} style="color:var(--red)">✗ Lost</option>
+        <option value="placed" ${ls==='placed'?'selected':''} style="color:var(--blue)">● Placed</option>
+        <option value="scratched" ${ls==='scratched'?'selected':''} style="color:var(--dim)">— Scratched</option>
+      </select>
+    </div>`;
+  }).join('');
+
+  return `<div style="background:var(--s2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px" id="slip-card-${slip.id}">
+    <!-- Slip header -->
+    <div style="padding:12px 14px;background:var(--s1);border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">${slip.title||'Untitled Slip'}</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:1px">${slip.subtitle||''} · ${pubDate}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:12px">
+          <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--green)">${slip.total_odds||''}</div>
+          <div style="font-size:10px;color:var(--dim)">odds</div>
+        </div>
+      </div>
+      <!-- Slip-level status + quick actions -->
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:10px;color:var(--muted)">Slip status:</span>
+        <select onchange="adminUpdateSlipStatus(${slip.id},this.value)" style="background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:3px 8px;color:${statusColor[slipStatus]||'var(--amber)'};font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer" id="slip-status-sel-${slip.id}">
+          <option value="pending" ${slipStatus==='pending'?'selected':''}>⏳ Pending</option>
+          <option value="won" ${slipStatus==='won'?'selected':''}>✓ Won</option>
+          <option value="lost" ${slipStatus==='lost'?'selected':''}>✗ Lost</option>
+          <option value="placed" ${slipStatus==='placed'?'selected':''}>● Placed</option>
+          <option value="scratched" ${slipStatus==='scratched'?'selected':''}>— Scratched</option>
+        </select>
+        <button onclick="adminMarkAllLegs(${slip.id},'won')" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px;background:var(--green-dim);border:1px solid var(--green-b);color:var(--green);cursor:pointer">All Won</button>
+        <button onclick="adminMarkAllLegs(${slip.id},'lost')" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px;background:var(--red-dim);border:1px solid var(--red-b);color:var(--red);cursor:pointer">All Lost</button>
+        <button onclick="adminDeleteSlip(${slip.id})" style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:5px;background:var(--s3);border:1px solid var(--border);color:var(--dim);cursor:pointer;margin-left:auto">Delete</button>
+      </div>
+      <div id="slip-save-msg-${slip.id}" style="font-size:10px;color:var(--green);margin-top:6px;display:none">✓ Saved</div>
+    </div>
+    <!-- Legs -->
+    <div id="slip-legs-${slip.id}">${legsHtml || '<div style="padding:12px 14px;font-size:12px;color:var(--dim)">No legs</div>'}</div>
+  </div>`;
+}
+
+async function adminUpdateLeg(slipId, legIndex, newStatus) {
+  if (!_supabase) return;
+  // Fetch current slip
+  const { data, error } = await _supabase.from('live_slips').select('legs,status').eq('id', slipId).single();
+  if (error || !data) { showToast('Failed to load slip','error'); return; }
+
+  const legs = Array.isArray(data.legs) ? [...data.legs] : [];
+  if (!legs[legIndex]) return;
+  legs[legIndex] = { ...legs[legIndex], status: newStatus };
+
+  // Auto-update slip status based on legs
+  const wonAll  = legs.every(l => l.status === 'won' || l.status === 'scratched');
+  const hasLost = legs.some(l => l.status === 'lost');
+  const allDone = legs.every(l => ['won','lost','scratched'].includes(l.status));
+  let slipStatus = data.status;
+  if (hasLost) slipStatus = 'lost';
+  else if (wonAll && allDone) slipStatus = 'won';
+  else if (!allDone) slipStatus = 'pending';
+
+  const { error: updateError } = await _supabase.from('live_slips').update({ legs, status: slipStatus }).eq('id', slipId);
+  if (updateError) { showToast('Save failed','error'); return; }
+
+  // Update slip status dropdown to reflect auto-change
+  const sel = document.getElementById('slip-status-sel-' + slipId);
+  if (sel) sel.value = slipStatus;
+
+  // Flash saved
+  const msg = document.getElementById('slip-save-msg-' + slipId);
+  if (msg) { msg.style.display='block'; setTimeout(()=>msg.style.display='none', 2000); }
+
+  if (typeof renderLiveSlips === 'function') renderLiveSlips();
+}
+
+async function adminUpdateSlipStatus(slipId, newStatus) {
+  if (!_supabase) return;
+  const { error } = await _supabase.from('live_slips').update({ status: newStatus }).eq('id', slipId);
+  if (error) { showToast('Save failed','error'); return; }
+  const msg = document.getElementById('slip-save-msg-' + slipId);
+  if (msg) { msg.style.display='block'; setTimeout(()=>msg.style.display='none', 2000); }
+  showToast('Slip status updated','success');
+  if (typeof renderLiveSlips === 'function') renderLiveSlips();
+}
+
+async function adminMarkAllLegs(slipId, status) {
+  if (!_supabase) return;
+  const { data, error } = await _supabase.from('live_slips').select('legs').eq('id', slipId).single();
+  if (error || !data) return;
+  const legs = (Array.isArray(data.legs) ? data.legs : []).map(l => ({ ...l, status }));
+  const slipStatus = status === 'won' ? 'won' : status === 'lost' ? 'lost' : 'pending';
+  await _supabase.from('live_slips').update({ legs, status: slipStatus }).eq('id', slipId);
+  showToast('All legs marked ' + status,'success');
+  adminLoadSlips();
+  if (typeof renderLiveSlips === 'function') renderLiveSlips();
+}
+
+async function adminDeleteSlip(slipId) {
+  if (!confirm('Delete this slip?')) return;
+  await _supabase.from('live_slips').delete().eq('id', slipId);
+  document.getElementById('slip-card-' + slipId)?.remove();
+  showToast('Slip deleted','success');
+  if (typeof renderLiveSlips === 'function') renderLiveSlips();
+}
+
+// Auto-load when switching to this panel
+const _origSwitchAdmin = typeof switchAdmin === 'function' ? switchAdmin : null;
 
 </script>
 </body>
