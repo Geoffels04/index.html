@@ -2531,46 +2531,35 @@ async function loadCommunityStrip() {
   }).join('');
 }
 
-async function loadCommunityPicks() {
+async function loadCommunityStrip() {
   if (!sb) return;
-  const { data } = await sb.from('community_picks').select('*').order('likes',{ascending:false}).order('created_at',{ascending:false}).limit(30);
-  const feed = document.getElementById('community-feed');
-  if (!feed) return;
-  if (!data || !data.length) {
-    feed.innerHTML = `<div style="text-align:center;padding:28px;color:var(--muted);font-size:12px">No picks yet. Share yours above.</div>`;
+  const { data } = await sb.from('community_picks').select('*').order('created_at',{ascending:false}).limit(12);
+  const strip = document.getElementById('cp-strip-inner');
+  if (!strip || !data || !data.length) {
+    if (strip) strip.innerHTML = `<div style="font-size:12px;color:var(--dim);padding:10px 0">No member codes yet today.</div>`;
     return;
   }
-  const platColors = { Betway:'#22C55E', '10bet':'var(--blue)', Easybet:'var(--amber)' };
-  feed.innerHTML = data.map(p => {
+  strip.innerHTML = data.map(p => {
     const url = (PLATFORM_URLS[p.platform]||PLATFORM_URLS.Other)(p.booking_code);
-    const liked = likedPicks.has(p.id);
-    return `<div class="cp-card">
-      <div class="cp-header">
-        <div class="cp-avatar">${(p.nickname||'?').slice(0,2).toUpperCase()}</div>
-        <div class="cp-nick">${p.nickname||'Anonymous'}</div>
-        <span class="cp-platform-badge" style="color:${platColors[p.platform]||'var(--muted)'}">${p.platform||'Other'}</span>
-        <span style="font-size:12px;margin-left:4px">${{racing:'🐎',soccer:'⚽',golf:'⛳',efc:'🥊'}[p.sport]||'🎯'}</span>
+    return `<a class="cp-strip-card" href="${url||'#'}" ${url?'target="_blank"':''} onclick="${!url?`copyCode('${p.booking_code}');return false`:''}" title="${p.description||''}">
+      <div class="cp-strip-top">
+        <div class="cp-strip-nick">${p.nickname||'Anonymous'}</div>
+        <div class="cp-strip-desc">${p.description||''}</div>
       </div>
-      <div class="cp-body">
-        <div class="cp-desc">${p.description||''}</div>
-        <a class="cp-code-link" href="${url||'#'}" ${url?'target="_blank"':''} onclick="${!url?`copyCode('${p.booking_code}');return false`:''}">
-          <span class="cp-code-val">${p.booking_code}</span>
-          <span class="cp-open-btn">${url?'Open '+p.platform+' →':'Copy code'}</span>
-        </a>
+      <div class="cp-strip-bottom">
+        <span class="cp-strip-code">${p.booking_code}</span>
+        <span class="cp-strip-platform">${p.platform||'Other'}</span>
+        ${p.odds ? `<span class="cp-strip-odds">@ ${p.odds}</span>` : ''}
       </div>
-      <div class="cp-footer">
-        <div class="cp-meta">
-          <span>${p.legs||1} leg${(p.legs||1)>1?'s':''}</span>
-          ${p.odds ? `<span>@ ${p.odds}</span>` : ''}
-          <span>${timeAgo(p.created_at)}</span>
-        </div>
-        <div class="cp-like-btn ${liked?'liked':''}" onclick="likePick('${p.id}',this)" id="like-${p.id}">
-          ♥ <span>${p.likes||0}</span>
-        </div>
-      </div>
-    </div>`;
+    </a>`;
   }).join('');
 }
+What was wrong: The catch(e) { block was never closed before renderCurrentPage and loadCommunityStrip started, so both functions were defined inside the catch and JavaScript was likely throwing a syntax error that silently broke the whole script — including Supabase loading and the sport nav cards.
+
+In your file, find this block and replace it entirely with the clean version above. The sport cards and community codes should load immediately after.
+
+
+
 
 async function submitCommunityPick() {
   const nick = document.getElementById('cp-nick')?.value.trim();
