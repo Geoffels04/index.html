@@ -1364,33 +1364,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
           <div><div style="font-size:13px;font-weight:600;color:var(--purple);margin-bottom:3px">Publish Full Card to MMA Page</div><div style="font-size:11px;color:var(--muted)">Renders all fights and predictions on the public MMA tab.</div></div>
           <button class="btn btn-sm" style="background:var(--purple);color:#fff;flex-shrink:0" onclick="mmaPublishFullCard()">Publish Card →</button>
         </div>
-        <div style="background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px">
-          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Step 3 — Tip Slip (cherry-pick fights)</div>
-          <div id="mma-slip-fights"><div style="font-size:12px;color:var(--dim);text-align:center;padding:12px 0">Generate predictions first.</div></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;margin-bottom:10px">
-            <div class="form-group" style="margin-bottom:0"><label class="form-label">Slip Title</label><input class="form-input" id="mma-slip-title" placeholder="UFC 314 Main Card Picks"></div>
-            <div class="form-group" style="margin-bottom:0"><label class="form-label">Stake (R)</label><input class="form-input" id="mma-slip-stake" type="number" value="100"></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-            <div class="form-group" style="margin-bottom:0"><label class="form-label">Tier</label><select class="form-select" id="mma-slip-tier"><option value="free">Free</option><option value="bronze">Bronze</option><option value="silver">Silver</option><option value="gold" selected>Gold</option></select></div>
-            <div class="form-group" style="margin-bottom:0"><label class="form-label">Publish to</label><select class="form-select" id="mma-slip-dest"><option value="both">Live Slips + MMA page</option><option value="live">Live Slips only</option><option value="mma">MMA page only</option></select></div>
-          </div>
-          <button class="btn btn-mg btn-full" onclick="()" id="mma-pub-btn">Publish MMA Tip Slip →</button>
-          <div id="mma-pub-status" style="font-size:11px;color:var(--green);margin-top:8px;display:none">✓ Published</div>
-        </div>
-      </div><!-- panel-mma -->
-
-      <!-- EDIT LIVE SLIPS -->
-      <div class="admin-panel" id="panel-editslips">
-        <div class="admin-page-title">Edit Live Slips</div>
-        <div class="admin-page-sub">Update leg results and slip status in real time. Changes go live instantly.</div>
-        <div style="display:flex;gap:8px;margin-bottom:14px">
-          <button class="btn btn-ghost btn-sm" onclick="adminLoadSlips()">↻ Refresh</button>
-          <span id="edit-slips-count" style="font-size:11px;color:var(--muted);align-self:center"></span>
-        </div>
-        <div id="edit-slips-feed">
-          <div style="font-size:12px;color:var(--dim);text-align:center;padding:32px 0">Click Refresh to load live slips.</div>
-        </div>
+       c
       </div><!-- panel-editslips -->
 
     </div><!-- admin-main -->
