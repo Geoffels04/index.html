@@ -4568,11 +4568,6 @@ async function mmaPublishSlip() {
       +'<div style="display:flex;align-items:center;gap:5px"><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.3);color:'+(confColor[conf]||'var(--muted)')+'">'+conf+'</span><span class="mma-method-tag '+mTag+'">'+method+'</span></div></div>'
       +(note?'<div style="font-size:10px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">'+note+'</div>':'')
       +'</div>';
-  });
-  inner.innerHTML=html;
-  showToast('Full card published — '+sorted.length+' fights live','success');
-}
-
 
 // ══════════════════════════════════════════════════
 // EDIT LIVE SLIPS — admin panel
