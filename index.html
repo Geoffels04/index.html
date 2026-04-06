@@ -4168,7 +4168,7 @@ window.addEventListener('load', async () => {
   checkHash();
 
   if (location.hash !== ADMIN_HASH) {
-    await loadCommunitystrip();
+    await loadCommunityStrip();
     checkPushPrompt();
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(()=>{});
