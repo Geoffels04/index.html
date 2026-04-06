@@ -4559,6 +4559,8 @@ async function mmaPublishSlip() {
     showToast('Published! '+legs.length+' fights @ '+totalOdds.toFixed(2)+'x = R'+potWin,'success');
     if(typeof loadLiveSlips==='function') loadLiveSlips();
   } catch(e) { showToast('Publish failed: '+e.message,'error'); }
+      btn.disabled=false; btn.textContent='Publish MMA Tip Slip →';
+}
 
 // ══════════════════════════════════════════════════
 // EDIT LIVE SLIPS — admin panel
