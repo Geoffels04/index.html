@@ -4523,7 +4523,6 @@ function mmaPublishFullCard() {
   if(subEl) subEl.textContent=(promo+' '+cardNum+(date?' · '+date:'')).trim();
   const cardTab=document.getElementById('page-efc');
   if(!cardTab){showToast('MMA page not found','error');return;}
-  const inner=cardTab.querySelector('.page-inner')||cardTab;
   let inner=document.getElementById('efc-feed')||cardTab.querySelector('.page-inner')||cardTab;
   const sorted=[...MMA.fights].sort((a,b)=>posOrder.indexOf(a.position)-posOrder.indexOf(b.position));
   const methodTag={Decision:'dec','KO/TKO':'ko',Submission:'sub'};
