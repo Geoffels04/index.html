@@ -4514,38 +4514,51 @@ function mmaSlipToggle(fid) {
   if(det) det.style.display=chk.checked?'grid':'none';
 }
 
-async function mmaPublishSlip() {
+function mmaPublishFullCard() {
   mmaSavePredictionEdits();
   const promo=document.getElementById('mma-promo')?.value||'UFC';
-  const cardNum=document.getElementById('mma-card-num')?.value.trim()||promo;
-  const title=document.getElementById('mma-slip-title')?.value.trim()||cardNum+' MMA Picks';
-  const stake=parseFloat(document.getElementById('mma-slip-stake')?.value)||100;
-  const tier=document.getElementById('mma-slip-tier')?.value||'gold';
-  const dest=document.getElementById('mma-slip-dest')?.value||'both';
-  const legs=[]; let totalOdds=1;
-  for(const f of MMA.fights) {
-    const chk=document.getElementById('slip-chk-'+f.id);
-    if(!chk?.checked) continue;
-    const odds=parseFloat(document.getElementById('slip-odds-'+f.id)?.value);
-    if(!odds||odds<1.01) { showToast('Add odds for: '+f.fighterA+' vs '+f.fighterB,'error'); return; }
-    const pick=document.getElementById('slip-pick-'+f.id)?.value||f.prediction?.pick||f.fighterA;
-    const mkt=document.getElementById('slip-mkt-'+f.id)?.value||'Win';
-    totalOdds*=odds;
-    legs.push({name:pick,detail:f.fighterA+' vs '+f.fighterB+' — '+mkt,odds,type:'mma'});
-  }
-  if(!legs.length) { showToast('Select at least one fight','error'); return; }
-  const potWin=(stake*totalOdds).toFixed(2);
-  const btn=document.getElementById('mma-pub-btn');
-  btn.disabled=true; btn.textContent='Publishing...';
-  try {
-    const slipData={title,subtitle:promo+' · '+legs.length+' leg'+(legs.length>1?'s':''),sport:'mma',status:'pending',total_odds:parseFloat(totalOdds.toFixed(2)),potential_win:parseFloat(potWin),legs,published_at:new Date().toISOString(),tier};
-    if(dest==='both'||dest==='live') { const {error}=await sb.from('live_slips').insert([slipData]); if(error) throw error; }
-    if(dest==='both'||dest==='mma') { await sb.from('bets').insert([{title,subtitle:promo+' · '+cardNum,sport:'efc',type:'mma',status:'pending',tier,selections:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'mma'})),note:promo+' '+cardNum+' — '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2))}]); }
-    document.getElementById('mma-pub-status').style.display='block';
-    showToast('Published! '+legs.length+' fights @ '+totalOdds.toFixed(2)+'x = R'+potWin,'success');
-    if(typeof loadLiveSlips==='function') loadLiveSlips();
-  } catch(e) { showToast('Publish failed: '+e.message,'error'); }
-  btn.disabled=false; btn.textContent='Publish MMA Tip Slip →';
+  const cardNum=document.getElementById('mma-card-num')?.value.trim()||'';
+  const date=document.getElementById('mma-card-date')?.value.trim()||'';
+  const subEl=document.getElementById('mma-event-sub');
+  if(subEl) subEl.textContent=(promo+' '+cardNum+(date?' · '+date:'')).trim();
+  const cardTab=document.getElementById('page-efc');
+  if(!cardTab){showToast('MMA page not found','error');return;}
+  const inner=cardTab.querySelector('.page-inner')||cardTab;
+  const posOrder=['main','co-main','main-card','prelim','early-prelim'];
+  const sorted=[...MMA.fights].sort((a,b)=>posOrder.indexOf(a.position)-posOrder.indexOf(b.position));
+  const methodTag={Decision:'dec','KO/TKO':'ko',Submission:'sub'};
+  const confColor={High:'var(--green)',Medium:'var(--amber)',Low:'var(--dim)'};
+  let html='<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap"><button class="btn btn-mg btn-sm mma-mkt-btn active" onclick="setMmaMkt(\'win\',this)">Win</button><button class="btn btn-ghost btn-sm mma-mkt-btn" onclick="setMmaMkt(\'method\',this)">Win + Method</button><button class="btn btn-ghost btn-sm mma-mkt-btn" onclick="setMmaMkt(\'distance\',this)">Goes Distance</button></div>';
+  let lastSection='';
+  sorted.forEach(f=>{
+    const p=f.prediction||{};
+    const pick=p.pick||f.fighterA;
+    const method=p.method||'Decision';
+    const dist=p.goes_distance!==undefined?p.goes_distance:(method==='Decision');
+    const conf=p.confidence||'Medium';
+    const note=p.note||'';
+    const mTag=methodTag[method]||'dec';
+    const isA=pick===f.fighterA;
+    const posLabel={main:'Main Event','co-main':'Co-Main'};
+    const chipHtml=posLabel[f.position]?'<span class="mma-main-chip">'+posLabel[f.position]+'</span>':'';
+    const isMain=['main','co-main','main-card'].includes(f.position);
+    const section=isMain?'main':'prelim';
+    if(section!==lastSection){
+      html+='<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mg);'+(lastSection?'margin:20px 0 10px':'margin-bottom:10px')+'">'+(section==='main'?'Main Card':'Prelims')+'</div>';
+      lastSection=section;
+    }
+    html+='<div class="mma-fight-card" data-pick="'+pick.toLowerCase().split(' ')[0]+'" data-method="'+mTag+'" data-distance="'+(dist?'yes':'no')+'">'
+      +'<div class="mma-division">'+f.division+' '+chipHtml+'</div>'
+      +'<div class="mma-matchup"><div class="mma-fighter'+(isA?' pick-side':'')+'"><div class="mma-fname">'+f.fighterA+'</div></div>'
+      +'<div class="mma-vs">VS</div>'
+      +'<div class="mma-fighter'+(!isA?' pick-side':'')+'"><div class="mma-fname">'+f.fighterB+'</div></div></div>'
+      +'<div class="mma-pick-footer"><div class="mma-pick-label"><span class="mma-pick-dot"></span><span class="mma-pick-text">'+pick+' wins · '+method+(dist?' · Goes Distance':' · Does Not Go Distance')+'</span></div>'
+      +'<div style="display:flex;align-items:center;gap:5px"><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.3);color:'+(confColor[conf]||'var(--muted)')+'">'+conf+'</span><span class="mma-method-tag '+mTag+'">'+method+'</span></div></div>'
+      +(note?'<div style="font-size:10px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">'+note+'</div>':'')
+      +'</div>';
+  });
+  inner.innerHTML=html;
+  showToast('Full card published — '+sorted.length+' fights live','success');
 }
 
 // ══════════════════════════════════════════════════
