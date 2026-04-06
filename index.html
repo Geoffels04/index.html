@@ -1375,7 +1375,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
             <div class="form-group" style="margin-bottom:0"><label class="form-label">Tier</label><select class="form-select" id="mma-slip-tier"><option value="free">Free</option><option value="bronze">Bronze</option><option value="silver">Silver</option><option value="gold" selected>Gold</option></select></div>
             <div class="form-group" style="margin-bottom:0"><label class="form-label">Publish to</label><select class="form-select" id="mma-slip-dest"><option value="both">Live Slips + MMA page</option><option value="live">Live Slips only</option><option value="mma">MMA page only</option></select></div>
           </div>
-          <button class="btn btn-mg btn-full" onclick="mmaPublishSlip()" id="mma-pub-btn">Publish MMA Tip Slip →</button>
+          <button class="btn btn-mg btn-full" onclick="()" id="mma-pub-btn">Publish MMA Tip Slip →</button>
           <div id="mma-pub-status" style="font-size:11px;color:var(--green);margin-top:8px;display:none">✓ Published</div>
         </div>
       </div><!-- panel-mma -->
@@ -4585,8 +4585,7 @@ async function mmaPublishSlip() {
   try {
     const slipData={title,subtitle:promo+' · '+legs.length+' leg'+(legs.length>1?'s':''),sport:'mma',status:'pending',total_odds:parseFloat(totalOdds.toFixed(2)),potential_win:parseFloat(potWin),legs,published_at:new Date().toISOString(),tier};
     if(dest==='both'||dest==='live') { const {error}=await sb.from('live_slips').insert([slipData]); if(error) throw error; }
-    if(dest==='both'||dest==='mma') { await sb.from('bets').insert([{title,subtitle:promo+' · '+cardNum,sport:'efc',type:'mma',status:'pending',tier,selections:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'mma'})),note:promo+' '+cardNum+' — '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2))}]); }
-    document.getElementById('mma-pub-status').style.display='block';
+await sb.from('bets').insert([{title,subtitle:promo+' · '+cardNum,sport:'efc',type:'mma',status:'pending',tier,legs:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'mma'})),note:promo+' '+cardNum+' — '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2))}]);    document.getElementById('mma-pub-status').style.display='block';
     showToast('Published! '+legs.length+' fights @ '+totalOdds.toFixed(2)+'x = R'+potWin,'success');
     if(typeof loadLiveSlips==='function') loadLiveSlips();
   } catch(e) { showToast('Publish failed: '+e.message,'error'); }
