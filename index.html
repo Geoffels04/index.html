@@ -4550,8 +4550,13 @@ async function mmaPublishSlip() {
     const pick=document.getElementById('slip-pick-'+f.id)?.value||f.prediction?.pick||f.fighterA;
     const mkt=document.getElementById('slip-mkt-'+f.id)?.value||'Win';
     totalOdds*=odds;
-    legs.push({name:pick,detail:f.fighterA+' vs '+f.fighterB+' — '+mkt,odds,type:'mma'});
- try {
+   legs.push({name:pick,detail:f.fighterA+' vs '+f.fighterB+' — '+mkt,odds,type:'mma'});
+  }
+  if(!legs.length) { showToast('Select at least one fight','error'); return; }
+  const potWin=(stake*totalOdds).toFixed(2);
+  const btn=document.getElementById('mma-pub-btn');
+  btn.disabled=true; btn.textContent='Publishing...';
+  try {
     const slipData={title,subtitle:promo+' · '+legs.length+' leg'+(legs.length>1?'s':''),sport:'mma',status:'pending',total_odds:parseFloat(totalOdds.toFixed(2)),potential_win:parseFloat(potWin),legs,published_at:new Date().toISOString(),tier};
     if(dest==='both'||dest==='live') { const {error}=await sb.from('live_slips').insert([slipData]); if(error) throw error; }
     if(dest==='both'||dest==='mma') { await sb.from('bets').insert([{title,subtitle:promo+' · '+cardNum,sport:'efc',type:'mma',status:'pending',tier,legs:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'mma'})),note:promo+' '+cardNum+' — '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2))}]); }
