@@ -4359,10 +4359,8 @@ async function mmaParseCard() {
     if (promoSel) { for(let o of promoSel.options) o.selected = o.value===MMA.promo; }
     mmaRenderFights();
     mmaClearPredictions();
+    mmaRenderSlipFights();
     mmaStatus('✓ ' + MMA.fights.length + ' fights parsed instantly','var(--green)');
-    showToast(MMA.fights.length + ' fights parsed','success');
-    btn.disabled = false; btn.textContent = '⚡ Parse Card';
-    return;
   }
 
   // Fallback: send to Claude for anything unusual
