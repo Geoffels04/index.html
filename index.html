@@ -4317,16 +4317,10 @@ async function mmaParseCard() {
   const btn = document.getElementById('mma-parse-btn');
   btn.disabled = true; btn.textContent = '⏳ Parsing...';
   mmaStatus('Parsing...','var(--muted)');
-
-  // Detect promo from text
   const promoDetect = raw.match(/\b(UFC|EFC|PFL|Bellator|ONE)\b/i);
   const detectedPromo = promoDetect ? promoDetect[1].toUpperCase() : 'UFC';
-
-  // Try local parser first — instant, no API call needed
   const localFights = mmaLocalParse(raw);
-
   if (localFights.length >= 2) {
-    // Local parse succeeded
     MMA.promo = detectedPromo;
     MMA.fights = localFights.map((f,i) => ({id:i+1, fighterA:f.fighter_a, fighterB:f.fighter_b, division:f.division, position:f.position, rounds:f.rounds, prediction:null}));
     const promoSel = document.getElementById('mma-promo');
@@ -4335,43 +4329,15 @@ async function mmaParseCard() {
     mmaClearPredictions();
     mmaRenderSlipFights();
     mmaStatus('✓ ' + MMA.fights.length + ' fights parsed instantly','var(--green)');
-  }
-
-  // Fallback: send to Claude for anything unusual
-  mmaStatus('Sending to Claude for parsing...','var(--muted)');
-  const prompt = 'Parse this MMA fight card. Return ONLY valid JSON, no markdown, no explanation:\n{"promotion":"UFC","card_name":"UFC Fight Night","date":"5 Apr 2025","fights":[{"fighter_a":"full name","fighter_b":"full name","division":"Lightweight","position":"main","rounds":5}]}\nPositions: main, co-main, main-card, prelim, early-prelim. Rounds: 5 for main/title, 3 for others. Order main event first. Include ALL fights.\n\nCard text:\n' + raw;
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:3000, messages:[{role:'user',content:prompt}] })
-    });
-    const data = await resp.json();
-    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    const jsonStr = text.replace(/```json|```/g,'').trim();
-    const jsonStart = jsonStr.indexOf('{');
-    const parsed = JSON.parse(jsonStr.slice(jsonStart));
-    if (!parsed.fights?.length) throw new Error('No fights found');
-    MMA.promo = parsed.promotion||detectedPromo;
-    MMA.cardNum = parsed.card_name||'';
-    MMA.date = parsed.date||'';
-    MMA.fights = parsed.fights.map((f,i)=>({id:i+1,fighterA:f.fighter_a,fighterB:f.fighter_b,division:f.division||'Unknown',position:f.position||'main-card',rounds:f.rounds||3,prediction:null}));
-    const promoSel = document.getElementById('mma-promo');
-    if (promoSel) { for(let o of promoSel.options) o.selected = o.value===MMA.promo; }
-    const numEl = document.getElementById('mma-card-num'); if(numEl) numEl.value = MMA.cardNum;
-    const dateEl = document.getElementById('mma-card-date'); if(dateEl) dateEl.value = MMA.date;
-    mmaRenderFights();
-    mmaClearPredictions();
-    mmaStatus('✓ ' + MMA.fights.length + ' fights parsed','var(--green)');
     showToast(MMA.fights.length + ' fights parsed','success');
-  } catch(e) {
-    mmaStatus('Could not parse — tip: use the "Renato Moicano vs. Chris Duncan / 155 lbs" format from Tapology','var(--red)');
-    showToast('Parse failed','error');
+       btn.disabled = false; btn.textContent = '⚡ Parse Card';
+    return;
   }
+  mmaStatus('Could not parse — paste fights in "Fighter A vs Fighter B" format','var(--red)');
+  showToast('Parse failed — check format','error');
   btn.disabled = false; btn.textContent = '⚡ Parse Card';
 }
-
 function mmaStatus(msg, color) { const el = document.getElementById('mma-import-status'); if(el){el.textContent=msg;el.style.color=color;} }
-
 function mmaRenderFights() {
   const el = document.getElementById('mma-fights-list');
   const cnt = document.getElementById('mma-fight-count');
