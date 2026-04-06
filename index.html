@@ -4548,29 +4548,7 @@ async function mmaPublishSlip() {
   btn.disabled=false; btn.textContent='Publish MMA Tip Slip →';
 }
 
-function mmaPublishFullCard() {
-  mmaSavePredictionEdits();
-  const promo=document.getElementById('mma-promo')?.value||'UFC';
-  const cardNum=document.getElementById('mma-card-num')?.value.trim()||'';
-  const date=document.getElementById('mma-card-date')?.value.trim()||'';
-  const subEl=document.getElementById('mma-event-sub');
-  if(subEl) subEl.textContent=(promo+' '+cardNum+(date?' · '+date:'')).trim();
-  const cardTab=document.getElementById('mma-tab-card');
-  if(!cardTab){showToast('MMA page tab not found','error');return;}
-  const inner=cardTab.querySelector('.page-inner')||cardTab;
-  const posOrder=['main','co-main','main-card','prelim','early-prelim'];
-  const sorted=[...MMA.fights].sort((a,b)=>posOrder.indexOf(a.position)-posOrder.indexOf(b.position));
-  const methodTag={Decision:'dec','KO/TKO':'ko',Submission:'sub'};
-  const confColor={High:'var(--green)',Medium:'var(--amber)',Low:'var(--dim)'};
-  let html='<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap"><button class="btn btn-mg btn-sm mma-mkt-btn active" onclick="setMmaMkt(\'win\',this)">Win</button><button class="btn btn-ghost btn-sm mma-mkt-btn" onclick="setMmaMkt(\'method\',this)">Win + Method</button><button class="btn btn-ghost btn-sm mma-mkt-btn" onclick="setMmaMkt(\'distance\',this)">Goes Distance</button></div>';
-  let lastSection='';
-  sorted.forEach(f=>{
-    const isMain=['main','co-main','main-card'].includes(f.position);
-    const section=isMain?'main':'prelim';
-    if(section!==lastSection){
-      html+='<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--mg);'+(lastSection?'margin:20px 0 10px':'margin-bottom:10px')+'">'+(section==='main'?'Main Card':'Prelims')+'</div>';
-      lastSection=section;
-    }
+
     const p=f.prediction||{};
     const pick=p.pick||f.fighterA;
     const method=p.method||'Decision';
@@ -4606,9 +4584,9 @@ async function adminLoadSlips() {
   if (!feed) return;
   feed.innerHTML = '<div style="padding:28px;text-align:center;color:var(--muted);font-size:12px">Loading...</div>';
 
-  if (!_supabase) { feed.innerHTML = '<div style="font-size:12px;color:var(--red);padding:20px;text-align:center">Not connected to Supabase.</div>'; return; }
+  if (!sb) { feed.innerHTML = '<div style="font-size:12px;color:var(--red);padding:20px;text-align:center">Not connected to Supabase.</div>'; return; }
 
-  const { data, error } = await _supabase.from('live_slips').select('*').order('published_at',{ascending:false}).limit(50);
+  const { data, error } = await sb.from('live_slips').select('*').order('published_at',{ascending:false}).limit(50);
   if (error || !data || !data.length) {
     feed.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:32px">No live slips found.</div>';
     if (cnt) cnt.textContent = '';
@@ -4682,9 +4660,9 @@ function adminRenderEditSlip(slip) {
 }
 
 async function adminUpdateLeg(slipId, legIndex, newStatus) {
-  if (!_supabase) return;
+  if (!sb) return;
   // Fetch current slip
-  const { data, error } = await _supabase.from('live_slips').select('legs,status').eq('id', slipId).single();
+  const { data, error } = await sb.from('live_slips').select('legs,status').eq('id', slipId).single();
   if (error || !data) { showToast('Failed to load slip','error'); return; }
 
   const legs = Array.isArray(data.legs) ? [...data.legs] : [];
@@ -4700,7 +4678,7 @@ async function adminUpdateLeg(slipId, legIndex, newStatus) {
   else if (wonAll && allDone) slipStatus = 'won';
   else if (!allDone) slipStatus = 'pending';
 
-  const { error: updateError } = await _supabase.from('live_slips').update({ legs, status: slipStatus }).eq('id', slipId);
+  const { error: updateError } = await sb.from('live_slips').update({ legs, status: slipStatus }).eq('id', slipId);
   if (updateError) { showToast('Save failed','error'); return; }
 
   // Update slip status dropdown to reflect auto-change
@@ -4715,8 +4693,8 @@ async function adminUpdateLeg(slipId, legIndex, newStatus) {
 }
 
 async function adminUpdateSlipStatus(slipId, newStatus) {
-  if (!_supabase) return;
-  const { error } = await _supabase.from('live_slips').update({ status: newStatus }).eq('id', slipId);
+  if (!sb) return;
+  const { error } = await sb.from('live_slips').update({ status: newStatus }).eq('id', slipId);
   if (error) { showToast('Save failed','error'); return; }
   const msg = document.getElementById('slip-save-msg-' + slipId);
   if (msg) { msg.style.display='block'; setTimeout(()=>msg.style.display='none', 2000); }
@@ -4725,12 +4703,12 @@ async function adminUpdateSlipStatus(slipId, newStatus) {
 }
 
 async function adminMarkAllLegs(slipId, status) {
-  if (!_supabase) return;
-  const { data, error } = await _supabase.from('live_slips').select('legs').eq('id', slipId).single();
+  if (!sb) return;
+  const { data, error } = await sb.from('live_slips').select('legs').eq('id', slipId).single();
   if (error || !data) return;
   const legs = (Array.isArray(data.legs) ? data.legs : []).map(l => ({ ...l, status }));
   const slipStatus = status === 'won' ? 'won' : status === 'lost' ? 'lost' : 'pending';
-  await _supabase.from('live_slips').update({ legs, status: slipStatus }).eq('id', slipId);
+  await sb.from('live_slips').update({ legs, status: slipStatus }).eq('id', slipId);
   showToast('All legs marked ' + status,'success');
   adminLoadSlips();
   if (typeof renderLiveSlips === 'function') renderLiveSlips();
@@ -4738,7 +4716,7 @@ async function adminMarkAllLegs(slipId, status) {
 
 async function adminDeleteSlip(slipId) {
   if (!confirm('Delete this slip?')) return;
-  await _supabase.from('live_slips').delete().eq('id', slipId);
+  await sb.from('live_slips').delete().eq('id', slipId);
   document.getElementById('slip-card-' + slipId)?.remove();
   showToast('Slip deleted','success');
   if (typeof renderLiveSlips === 'function') renderLiveSlips();
