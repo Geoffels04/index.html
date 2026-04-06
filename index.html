@@ -4548,27 +4548,6 @@ async function mmaPublishSlip() {
   btn.disabled=false; btn.textContent='Publish MMA Tip Slip →';
 }
 
-
-    const p=f.prediction||{};
-    const pick=p.pick||f.fighterA;
-    const method=p.method||'Decision';
-    const dist=p.goes_distance!==undefined?p.goes_distance:(method==='Decision');
-    const conf=p.confidence||'Medium';
-    const note=p.note||'';
-    const mTag=methodTag[method]||'dec';
-    const isA=pick===f.fighterA;
-    const posLabel={main:'Main Event','co-main':'Co-Main'};
-    const chipHtml=posLabel[f.position]?'<span class="mma-main-chip">'+posLabel[f.position]+'</span>':'';
-    html+='<div class="mma-fight-card" data-pick="'+pick.toLowerCase().split(' ')[0]+'" data-method="'+mTag+'" data-distance="'+(dist?'yes':'no')+'">'
-      +'<div class="mma-division">'+f.division+' '+chipHtml+'</div>'
-      +'<div class="mma-matchup"><div class="mma-fighter'+(isA?' pick-side':'')+'"><div class="mma-fname">'+f.fighterA+'</div></div>'
-      +'<div class="mma-vs">VS</div>'
-      +'<div class="mma-fighter'+(!isA?' pick-side':'')+'"><div class="mma-fname">'+f.fighterB+'</div></div></div>'
-      +'<div class="mma-pick-footer"><div class="mma-pick-label"><span class="mma-pick-dot"></span><span class="mma-pick-text">'+pick+' wins · '+method+(dist?' · Goes Distance':' · Does Not Go Distance')+'</span></div>'
-      +'<div style="display:flex;align-items:center;gap:5px"><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.3);color:'+(confColor[conf]||'var(--muted)')+'">'+conf+'</span><span class="mma-method-tag '+mTag+'">'+method+'</span></div></div>'
-      +(note?'<div style="font-size:10px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">'+note+'</div>':'')
-      +'</div>';
-
 // ══════════════════════════════════════════════════
 // EDIT LIVE SLIPS — admin panel
 // ══════════════════════════════════════════════════
