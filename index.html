@@ -740,6 +740,11 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
       </div>
     </div>
   </div>
+  <div class="sport-sub-tabs">
+    <button class="stab on" id="stab-golf-masters" onclick="switchGolfTab('masters',this)">Masters 2026</button>
+    <button class="stab" id="stab-golf-tips" onclick="switchGolfTab('tips',this)">Tips</button>
+    <button class="stab" id="stab-golf-rankings" onclick="switchGolfTab('rankings',this)">Rankings</button>
+  </div>
   <div class="page-inner" style="padding-top:16px">
     <div id="golf-feed"></div>
   </div>
@@ -1571,6 +1576,7 @@ let allBets = [];
 let adminFilter = 'all';
 let currentRacingTab = 'all';
 let currentSoccerTab = 'trends';
+let currentGolfTab = 'masters';
 let adminPw = localStorage.getItem('fiq_admin_pw') || 'Poison@04';
 let editingBetId = null;
 let selectedPlan = 'monthly';
@@ -1601,7 +1607,7 @@ function setDbStatus(ok) {
 async function loadAllData() {
   if (!sb) return;
   const { data } = await sb.from('bets').select('*').order('display_order',{ascending:true}).order('published_at',{ascending:false});
-  allBets = data || [];
+  allBets = (data || []).filter(b => b.archived !== true);
 
   const inAdmin = document.getElementById('admin-page')?.classList.contains('on');
 
@@ -1644,7 +1650,7 @@ function goPage(page, navEl) {
   // Page-specific loads
   if (page === 'racing') renderSportFeed('racing');
   if (page === 'soccer') renderSoccerPage();
-  if (page === 'golf') renderSportFeed('golf');
+  if (page === 'golf') renderGolfPage();
   if (page === 'efc') renderSportFeed('efc');
   if (page === 'community') loadCommunityStrip();
   if (page === 'slips') renderLiveSlips();
@@ -1655,7 +1661,7 @@ function goPage(page, navEl) {
 function renderCurrentPage() {
   if (currentPage === 'racing') renderSportFeed('racing');
   else if (currentPage === 'soccer') renderSoccerPage();
-  else if (currentPage === 'golf') renderSportFeed('golf');
+  else if (currentPage === 'golf') renderGolfPage();
   else if (currentPage === 'efc') renderSportFeed('efc');
 }
 
@@ -1975,6 +1981,228 @@ function switchSoccerTab(tab, el) {
   });
   el.classList.add('on');
   renderSoccerPage();
+}
+
+function switchGolfTab(tab, el) {
+  currentGolfTab = tab;
+  document.querySelectorAll('#page-golf .stab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  renderGolfPage();
+}
+
+function renderGolfPage() {
+  const tab = currentGolfTab;
+  const subEl = document.getElementById('golf-sub-label');
+  if (subEl) subEl.textContent = 'Masters 2026 · Apr 10–13 · Augusta National';
+  const feedEl = document.getElementById('golf-feed');
+  if (!feedEl) return;
+  if (tab === 'tips') {
+    const bets = allBets.filter(b => b.sport === 'golf');
+    feedEl.innerHTML = bets.length ? bets.map((b,i) => renderBetCard(b,i)).join('') : renderEmptyState('golf');
+    return;
+  }
+  if (tab === 'rankings') { feedEl.innerHTML = renderMastersRankings(); return; }
+  feedEl.innerHTML = renderMastersTips();
+}
+
+function renderMastersTips() {
+  let html = `
+    <div style="background:linear-gradient(135deg,rgba(20,184,166,0.12),rgba(11,11,11,0));border:1px solid rgba(20,184,166,0.3);border-radius:14px;padding:16px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="width:44px;height:44px;background:rgba(20,184,166,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">⛳</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:18px;font-weight:800;letter-spacing:-.3px">The Masters 2026</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px">Augusta National · Apr 10–13 · 72-hole stroke play</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(20,184,166,0.9);background:rgba(20,184,166,0.12);border:1px solid rgba(20,184,166,0.3);border-radius:5px;padding:2px 8px;margin-bottom:4px">LIVE PREVIEW</div>
+          <div style="font-size:10px;color:var(--muted)">18 players analysed</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:9px;text-align:center">
+          <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Predicted Score</div>
+          <div style="font-size:15px;font-weight:700;font-family:monospace">-10 to -13</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:9px;text-align:center">
+          <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Key Stat</div>
+          <div style="font-size:15px;font-weight:700;color:var(--amber);font-family:monospace">SG T2G</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.25);border-radius:8px;padding:9px;text-align:center">
+          <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Threshold</div>
+          <div style="font-size:15px;font-weight:700;color:var(--green);font-family:monospace">1.70+</div>
+        </div>
+      </div>
+    </div>
+    <div class="bet-card" style="margin-bottom:10px">
+      <div class="bet-header">
+        <div class="bet-sport-icon icon-golf" style="background:rgba(20,184,166,0.12);color:rgba(20,184,166,0.9);font-size:18px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">⛳</div>
+        <div class="bet-meta"><div class="bet-title">Masters 2026 — Win Bets</div><div class="bet-sub">Augusta National · Apr 10–13</div></div>
+        <div class="bet-time-col"><div class="bet-tier-badge" style="color:var(--amber)">GOLD</div><div class="bet-ago">2 picks</div></div>
+      </div>
+      <div class="bet-body">
+        <div class="bet-selections">
+          <div class="sel-row best-bet">
+            <span class="sel-type-pill">Best Bet</span>
+            <div style="flex:1;min-width:0"><div class="sel-name">Rory McIlroy</div><div class="sel-detail">91.4/100 composite · 10/10 trend filters · SG T2G leader +1.785 · Defending Champion 2025</div></div>
+            <div class="sel-odds">+1200</div>
+          </div>
+          <div class="sel-row value-bet">
+            <span class="sel-type-pill">Value</span>
+            <div style="flex:1;min-width:0"><div class="sel-name">Collin Morikawa</div><div class="sel-detail">75.0/100 composite · 7/10 trend · #1 SG Approach +1.066 · GIR 72.22% matches winner average exactly</div></div>
+            <div class="sel-odds">+3000</div>
+          </div>
+        </div>
+        <div class="bet-note"><strong>FanatIQ Analysis:</strong> McIlroy leads every key Augusta metric — SG T2G, SG OTT, bogey avoidance — and is the defending champion. Morikawa is the value of the tournament: #1 SG Approach, GIR matches the historical winner average of 72.23% exactly. Augusta rewards ball-strikers — 5 of the last 5 winners ranked outside the top 10 in putting.</div>
+      </div>
+      <div class="bet-footer">
+        <div class="bet-status-row"><div class="sdot" style="background:var(--amber)"></div><span style="color:var(--amber);font-family:monospace;font-size:10px">⏳ Pending · Apr 10–13</span></div>
+        <div class="watermark">FIQ-GOLF-MASTERS26</div>
+      </div>
+    </div>
+    <div class="bet-card" style="margin-bottom:10px">
+      <div class="bet-header">
+        <div class="bet-sport-icon icon-golf" style="background:rgba(20,184,166,0.12);color:rgba(20,184,166,0.9);font-size:18px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">⛳</div>
+        <div class="bet-meta"><div class="bet-title">Masters 2026 — Each Way Picks</div><div class="bet-sub">Augusta National · Place terms: Top 5</div></div>
+        <div class="bet-time-col"><div class="bet-tier-badge" style="color:var(--amber)">GOLD</div><div class="bet-ago">3 picks</div></div>
+      </div>
+      <div class="bet-body">
+        <div class="bet-selections">
+          <div class="sel-row" style="border-color:rgba(20,184,166,0.3);background:rgba(20,184,166,0.06)">
+            <span class="sel-type-pill" style="background:rgba(20,184,166,0.2);color:rgba(20,184,166,0.95)">EW</span>
+            <div style="flex:1;min-width:0"><div class="sel-name">Tommy Fleetwood</div><div class="sel-detail">68.0/100 · 8/10 trend · 4/5 starts top 10 · #1 birdie% from 200+ yds (53.68%) · Model top pick</div></div>
+            <div class="sel-odds">+2200</div>
+          </div>
+          <div class="sel-row" style="border-color:rgba(20,184,166,0.3);background:rgba(20,184,166,0.06)">
+            <span class="sel-type-pill" style="background:rgba(20,184,166,0.2);color:rgba(20,184,166,0.95)">EW</span>
+            <div style="flex:1;min-width:0"><div class="sel-name">Hideki Matsuyama</div><div class="sel-detail">70.0/100 · 8/10 trend · T13→T11→T2 trajectory · #1 scrambling 73.68% · 2021 Champion</div></div>
+            <div class="sel-odds">+4000</div>
+          </div>
+          <div class="sel-row" style="border-color:rgba(20,184,166,0.3);background:rgba(20,184,166,0.06)">
+            <span class="sel-type-pill" style="background:rgba(20,184,166,0.2);color:rgba(20,184,166,0.95)">EW</span>
+            <div style="flex:1;min-width:0"><div class="sel-name">Ludvig Åberg</div><div class="sel-detail">62.1/100 · 7/10 trend · T2 Augusta 2024 · 100% Sunday closer · SG T2G +1.540</div></div>
+            <div class="sel-odds">+1500</div>
+          </div>
+        </div>
+        <div class="bet-note"><strong>FanatIQ Analysis:</strong> Fleetwood is the model's surprise pick — SportsLine's top value play who leads the tour in birdie% from 200+ yards, a critical Augusta skill. Matsuyama's trajectory is unmistakable: T13→T11→T2. Åberg nearly won last year and closes better than anyone in the field.</div>
+      </div>
+      <div class="bet-footer">
+        <div class="bet-status-row"><div class="sdot" style="background:var(--amber)"></div><span style="color:var(--amber);font-family:monospace;font-size:10px">⏳ Pending · Apr 10–13</span></div>
+        <div class="watermark">FIQ-GOLF-MASTERS26-EW</div>
+      </div>
+    </div>
+    <div class="bet-card" style="margin-bottom:10px">
+      <div class="bet-header">
+        <div class="bet-sport-icon icon-golf" style="background:rgba(20,184,166,0.12);color:rgba(20,184,166,0.9);font-size:18px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">⛳</div>
+        <div class="bet-meta"><div class="bet-title">Masters 2026 — Small Each Way</div><div class="bet-sub">Top 10 specials · Small stakes only</div></div>
+        <div class="bet-time-col"><div class="bet-tier-badge" style="color:var(--amber)">GOLD</div><div class="bet-ago">2 picks</div></div>
+      </div>
+      <div class="bet-body">
+        <div class="bet-selections">
+          <div class="sel-row place-bet">
+            <span class="sel-type-pill">Top 10</span>
+            <div style="flex:1;min-width:0"><div class="sel-name">Justin Rose</div><div class="sel-detail">59.9/100 · 3× runner-up · 2025 playoff · Career avg 71.76 at Augusta (3rd all time) · 2 wins this season</div></div>
+            <div class="sel-odds">+3000</div>
+          </div>
+          <div class="sel-row" style="border-color:var(--border);background:var(--s2)">
+            <span class="sel-type-pill" style="background:var(--s3);color:var(--muted)">Flutter</span>
+            <div style="flex:1;min-width:0"><div class="sel-name">Min Woo Lee</div><div class="sel-detail">66.6/100 · SG T2G +1.693 (near threshold) · Par 5 birdie% 67% leads tour · 316 yds avg driving</div></div>
+            <div class="sel-odds">+4000</div>
+          </div>
+        </div>
+        <div class="bet-note"><strong>FanatIQ Analysis:</strong> Rose's Augusta-specific knowledge is unmatched — T2G below the statistical threshold keeps him off the win list, but top-10 each way at +3000 is excellent value for a three-time runner-up. Min Woo Lee is the par-5 king this season — his T2G is the closest of any non-recommended player to the 1.70 threshold.</div>
+      </div>
+      <div class="bet-footer">
+        <div class="bet-status-row"><div class="sdot" style="background:var(--amber)"></div><span style="color:var(--amber);font-family:monospace;font-size:10px">⏳ Pending · Small stakes</span></div>
+        <div class="watermark">FIQ-GOLF-MASTERS26-SM</div>
+      </div>
+    </div>
+    <div class="bet-card" style="margin-bottom:10px">
+      <div class="bet-header">
+        <div style="width:32px;height:32px;border-radius:8px;background:var(--red-dim);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✗</div>
+        <div class="bet-meta"><div class="bet-title">Masters 2026 — Fades</div><div class="bet-sub">Do not back these players</div></div>
+        <div class="bet-time-col"><div class="bet-tier-badge" style="color:var(--red)">FADE</div></div>
+      </div>
+      <div class="bet-body">
+        <div class="bet-selections">
+          <div class="sel-row" style="border-color:var(--red-b);background:var(--red-dim)">
+            <span class="sel-type-pill" style="background:rgba(239,68,68,0.2);color:var(--red)">Fade</span>
+            <div style="flex:1;min-width:0"><div class="sel-name">Jon Rahm <span style="font-size:10px;font-weight:500;color:var(--red)">⚠ WORST VALUE</span></div><div class="sel-detail">37.5/100 composite · T45 Augusta 2024 · SG T2G +0.400 · Fails form, T2G and Augusta history filters simultaneously</div></div>
+            <div style="font-family:monospace;font-size:13px;font-weight:500;color:var(--red);flex-shrink:0;margin-top:1px">+950</div>
+          </div>
+          <div class="sel-row" style="border-color:var(--red-b);background:var(--red-dim)">
+            <span class="sel-type-pill" style="background:rgba(239,68,68,0.2);color:var(--red)">Fade</span>
+            <div style="flex:1;min-width:0"><div class="sel-name">Brooks Koepka</div><div class="sel-detail">50.5/100 composite · SG T2G +0.546 (2nd lowest) · Missed cut 2025 · Limited 2026 starts</div></div>
+            <div style="font-family:monospace;font-size:13px;font-weight:500;color:var(--red);flex-shrink:0;margin-top:1px">+4500</div>
+          </div>
+          <div class="sel-row" style="border-color:var(--red-b);background:var(--red-dim)">
+            <span class="sel-type-pill" style="background:rgba(239,68,68,0.2);color:var(--red)">Fade</span>
+            <div style="flex:1;min-width:0"><div class="sel-name">Sepp Straka</div><div class="sel-detail">47.8/100 composite · SG T2G +0.906 · Driving rank 96th · Multiple filter failures</div></div>
+            <div style="font-family:monospace;font-size:13px;font-weight:500;color:var(--red);flex-shrink:0;margin-top:1px">+7000</div>
+          </div>
+        </div>
+        <div class="bet-note" style="border-left-color:var(--red)"><strong>FanatIQ Analysis:</strong> Rahm at +950 is the single biggest market mispricing in the field. The market is pricing his 2023 green jacket — our model prices his 2026 form. He fails T2G, Augusta history and current form filters simultaneously. 37.5/100 composite. Do not bet him at any price.</div>
+      </div>
+      <div class="bet-footer">
+        <div class="bet-status-row"><div class="sdot" style="background:var(--red)"></div><span style="color:var(--red);font-family:monospace;font-size:10px">✗ Fade — do not back</span></div>
+        <div class="watermark">FIQ-GOLF-MASTERS26-FD</div>
+      </div>
+    </div>
+    <div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px">
+      <div style="padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px">Augusta Winning Trends <span style="font-size:8px;font-weight:700;padding:2px 7px;border-radius:8px;text-transform:uppercase;letter-spacing:.5px;background:rgba(20,184,166,0.12);color:rgba(20,184,166,0.9)">12 Filters</span></div>
+        <div style="font-size:10px;color:var(--muted)">Last 12 winners</div>
+      </div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+        ${[['SG T2G 1.70+','11/13 winners — THE most predictive Augusta stat. Only McIlroy (+1.785) and Scheffler (+1.868) clearly exceed the threshold.','var(--green)'],['No debut wins since 1979','46/46 winners had prior Masters experience. Fuzzy Zoeller (1979) the only exception ever. Eliminates Gotterup, Knapp, Bridgeman and 15 others.','var(--amber)'],['4+ PGA Tour wins','12/12 winners — winning pedigree is non-negotiable. Eliminates Åberg (only 2 wins).','var(--amber)'],['Top 50 driving distance','16/17 winners. Par-5 advantage is decisive. Eliminates Fleetwood (117th), Matsuyama (110th), Rose (77th).','var(--amber)'],['Augusta is ball-striking, not putting','Last 5 winners averaged 98th in SG Putting rank. Rory won in 2025 losing strokes on the greens. Scheffler four-putted the last hole in 2022 and won.','var(--blue)']].map(([t,d,c]) => `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--s2);border-radius:7px;border:1px solid var(--border)"><div style="width:6px;height:6px;border-radius:50%;background:${c};flex-shrink:0;margin-top:5px"></div><div><div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:1px">${t}</div><div style="font-size:10px;color:var(--muted);line-height:1.5">${d}</div></div></div>`).join('')}
+      </div>
+    </div>`;
+  return html;
+}
+
+function renderMastersRankings() {
+  const players = [
+    {rank:1,name:'Rory McIlroy',odds:'+1200',cat:'FAVOURITE',composite:91.4,trend:10,verdict:'WIN BET',col:'var(--mg)'},
+    {rank:2,name:'Bryson DeChambeau',odds:'+1000',cat:'FAVOURITE',composite:76.6,trend:9,verdict:'CONTENDER',col:'var(--amber)'},
+    {rank:3,name:'Scottie Scheffler',odds:'+500',cat:'FAVOURITE',composite:75.9,trend:10,verdict:'CONTENDER',col:'var(--amber)'},
+    {rank:4,name:'Collin Morikawa',odds:'+3000',cat:'VALUE',composite:75.0,trend:7,verdict:'WIN BET',col:'var(--green)'},
+    {rank:5,name:'Si Woo Kim',odds:'+5000',cat:'SLEEPER',composite:73.0,trend:6,verdict:'EACH WAY',col:'var(--blue)'},
+    {rank:6,name:'Chris Gotterup',odds:'+4500',cat:'SLEEPER',composite:71.4,trend:4,verdict:'EACH WAY',col:'var(--blue)'},
+    {rank:7,name:'Hideki Matsuyama',odds:'+4000',cat:'SLEEPER',composite:70.0,trend:8,verdict:'EACH WAY',col:'var(--green)'},
+    {rank:8,name:'Xander Schauffele',odds:'+1600',cat:'CONTENDER',composite:69.7,trend:9,verdict:'EACH WAY',col:'var(--blue)'},
+    {rank:9,name:'Tommy Fleetwood',odds:'+2200',cat:'CONTENDER',composite:68.0,trend:8,verdict:'EACH WAY',col:'var(--green)'},
+    {rank:10,name:'Min Woo Lee',odds:'+4000',cat:'SLEEPER',composite:66.6,trend:5,verdict:'EACH WAY',col:'var(--blue)'},
+    {rank:11,name:'Nicolai Højgaard',odds:'+6500',cat:'LONG SHOT',composite:64.0,trend:4,verdict:'SMALL EW',col:'var(--dim)'},
+    {rank:12,name:'Ludvig Åberg',odds:'+1500',cat:'CONTENDER',composite:62.1,trend:7,verdict:'EACH WAY',col:'var(--green)'},
+    {rank:13,name:'Cameron Young',odds:'+2000',cat:'CONTENDER',composite:61.2,trend:6,verdict:'WATCH',col:'var(--dim)'},
+    {rank:14,name:'Justin Rose',odds:'+3000',cat:'SLEEPER',composite:59.9,trend:7,verdict:'TOP 10 EW',col:'var(--blue)'},
+    {rank:15,name:'Akshay Bhatia',odds:'+6000',cat:'LONG SHOT',composite:58.8,trend:4,verdict:'SMALL EW',col:'var(--dim)'},
+    {rank:16,name:'Brooks Koepka',odds:'+4500',cat:'FADE',composite:50.5,trend:4,verdict:'FADE',col:'var(--red)'},
+    {rank:17,name:'Sepp Straka',odds:'+7000',cat:'FADE',composite:47.8,trend:5,verdict:'FADE',col:'var(--red)'},
+    {rank:18,name:'Jon Rahm',odds:'+950',cat:'FADE',composite:37.5,trend:6,verdict:'FADE',col:'var(--red)'},
+  ];
+  const barCol = s => s>=75?'var(--green)':s>=60?'var(--amber)':'var(--red)';
+  return `<div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">
+    <div style="padding:12px 14px;border-bottom:1px solid var(--border);background:var(--s2);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:13px;font-weight:700">Masters 2026 — Player Rankings</div>
+      <div style="font-size:10px;color:var(--muted)">18 players · Composite /100</div>
+    </div>
+    ${players.map(p => `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
+      <div style="font-size:11px;color:var(--dim);width:20px;text-align:right;flex-shrink:0;font-family:monospace">${p.rank}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
+        <div style="font-size:10px;color:var(--dim);margin-top:1px">${p.cat} · Trend ${p.trend}/10</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-right:8px">
+        <div style="font-size:10px;font-weight:700;color:${p.col};padding:1px 6px;border-radius:4px;margin-bottom:2px;white-space:nowrap">${p.verdict}</div>
+        <div style="font-size:10px;color:var(--muted);font-family:monospace">${p.odds}</div>
+      </div>
+      <div style="width:52px;flex-shrink:0">
+        <div style="font-size:14px;font-weight:700;font-family:monospace;color:${barCol(p.composite)};text-align:right">${p.composite}</div>
+        <div style="height:3px;background:var(--s3);border-radius:2px;margin-top:3px;overflow:hidden"><div style="height:100%;width:${p.composite}%;background:${barCol(p.composite)};border-radius:2px"></div></div>
+      </div>
+    </div>`).join('')}
+  </div>`;
 }
 
 // ═══════════════════════════════════════════════
@@ -2869,6 +3097,7 @@ function renderAdminTable(bets) {
       <td>
         <div style="display:flex;gap:4px">
           <button class="btn btn-ghost btn-xs" onclick="openEditModal('${b.id}')">Edit</button>
+          <button class="btn btn-xs" style="background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-b)" onclick="adminArchiveBet('${b.id}')">Archive</button>
           <button class="btn btn-xs" style="background:var(--red-dim);color:var(--red);border:1px solid var(--red-b)" onclick="deleteBet('${b.id}')">Del</button>
         </div>
       </td>
@@ -2890,6 +3119,14 @@ async function updateStatus(id, status) {
   }
   await loadAllData();
   showToast('Updated to '+status,'success');
+}
+
+async function adminArchiveBet(id) {
+  if (!sb) return;
+  const { error } = await sb.from('bets').update({ archived: true }).eq('id', id);
+  if (error) { showToast('Archive failed: ' + error.message, 'error'); return; }
+  showToast('Bet archived — removed from public feeds', 'success');
+  await loadAllData();
 }
 
 async function deleteBet(id) {
@@ -3443,19 +3680,21 @@ async function runResultsUpdater() {
 const LIVE_SLIPS = [
   {
     id: 'SLIP-001',
-    title: 'Weekend Multi',
+    title: '🏆 Weekend Multi — 56/1 WINNER',
     subtitle: '8-leg acca — Fri/Sat 3-5 Apr',
-    totalOdds: '53.91/1',
+    totalOdds: '56/1',
     potentialWin: 'R109,821.47',
+    archived: true,
+    status: 'won',
     legs: [
       { sel: 'BTTS + Over 2.5', match: 'Antwerp vs Genk', date: 'Fri 3 Apr 20:45', status: 'won' },
       { sel: 'Gil Vicente FC', match: 'Gil Vicente vs AVS Futebol', date: 'Fri 3 Apr 16:30', status: 'won' },
-      { sel: 'BTTS + Over 2.5', match: 'SV Zulte Waregem vs Cercle Brugge', date: 'Sat 4 Apr 16:00', status: 'pending' },
+      { sel: 'BTTS + Over 2.5', match: 'SV Zulte Waregem vs Cercle Brugge', date: 'Sat 4 Apr 16:00', status: 'won' },
       { sel: 'Paris Saint-Germain', match: 'PSG vs Toulouse', date: 'Fri 3 Apr 20:45', status: 'won' },
       { sel: 'BTTS Yes', match: 'Coventry vs Derby', date: 'Fri 3 Apr 21:00', status: 'won' },
       { sel: 'Sporting CP', match: 'Sporting CP vs CD Santa Clara', date: 'Fri 3 Apr 21:30', status: 'won' },
-      { sel: 'BTTS Yes', match: 'Oud-Heverlee Leuven vs Standard Liege', date: 'Sat 4 Apr 18:15', status: 'pending' },
-      { sel: 'Union Saint-Gilloise', match: 'Union Saint-Gilloise vs Sint-Truidense VV', date: 'Sat 4 Apr 20:45', status: 'pending' }
+      { sel: 'BTTS Yes', match: 'Oud-Heverlee Leuven vs Standard Liege', date: 'Sat 4 Apr 18:15', status: 'won' },
+      { sel: 'Union Saint-Gilloise', match: 'Union Saint-Gilloise vs Sint-Truidense VV', date: 'Sat 4 Apr 20:45', status: 'won' }
     ]
   }
 ];
@@ -3467,22 +3706,24 @@ function renderLiveSlips() {
 
   if (sb) {
     sb.from('live_slips').select('*').order('published_at',{ascending:false}).limit(20).then(function(res) {
-      const dbSlips = (res.data || []).map(function(row) {
+      const dbSlips = (res.data || []).filter(function(row){ return !row.archived; }).map(function(row) {
         return {
           id: row.id,
           title: row.title,
           subtitle: row.subtitle,
           totalOdds: row.total_odds,
           potentialWin: row.potential_win,
+          archived: row.archived,
+          status: row.status,
           legs: Array.isArray(row.legs) ? row.legs : []
         };
       });
-      // Always show hardcoded slip PLUS any DB slips
-      const allSlips = dbSlips.concat(LIVE_SLIPS);
+      const activeHardcoded = LIVE_SLIPS.filter(function(s){ return !s.archived; });
+      const allSlips = dbSlips.concat(activeHardcoded);
       renderSlipCards(feed, allSlips);
     });
   } else {
-    renderSlipCards(feed, LIVE_SLIPS);
+    renderSlipCards(feed, LIVE_SLIPS.filter(function(s){ return !s.archived; }));
   }
 }
 
@@ -4525,7 +4766,7 @@ async function mmaPublishSlip() {
   try {
     const slipData={title,subtitle:promo+' · '+legs.length+' leg'+(legs.length>1?'s':''),sport:'mma',status:'pending',total_odds:parseFloat(totalOdds.toFixed(2)),potential_win:parseFloat(potWin),legs,published_at:new Date().toISOString(),tier};
     if(dest==='both'||dest==='live') { const {error}=await sb.from('live_slips').insert([slipData]); if(error) throw error; }
-    if(dest==='both'||dest==='mma') { await sb.from('bets').insert([{title,subtitle:promo+' · '+cardNum,sport:'efc',type:'mma',status:'pending',tier,legs:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'mma'})),note:promo+' '+cardNum+' — '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2))}]); }
+    if(dest==='both'||dest==='mma') { await sb.from('bets').insert([{event:title,venue:promo+' · '+cardNum,sport:'efc',type:'mma',status:'pending',tier,selections:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'best'})),note:promo+' '+cardNum+' — '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2))}]); }
     document.getElementById('mma-pub-status').style.display='block';
     showToast('Published! '+legs.length+' fights @ '+totalOdds.toFixed(2)+'x = R'+potWin,'success');
     if(typeof loadLiveSlips==='function') loadLiveSlips();
@@ -4609,7 +4850,8 @@ function adminRenderEditSlip(slip) {
         </select>
         <button onclick="adminMarkAllLegs(${slip.id},'won')" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px;background:var(--green-dim);border:1px solid var(--green-b);color:var(--green);cursor:pointer">All Won</button>
         <button onclick="adminMarkAllLegs(${slip.id},'lost')" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px;background:var(--red-dim);border:1px solid var(--red-b);color:var(--red);cursor:pointer">All Lost</button>
-        <button onclick="adminDeleteSlip(${slip.id})" style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:5px;background:var(--s3);border:1px solid var(--border);color:var(--dim);cursor:pointer;margin-left:auto">Delete</button>
+        <button onclick="adminArchiveSlip(${slip.id})" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px;background:var(--amber-dim);border:1px solid var(--amber-b);color:var(--amber);cursor:pointer;margin-left:auto">Archive</button>
+        <button onclick="adminDeleteSlip(${slip.id})" style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:5px;background:var(--s3);border:1px solid var(--border);color:var(--dim);cursor:pointer">Delete</button>
       </div>
       <div id="slip-save-msg-${slip.id}" style="font-size:10px;color:var(--green);margin-top:6px;display:none">✓ Saved</div>
     </div>
@@ -4670,6 +4912,15 @@ async function adminMarkAllLegs(slipId, status) {
   await sb.from('live_slips').update({ legs, status: slipStatus }).eq('id', slipId);
   showToast('All legs marked ' + status,'success');
   adminLoadSlips();
+  if (typeof renderLiveSlips === 'function') renderLiveSlips();
+}
+
+async function adminArchiveSlip(slipId) {
+  if (!sb) return;
+  const { error } = await sb.from('live_slips').update({ archived: true }).eq('id', slipId);
+  if (error) { showToast('Archive failed: ' + error.message, 'error'); return; }
+  document.getElementById('slip-card-' + slipId)?.remove();
+  showToast('Slip archived — hidden from public feed', 'success');
   if (typeof renderLiveSlips === 'function') renderLiveSlips();
 }
 
