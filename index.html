@@ -5103,7 +5103,7 @@ async function mmaPublishSlip() {
   try {
     const slipData={title,subtitle:promo+' &middot; '+legs.length+' leg'+(legs.length>1?'s':''),sport:'mma',status:'pending',total_odds:parseFloat(totalOdds.toFixed(2)),potential_win:parseFloat(potWin),legs,published_at:new Date().toISOString()};
     if(dest==='both'||dest==='slips') { const {error}=await sb.from('live_slips').insert([slipData]); if(error) throw error; }
-    if(dest==='both'||dest==='bets') { await sb.from('bets').insert([{event:title,venue:promo+' &middot; '+cardNum,sport:'efc',type:'mma',status:'pending',tier,selections:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'best'})),note:promo+' '+cardNum+' &mdash; '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2))}]); }
+    if(dest==='both'||dest==='bets') { const betId='FIQ-MMA-'+Date.now(); const {error:betErr}=await sb.from('bets').insert([{id:betId,event:title,venue:promo+' &middot; '+cardNum,sport:'efc',status:'pending',tier,selections:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'best'})),note:promo+' '+cardNum+' &mdash; '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2)),published_at:new Date().toISOString()}]); if(betErr) throw betErr; }
     const pubStatus=document.getElementById('mma-publish-status');
     if(pubStatus){pubStatus.innerHTML='<span style="color:var(--green)">&#x2713; Published &mdash; '+legs.length+' fights live</span>';}
     showToast('&#x2713; Published! '+legs.length+' fights @ '+totalOdds.toFixed(2)+'x = R'+potWin,'success');
