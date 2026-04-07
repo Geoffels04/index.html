@@ -1844,7 +1844,7 @@ function renderEmptyState(sport) {
 }
 
 // ===============================================
-// PAST BETS ‚Äî drill down: Month -> Date -> Bets
+// PAST BETS &mdash; drill down: Month -> Date -> Bets
 // ===============================================
 function renderPastBets(sport) {
   const feedEl = document.getElementById(sport === 'racing' ? 'racing-feed' : 'soccer-feed');
@@ -2197,7 +2197,7 @@ function renderEfcPage() {
     return;
   }
 
-  // Tips tab ‚Äî DB bets for efc/ufc/mma sport
+  // Tips tab &mdash; DB bets for efc/ufc/mma sport
   const bets = allBets.filter(b => b.sport === 'efc' || b.sport === 'ufc' || b.sport === 'mma');
   if (subEl) subEl.textContent = bets.length ? bets.length + ' tip' + (bets.length>1?'s':'') + ' live' : 'No tips published yet';
   if (!bets.length) {
@@ -5063,7 +5063,7 @@ function mmaPublishFullCard() {
       +(note?'<div style="font-size:10px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">'+note+'</div>':'')
       +'</div>';
   });
-  // Store card HTML and let renderEfcPage use it ‚Äî don't write directly (causes double-render)
+  // Store card HTML and let renderEfcPage use it &mdash; don't write directly (causes double-render)
   MMA.cardHtml = html;
   showToast('Full card published &mdash; '+sorted.length+' fights live','success');
   // Switch public EFC tab to Full Card view
@@ -5144,7 +5144,7 @@ async function migrateSlipToSupabase(slipId) {
   }]);
 
   if (error) { showToast('Migration failed: ' + error.message, 'error'); return; }
-  showToast('Migrated! Find it in the Supabase slips above ‚Äî now fully editable.', 'success');
+  showToast('Migrated! Find it in the Supabase slips above &mdash; now fully editable.', 'success');
   adminLoadSlips();
 }
 
