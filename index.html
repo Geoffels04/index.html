@@ -766,8 +766,8 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
     </div>
   </div>
   <div class="sport-sub-tabs">
-    <button class="stab on" id="stab-efc-tips" onclick="switchEfcTab('tips',this)">Tips</button>
-    <button class="stab" id="stab-efc-card" onclick="switchEfcTab('card',this)">Full Card</button>
+    <button class="stab" id="stab-efc-tips" onclick="switchEfcTab('tips',this)">Tips</button>
+    <button class="stab on" id="stab-efc-card" onclick="switchEfcTab('card',this)">Full Card</button>
   </div>
   <div class="page-inner" style="padding-top:16px">
     <div id="efc-feed"></div>
@@ -1612,7 +1612,7 @@ let adminFilter = 'all';
 let currentRacingTab = 'all';
 let currentSoccerTab = 'trends';
 let currentGolfTab = 'masters';
-let currentEfcTab = 'tips';
+let currentEfcTab = 'card';
 let adminPw = localStorage.getItem('fiq_admin_pw') || 'Poison@04';
 let editingBetId = null;
 let selectedPlan = 'monthly';
@@ -2184,6 +2184,10 @@ function renderEfcPage() {
   const feedEl = document.getElementById('efc-feed');
   if (!feedEl) return;
   const subEl = document.getElementById('efc-sub-label');
+  // Sync tab button highlight
+  document.querySelectorAll('#page-efc .stab').forEach(t => t.classList.remove('on'));
+  const activeStab = document.getElementById(currentEfcTab === 'card' ? 'stab-efc-card' : 'stab-efc-tips');
+  if (activeStab) activeStab.classList.add('on');
 
   if (currentEfcTab === 'card') {
     if (MMA.cardHtml) {
@@ -4702,7 +4706,7 @@ window.addEventListener('load', async () => {
 });
 
 // == MMA CARD BUILDER ==
-let MMA = { promo:'UFC', cardNum:'', date:'', fights:[], cardHtml:'' };
+let MMA = { promo:'UFC', cardNum:'', date:'', fights:[], cardHtml: localStorage.getItem('fiq_mma_card')||'' };
 
 async function mmaFetchUrl() {
   const url = document.getElementById('mma-url-input').value.trim();
@@ -5068,6 +5072,7 @@ function mmaPublishFullCard() {
   });
   // Store card HTML and let renderEfcPage use it &mdash; don't write directly (causes double-render)
   MMA.cardHtml = html;
+  localStorage.setItem('fiq_mma_card', html);
   showToast('Full card published &mdash; '+sorted.length+' fights live','success');
   // Switch public EFC tab to Full Card view
   currentEfcTab = 'card';
