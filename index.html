@@ -4929,7 +4929,7 @@ async function mmaPublishSlip() {
   const btn=document.getElementById('mma-publish-btn');
   if(btn){btn.disabled=true; btn.textContent='Publishing...';}
   try {
-    const slipData={title,subtitle:promo+' &middot; '+legs.length+' leg'+(legs.length>1?'s':''),sport:'mma',status:'pending',total_odds:parseFloat(totalOdds.toFixed(2)),potential_win:parseFloat(potWin),legs,published_at:new Date().toISOString(),tier};
+    const slipData={title,subtitle:promo+' &middot; '+legs.length+' leg'+(legs.length>1?'s':''),sport:'mma',status:'pending',total_odds:parseFloat(totalOdds.toFixed(2)),potential_win:parseFloat(potWin),legs,published_at:new Date().toISOString()};
     if(dest==='both'||dest==='slips') { const {error}=await sb.from('live_slips').insert([slipData]); if(error) throw error; }
     if(dest==='both'||dest==='bets') { await sb.from('bets').insert([{event:title,venue:promo+' &middot; '+cardNum,sport:'efc',type:'mma',status:'pending',tier,selections:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'best'})),note:promo+' '+cardNum+' &mdash; '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2))}]); }
     const pubStatus=document.getElementById('mma-publish-status');
@@ -4938,7 +4938,7 @@ async function mmaPublishSlip() {
     await loadAllData();
     if(typeof renderLiveSlips==='function') renderLiveSlips();
   } catch(e) { showToast('Publish failed: '+e.message,'error'); }
-  if(btn){btn.disabled=false; btn.textContent='&#x26A1; Publish Slip to Supabase';}
+  if(btn){btn.disabled=false; btn.textContent='Publish Slip to Supabase';}
 }
 
 // ==================================================
