@@ -695,6 +695,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
     <button class="stab" id="rtab-pick6" onclick="switchRacingTab('pick6',this)">Pick 6</button>
     <button class="stab" id="rtab-bankers" onclick="switchRacingTab('bankers',this)">Bankers</button>
     <button class="stab" id="rtab-ew" onclick="switchRacingTab('ew',this)">Each Way</button>
+    <button class="stab" id="rtab-past" onclick="switchRacingTab('past',this)">Past Bets</button>
   </div>
   <div class="page-inner" style="padding-top:16px" id="racing-feed-wrap">
     <div id="racing-feed"></div>
@@ -721,6 +722,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
     <button class="stab" id="stab-over15" onclick="switchSoccerTab('over15',this)">Over 1.5</button>
     <button class="stab" id="stab-over25" onclick="switchSoccerTab('over25',this)">Over 2.5</button>
     <button class="stab" id="stab-winpct" onclick="switchSoccerTab('winpct',this)">Win %</button>
+    <button class="stab" id="stab-past" onclick="switchSoccerTab('past',this)">Past Bets</button>
   </div>
   <div class="page-inner" style="padding-top:16px">
     <div id="soccer-feed"></div>
@@ -1842,6 +1844,96 @@ function renderEmptyState(sport) {
 }
 
 // ===============================================
+// PAST BETS ‚Äî drill down: Month -> Date -> Bets
+// ===============================================
+function renderPastBets(sport) {
+  const feedEl = document.getElementById(sport === 'racing' ? 'racing-feed' : 'soccer-feed');
+  if (!feedEl) return;
+
+  // For racing: only feature bets in W/L (exclude race-by-race)
+  // For soccer: only best bets in W/L
+  const isFeatureBet = (b) => {
+    if (sport === 'racing') {
+      return b.id?.includes('BANK') || b.id?.includes('EW') || b.id?.includes('P6') ||
+             b.event?.toLowerCase().includes('pick 6') || b.event?.toLowerCase().includes('banker') ||
+             b.event?.toLowerCase().includes('each way') || b.event?.toLowerCase().includes('each-way') ||
+             b.event?.toLowerCase().includes('special');
+    }
+    if (sport === 'soccer') {
+      return b.tier === 'gold' || (b.selections||[]).some(s => s.type === 'best');
+    }
+    return true;
+  };
+
+  const sportBets = archivedBets.filter(b => b.sport === sport);
+  if (!sportBets.length) {
+    feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">No past bets yet</div><div class="empty-sub">Tips you publish and archive will appear here grouped by month and date.</div></div>';
+    return;
+  }
+
+  // Group by month, then by date within month
+  const months = {};
+  sportBets.forEach(b => {
+    const d = b.published_at ? new Date(b.published_at) : null;
+    const monthKey = d ? d.toLocaleDateString('en-ZA',{month:'long',year:'numeric'}) : 'Earlier';
+    const dateKey = d ? d.toLocaleDateString('en-ZA',{weekday:'short',day:'numeric',month:'short'}) : 'Unknown date';
+    if (!months[monthKey]) months[monthKey] = {};
+    if (!months[monthKey][dateKey]) months[monthKey][dateKey] = [];
+    months[monthKey][dateKey].push(b);
+  });
+
+  // Overall feature-only W/L
+  const allFeature = sportBets.filter(isFeatureBet);
+  const totalW = allFeature.filter(b=>b.status==='won').length;
+  const totalL = allFeature.filter(b=>b.status==='lost').length;
+  const totalSettled = totalW + totalL;
+  const winRate = totalSettled ? Math.round((totalW/totalSettled)*100) : null;
+
+  let html = '<div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:16px">'
+    + '<div style="flex:1"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Best Bets Record</div>'
+    + '<div style="font-size:13px;font-weight:700">'
+    + (totalSettled ? '<span style="color:var(--green)">' + totalW + 'W</span> <span style="color:var(--dim)">/ </span><span style="color:var(--red)">' + totalL + 'L</span>' : '<span style="color:var(--dim)">No settled bets yet</span>')
+    + '</div></div>'
+    + (winRate !== null ? '<div style="text-align:right"><div style="font-size:9px;color:var(--dim);text-transform:uppercase;margin-bottom:2px">Hit Rate</div><div style="font-size:22px;font-weight:700;color:' + (winRate>=50?'var(--green)':'var(--red)') + '">' + winRate + '%</div></div>' : '')
+    + '</div>';
+
+  Object.entries(months).forEach(([month, dates]) => {
+    const mFeature = Object.values(dates).flat().filter(isFeatureBet);
+    const mW = mFeature.filter(b=>b.status==='won').length;
+    const mL = mFeature.filter(b=>b.status==='lost').length;
+    const mId = 'past-m-' + month.replace(/[^a-z0-9]/gi,'');
+    html += '<div style="margin-bottom:12px">'
+      + '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:4px" onclick="var el=document.getElementById('' + mId + '');el.style.display=el.style.display==='none'?'block':'none';this.querySelector('.pchev').textContent=el.style.display==='none'?'&#x25B8;':'&#x25BE;'">'
+      + '<div style="font-size:13px;font-weight:700;flex:1">' + month + '</div>'
+      + (mW||mL ? '<div style="font-size:11px"><span style="color:var(--green)">' + mW + 'W</span> <span style="color:var(--red)">' + mL + 'L</span></div>' : '')
+      + '<span class="pchev" style="font-size:11px;color:var(--dim)">&#x25B8;</span>'
+      + '</div>'
+      + '<div id="' + mId + '" style="display:none">';
+
+    Object.entries(dates).forEach(([date, bets]) => {
+      const dFeature = bets.filter(isFeatureBet);
+      const dW = dFeature.filter(b=>b.status==='won').length;
+      const dL = dFeature.filter(b=>b.status==='lost').length;
+      const dId = mId + '-' + date.replace(/[^a-z0-9]/gi,'');
+      html += '<div style="margin-bottom:4px;margin-left:8px">'
+        + '<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--s1);border:1px solid var(--border);border-radius:7px;cursor:pointer;margin-bottom:3px" onclick="var el=document.getElementById('' + dId + '');el.style.display=el.style.display==='none'?'block':'none';this.querySelector('.dchev').textContent=el.style.display==='none'?'&#x25B8;':'&#x25BE;'">'
+        + '<div style="font-size:12px;font-weight:600;flex:1">' + date + '</div>'
+        + '<div style="font-size:10px;color:var(--muted)">' + bets.length + ' tip' + (bets.length!==1?'s':'') + '</div>'
+        + (dW||dL ? '<div style="font-size:10px;margin-left:6px"><span style="color:var(--green)">' + dW + 'W</span> <span style="color:var(--red)">' + dL + 'L</span></div>' : '')
+        + '<span class="dchev" style="font-size:10px;color:var(--dim);margin-left:4px">&#x25B8;</span>'
+        + '</div>'
+        + '<div id="' + dId + '" style="display:none;opacity:0.85;padding-left:4px">'
+        + bets.map((b,i) => renderBetCard(b,i)).join('')
+        + '</div></div>';
+    });
+
+    html += '</div></div>';
+  });
+
+  feedEl.innerHTML = html;
+}
+
+// ===============================================
 // ARCHIVE SECTION
 // ===============================================
 function renderArchiveSection(sport) {
@@ -1909,18 +2001,18 @@ function renderSportFeed(sport, filter) {
   if (subEl) subEl.textContent = bets.length ? bets.length + ' tip' + (bets.length>1?'s':'') + ' &middot; Turffontein &middot; Sat 4 Apr' : 'No tips published yet';
 
   if (!feedEl) return;
-  const archiveHtml = renderArchiveSection(sport);
   if (!bets.length) {
-    feedEl.innerHTML = renderEmptyState(sport) + archiveHtml;
+    feedEl.innerHTML = renderEmptyState(sport);
     return;
   }
-  feedEl.innerHTML = bets.map((b,i) => renderBetCard(b,i)).join('') + archiveHtml;
+  feedEl.innerHTML = bets.map((b,i) => renderBetCard(b,i)).join('');
 }
 
 function switchRacingTab(tab, el) {
   currentRacingTab = tab;
   document.querySelectorAll('#page-racing .stab').forEach(t => t.classList.remove('on'));
   el.classList.add('on');
+  if (tab === 'past') { renderPastBets('racing'); return; }
   renderSportFeed('racing', tab === 'all' ? null : tab);
 }
 
@@ -1939,6 +2031,9 @@ function renderSoccerPage() {
     sb.from('market_trends').select('*').eq('sport','soccer').order('league').order('match_time').limit(200).then(({data}) => {
       renderLeagueAccordions(data, 'soccer-feed');
     });
+  } else if (tab === 'past') {
+    renderPastBets('soccer');
+    return;
   } else if (tab === 'tips') {
     const tips = bets.filter(b => !b.id?.includes('ACCA'));
     feedEl.innerHTML = (tips.length ? tips.map((b,i) => renderBetCard(b,i)).join('') : renderEmptyState('soccer')) + renderArchiveSection('soccer');
@@ -2102,10 +2197,18 @@ function renderEfcPage() {
     return;
   }
 
-  // Tips tab ‚Äî DB bets for efc/ufc sport
-  const bets = allBets.filter(b => b.sport === 'efc' || b.sport === 'ufc');
+  // Tips tab ‚Äî DB bets for efc/ufc/mma sport
+  const bets = allBets.filter(b => b.sport === 'efc' || b.sport === 'ufc' || b.sport === 'mma');
   if (subEl) subEl.textContent = bets.length ? bets.length + ' tip' + (bets.length>1?'s':'') + ' live' : 'No tips published yet';
-  feedEl.innerHTML = (bets.length ? bets.map((b,i) => renderBetCard(b,i)).join('') : renderEmptyState('efc')) + renderArchiveSection('efc');
+  if (!bets.length) {
+    feedEl.innerHTML = '<div class="empty-state">'
+      + '<div class="empty-icon" style="color:var(--red)">&#x1F94A;</div>'
+      + '<div class="empty-title">No tips yet</div>'
+      + '<div class="empty-sub">Go to Admin &rarr; MMA Card Builder, parse the fight card and click <strong>Publish Slip to Supabase</strong>.</div>'
+      + '</div>' + renderArchiveSection('efc');
+    return;
+  }
+  feedEl.innerHTML = bets.map((b,i) => renderBetCard(b,i)).join('') + renderArchiveSection('efc');
 }
 
 function renderGolfPage() {
