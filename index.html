@@ -1643,8 +1643,12 @@ function setDbStatus(ok) {
 async function loadAllData() {
   if (!sb) return;
   const { data } = await sb.from('bets').select('*').order('display_order',{ascending:true}).order('published_at',{ascending:false});
-  allBets = (data || []).filter(b => b.archived !== true);
-  archivedBets = (data || []).filter(b => b.archived === true);
+  const allData = data || [];
+  allBets = allData.filter(b => b.archived !== true && b.sport !== 'mma-card');
+  archivedBets = allData.filter(b => b.archived === true && b.sport !== 'mma-card');
+  // Load persisted MMA full card if present
+  const mmaCardRow = allData.find(b => b.id === 'FIQ-MMA-FULLCARD');
+  if(mmaCardRow && mmaCardRow.note) { MMA.cardHtml = mmaCardRow.note; localStorage.setItem('fiq_mma_card', mmaCardRow.note); }
 
   const inAdmin = document.getElementById('admin-page')?.classList.contains('on');
 
@@ -5027,7 +5031,7 @@ function mmaSlipToggle(fid) {
   if(det) det.style.display=chk.checked?'grid':'none';
 }
 
-function mmaPublishFullCard() {
+async function mmaPublishFullCard() {
   mmaSavePredictionEdits();
   const promo=document.getElementById('mma-promo')?.value||'UFC';
   const cardNum=document.getElementById('mma-card-num')?.value.trim()||'';
@@ -5039,6 +5043,7 @@ function mmaPublishFullCard() {
   let inner=document.getElementById('efc-feed')||cardTab.querySelector('.page-inner')||cardTab;
   const posOrder=['main','co-main','main-card','prelim','early-prelim'];
   const sorted=[...MMA.fights].sort((a,b)=>posOrder.indexOf(a.position)-posOrder.indexOf(b.position));
+  if(!sorted.length){showToast('No fights loaded &mdash; fetch and parse a card first','error');return;}
   const methodTag={Decision:'dec','KO/TKO':'ko',Submission:'sub'};
   const confColor={High:'var(--green)',Medium:'var(--amber)',Low:'var(--dim)'};
   let html='<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap"><button class="btn btn-mg btn-sm mma-mkt-btn active" onclick="setMmaMkt(\'win\',this)">Win</button><button class="btn btn-ghost btn-sm mma-mkt-btn" onclick="setMmaMkt(\'method\',this)">Win + Method</button><button class="btn btn-ghost btn-sm mma-mkt-btn" onclick="setMmaMkt(\'distance\',this)">Goes Distance</button></div>';
@@ -5073,6 +5078,10 @@ function mmaPublishFullCard() {
   // Store card HTML and let renderEfcPage use it &mdash; don't write directly (causes double-render)
   MMA.cardHtml = html;
   localStorage.setItem('fiq_mma_card', html);
+  // Persist to Supabase so card survives across devices and browsers
+  if(sb){
+    await sb.from('bets').upsert([{id:'FIQ-MMA-FULLCARD',sport:'mma-card',event:promo+(cardNum?' '+cardNum:''),note:html,selections:MMA.fights,status:'pending',tier:'free',published_at:new Date().toISOString()}]);
+  }
   showToast('Full card published &mdash; '+sorted.length+' fights live','success');
   // Switch public EFC tab to Full Card view
   currentEfcTab = 'card';
