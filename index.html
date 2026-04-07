@@ -763,6 +763,10 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
       </div>
     </div>
   </div>
+  <div class="sport-sub-tabs">
+    <button class="stab on" id="stab-efc-tips" onclick="switchEfcTab('tips',this)">Tips</button>
+    <button class="stab" id="stab-efc-card" onclick="switchEfcTab('card',this)">Full Card</button>
+  </div>
   <div class="page-inner" style="padding-top:16px">
     <div id="efc-feed"></div>
   </div>
@@ -1606,6 +1610,7 @@ let adminFilter = 'all';
 let currentRacingTab = 'all';
 let currentSoccerTab = 'trends';
 let currentGolfTab = 'masters';
+let currentEfcTab = 'tips';
 let adminPw = localStorage.getItem('fiq_admin_pw') || 'Poison@04';
 let editingBetId = null;
 let selectedPlan = 'monthly';
@@ -1681,7 +1686,7 @@ function goPage(page, navEl) {
   if (page === 'racing') renderSportFeed('racing');
   if (page === 'soccer') renderSoccerPage();
   if (page === 'golf') renderGolfPage();
-  if (page === 'efc') renderSportFeed('efc');
+  if (page === 'efc') renderEfcPage();
   if (page === 'community') loadCommunityStrip();
   if (page === 'slips') renderLiveSlips();
 
@@ -1692,7 +1697,7 @@ function renderCurrentPage() {
   if (currentPage === 'racing') renderSportFeed('racing');
   else if (currentPage === 'soccer') renderSoccerPage();
   else if (currentPage === 'golf') renderGolfPage();
-  else if (currentPage === 'efc') renderSportFeed('efc');
+  else if (currentPage === 'efc') renderEfcPage();
 }
 
 function toggleMoreMenu() {
@@ -1842,21 +1847,42 @@ function renderArchiveSection(sport) {
     return b.sport === sport;
   });
   if (!sportBets.length) return '';
-  const cards = sportBets.map((b,i) => renderBetCard(b,i)).join('');
-  return `<div style="margin-top:24px">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer" onclick="var s=document.getElementById('arch-${sport}');s.style.display=s.style.display==='none'?'block':'none';this.querySelector('.arch-arrow').textContent=s.style.display==='none'?'&#x25B8;':'&#x25BE;'">
-      <div style="height:1px;flex:1;background:var(--border)"></div>
-      <div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:5px;white-space:nowrap">
-        <span>&#x1F4E6; Past Results</span>
-        <span style="background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:1px 7px;font-size:10px;color:var(--muted)">${sportBets.length}</span>
-        <span class="arch-arrow" style="font-size:10px;color:var(--muted)">&#x25B8;</span>
-      </div>
-      <div style="height:1px;flex:1;background:var(--border)"></div>
-    </div>
-    <div id="arch-${sport}" style="display:none">
-      <div style="opacity:0.7">${cards}</div>
-    </div>
-  </div>`;
+
+  // Group by month
+  const months = {};
+  sportBets.forEach(b => {
+    const d = b.published_at ? new Date(b.published_at) : null;
+    const key = d ? d.toLocaleDateString('en-ZA',{month:'long',year:'numeric'}) : 'Earlier';
+    if (!months[key]) months[key] = [];
+    months[key].push(b);
+  });
+
+  const monthsHtml = Object.entries(months).map(([month, bets]) => {
+    const won = bets.filter(b=>b.status==='won').length;
+    const lost = bets.filter(b=>b.status==='lost').length;
+    const mId = 'arch-' + sport + '-' + month.replace(/[^a-z0-9]/gi,'');
+    return '<div style="margin-bottom:10px">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer" onclick="var s=document.getElementById(\'' + mId + '\');s.style.display=s.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.arch-chev\').textContent=s.style.display===\'none\'?\'&#x25B8;\':\'&#x25BE;\';">'
+      + '<div style="font-size:11px;font-weight:700;color:var(--muted)">' + month + '</div>'
+      + '<div style="font-size:10px;color:var(--dim)">' + bets.length + ' tip' + (bets.length!==1?'s':'')
+      + (won ? ' &middot; <span style="color:var(--green)">' + won + 'W</span>' : '')
+      + (lost ? ' &middot; <span style="color:var(--red)">' + lost + 'L</span>' : '')
+      + '</div>'
+      + '<div style="flex:1;height:1px;background:var(--border)"></div>'
+      + '<span class="arch-chev" style="font-size:10px;color:var(--dim)">&#x25B8;</span>'
+      + '</div>'
+      + '<div id="' + mId + '" style="display:none;opacity:0.75">' + bets.map((b,i)=>renderBetCard(b,i)).join('') + '</div>'
+      + '</div>';
+  }).join('');
+
+  return '<div style="margin-top:24px">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">'
+    + '<div style="height:1px;flex:1;background:var(--border)"></div>'
+    + '<div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap">&#x1F4E6; Past Results &middot; ' + sportBets.length + ' tips</div>'
+    + '<div style="height:1px;flex:1;background:var(--border)"></div>'
+    + '</div>'
+    + monthsHtml
+    + '</div>';
 }
 
 // ===============================================
@@ -2047,6 +2073,51 @@ function switchGolfTab(tab, el) {
   document.querySelectorAll('#page-golf .stab').forEach(t => t.classList.remove('on'));
   el.classList.add('on');
   renderGolfPage();
+}
+
+function switchEfcTab(tab, el) {
+  currentEfcTab = tab;
+  document.querySelectorAll('#page-efc .stab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  renderEfcPage();
+}
+
+function renderEfcPage() {
+  const feedEl = document.getElementById('efc-feed');
+  if (!feedEl) return;
+  const subEl = document.getElementById('efc-sub-label');
+
+  if (currentEfcTab === 'card') {
+    // Full card ‚Äî show all fights from MMA.fights if available
+    if (subEl) subEl.textContent = MMA && MMA.fights && MMA.fights.length ? MMA.fights.length + ' fights' : 'Full fight card';
+    if (MMA && MMA.fights && MMA.fights.length) {
+      const posLabel = {main:'Main Event','co-main':'Co-Main','main-card':'Main Card',prelim:'Prelim','early-prelim':'Early Prelim'};
+      const posColor = {main:'var(--mg)','co-main':'var(--amber)','main-card':'var(--text)',prelim:'var(--muted)','early-prelim':'var(--dim)'};
+      const promo = document.getElementById('mma-promo')?.value || MMA.promo || 'UFC';
+      const cardNum = document.getElementById('mma-card-num')?.value || '';
+      const cardDate = document.getElementById('mma-card-date')?.value || '';
+      feedEl.innerHTML = '<div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px">'
+        + '<div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">'
+        + '<div style="font-size:14px;font-weight:700">' + promo + ' ' + cardNum + '</div>'
+        + '<div style="font-size:11px;color:var(--muted)">' + cardDate + '</div>'
+        + '</div>'
+        + MMA.fights.map(f => '<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border)">'
+          + '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">' + f.fighterA + ' <span style="color:var(--dim);font-weight:400">vs</span> ' + f.fighterB + '</div>'
+          + '<div style="font-size:10px;color:var(--muted);margin-top:1px">' + f.division + ' &middot; <span style="color:' + (posColor[f.position]||'var(--muted)') + '">' + (posLabel[f.position]||f.position) + '</span> &middot; ' + f.rounds + 'R</div></div>'
+          + (f.prediction ? '<div style="text-align:right;flex-shrink:0"><div style="font-size:11px;font-weight:600;color:var(--mg)">' + f.prediction.pick + '</div><div style="font-size:10px;color:var(--muted)">' + f.prediction.method + '</div></div>' : '<div style="font-size:10px;color:var(--dim);flex-shrink:0">TBD</div>')
+          + '</div>').join('')
+        + '</div>'
+        + renderArchiveSection('efc');
+    } else {
+      feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">No card loaded</div><div class="empty-sub">Use the MMA Card Builder in Admin to parse and publish a fight card.</div></div>' + renderArchiveSection('efc');
+    }
+    return;
+  }
+
+  // Tips tab ‚Äî DB bets for efc/ufc sport
+  const bets = allBets.filter(b => b.sport === 'efc' || b.sport === 'ufc');
+  if (subEl) subEl.textContent = bets.length ? bets.length + ' tip' + (bets.length>1?'s':'') + ' live' : 'No tips published yet';
+  feedEl.innerHTML = (bets.length ? bets.map((b,i) => renderBetCard(b,i)).join('') : renderEmptyState('efc')) + renderArchiveSection('efc');
 }
 
 function renderGolfPage() {
@@ -4903,6 +4974,12 @@ function mmaPublishFullCard() {
   });
   inner.innerHTML=html;
   showToast('Full card published &mdash; '+sorted.length+' fights live','success');
+  // Switch EFC tab to Full Card view
+  currentEfcTab = 'card';
+  const cardStab = document.getElementById('stab-efc-card');
+  const tipsStab = document.getElementById('stab-efc-tips');
+  if(cardStab){document.querySelectorAll('#page-efc .stab').forEach(t=>t.classList.remove('on'));cardStab.classList.add('on');}
+  if(typeof renderEfcPage==='function') renderEfcPage();
 }
 
 async function mmaPublishSlip() {
@@ -4937,6 +5014,7 @@ async function mmaPublishSlip() {
     showToast('&#x2713; Published! '+legs.length+' fights @ '+totalOdds.toFixed(2)+'x = R'+potWin,'success');
     await loadAllData();
     if(typeof renderLiveSlips==='function') renderLiveSlips();
+    if(typeof renderEfcPage==='function') renderEfcPage();
   } catch(e) { showToast('Publish failed: '+e.message,'error'); }
   if(btn){btn.disabled=false; btn.textContent='Publish Slip to Supabase';}
 }
@@ -4944,6 +5022,39 @@ async function mmaPublishSlip() {
 // ==================================================
 // EDIT LIVE SLIPS &mdash; admin panel
 // ==================================================
+
+async function migrateSlipToSupabase(slipId) {
+  if (!sb) { showToast('Not connected to Supabase','error'); return; }
+  const slip = LIVE_SLIPS.find(s => s.id === slipId);
+  if (!slip) { showToast('Slip not found','error'); return; }
+
+  // Check if already migrated
+  const { data: existing } = await sb.from('live_slips').select('id').eq('id', 'HC-' + slipId).limit(1);
+  if (existing && existing.length) { showToast('Already migrated to Supabase','error'); return; }
+
+  const legs = slip.legs.map(l => ({
+    name: l.sel || l.name || '',
+    detail: l.match || l.detail || '',
+    odds: l.odds || null,
+    status: l.status || 'won'
+  }));
+
+  const { error } = await sb.from('live_slips').insert([{
+    id: 'HC-' + slipId,
+    title: slip.title.replace(/&#x[0-9A-F]+;/gi,'').replace(/&[a-z]+;/gi,'').trim(),
+    subtitle: slip.subtitle.replace(/&[a-z]+;/gi,'').replace(/&#x[0-9A-F]+;/gi,'').trim(),
+    total_odds: slip.totalOdds,
+    potential_win: slip.potentialWin,
+    status: slip.status || 'won',
+    legs: legs,
+    archived: true,
+    published_at: new Date('2025-04-05').toISOString()
+  }]);
+
+  if (error) { showToast('Migration failed: ' + error.message, 'error'); return; }
+  showToast('Migrated! Find it in the Supabase slips above ‚Äî now fully editable.', 'success');
+  adminLoadSlips();
+}
 
 async function adminLoadSlips() {
   const feed = document.getElementById('edit-slips-feed');
@@ -5015,8 +5126,9 @@ function adminRenderHardcodedSlip(slip) {
       </div>
     </div>
     ${legsHtml}
-    <div style="padding:10px 14px;background:rgba(239,159,39,0.04);border-top:1px solid rgba(239,159,39,0.15)">
-      <div style="font-size:10px;color:var(--muted);line-height:1.6">&#x1F4CC; <strong style="color:var(--amber)">Hardcoded slip</strong> &mdash; stored in <code style="background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber)">LIVE_SLIPS</code> array in index.html. To toggle visibility set <code style="background:var(--s3);padding:1px 5px;border-radius:3px;color:var(--amber)">archived: ${slip.archived?'false':'true'}</code> in the source code.</div>
+    <div style="padding:10px 14px;background:rgba(239,159,39,0.04);border-top:1px solid rgba(239,159,39,0.15);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+      <div style="font-size:10px;color:var(--muted);line-height:1.6">&#x1F4CC; <strong style="color:var(--amber)">Hardcoded slip</strong> &mdash; click Migrate to make it editable in Supabase.</div>
+      <button class="btn btn-amber btn-xs" onclick="migrateSlipToSupabase('${slip.id}')">Migrate to Supabase &rarr;</button>
     </div>
   </div>`;
 }
