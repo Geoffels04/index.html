@@ -4171,7 +4171,7 @@ function copyCode(code) {
 
 function showToast(msg, type='success') {
   const t = document.getElementById('toast');
-  t.textContent = msg;
+  t.innerHTML = msg;
   t.className = 'toast show '+(type==='error'?'error':'success');
   clearTimeout(t._t);
   t._t = setTimeout(()=>t.classList.remove('show'),3500);
@@ -4926,17 +4926,19 @@ async function mmaPublishSlip() {
   }
   if(!legs.length) { showToast('Select at least one fight','error'); return; }
   const potWin=(stake*totalOdds).toFixed(2);
-  const btn=document.getElementById('mma-pub-btn');
-  btn.disabled=true; btn.textContent='Publishing...';
+  const btn=document.getElementById('mma-publish-btn');
+  if(btn){btn.disabled=true; btn.textContent='Publishing...';}
   try {
     const slipData={title,subtitle:promo+' &middot; '+legs.length+' leg'+(legs.length>1?'s':''),sport:'mma',status:'pending',total_odds:parseFloat(totalOdds.toFixed(2)),potential_win:parseFloat(potWin),legs,published_at:new Date().toISOString(),tier};
-    if(dest==='both'||dest==='live') { const {error}=await sb.from('live_slips').insert([slipData]); if(error) throw error; }
-    if(dest==='both'||dest==='mma') { await sb.from('bets').insert([{event:title,venue:promo+' &middot; '+cardNum,sport:'efc',type:'mma',status:'pending',tier,selections:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'best'})),note:promo+' '+cardNum+' &mdash; '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2))}]); }
-    document.getElementById('mma-pub-status').style.display='block';
-    showToast('Published! '+legs.length+' fights @ '+totalOdds.toFixed(2)+'x = R'+potWin,'success');
-    if(typeof loadLiveSlips==='function') loadLiveSlips();
+    if(dest==='both'||dest==='slips') { const {error}=await sb.from('live_slips').insert([slipData]); if(error) throw error; }
+    if(dest==='both'||dest==='bets') { await sb.from('bets').insert([{event:title,venue:promo+' &middot; '+cardNum,sport:'efc',type:'mma',status:'pending',tier,selections:legs.map(l=>({name:l.name,detail:l.detail,odds:l.odds,type:'best'})),note:promo+' '+cardNum+' &mdash; '+legs.length+' fight'+(legs.length>1?'s':''),total_odds:parseFloat(totalOdds.toFixed(2))}]); }
+    const pubStatus=document.getElementById('mma-publish-status');
+    if(pubStatus){pubStatus.innerHTML='<span style="color:var(--green)">&#x2713; Published &mdash; '+legs.length+' fights live</span>';}
+    showToast('&#x2713; Published! '+legs.length+' fights @ '+totalOdds.toFixed(2)+'x = R'+potWin,'success');
+    await loadAllData();
+    if(typeof renderLiveSlips==='function') renderLiveSlips();
   } catch(e) { showToast('Publish failed: '+e.message,'error'); }
-      btn.disabled=false; btn.textContent='Publish MMA Tip Slip &rarr;';
+  if(btn){btn.disabled=false; btn.textContent='&#x26A1; Publish Slip to Supabase';}
 }
 
 // ==================================================
