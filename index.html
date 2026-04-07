@@ -5362,8 +5362,13 @@ async function adminDeleteSlip(slipId) {
 }
 
 // Auto-load when switching to this panel
-const _origSwitchAdmin = typeof switchAdmin === 'function' ? switchAdmin : null;
-
+if (typeof switchAdmin === 'function') {
+  const _origSwitchAdmin = switchAdmin;
+  switchAdmin = function(panel, el) {
+    _origSwitchAdmin(panel, el);
+    if (panel === 'editslips') adminLoadSlips();
+  };
+}
 </script>
 </body>
 </html>
