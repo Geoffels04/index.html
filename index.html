@@ -1646,9 +1646,11 @@ async function loadAllData() {
 
   const inAdmin = document.getElementById('admin-page')?.classList.contains('on');
 
+  // Always update sport nav cards so home page shows correct tip counts
+  updateSportNavCards();
+
   if (!inAdmin) {
     renderCurrentPage();
-    updateSportNavCards();
     loadCommunityStrip();
     loadTrends();
   }
@@ -1683,6 +1685,7 @@ function goPage(page, navEl) {
   if (navEl) navEl.classList.add('on');
 
   // Page-specific loads
+  if (page === 'home') updateSportNavCards();
   if (page === 'racing') renderSportFeed('racing');
   if (page === 'soccer') renderSoccerPage();
   if (page === 'golf') renderGolfPage();
@@ -2088,28 +2091,13 @@ function renderEfcPage() {
   const subEl = document.getElementById('efc-sub-label');
 
   if (currentEfcTab === 'card') {
-    // Full card ‚Äî show all fights from MMA.fights if available
-    if (subEl) subEl.textContent = MMA && MMA.fights && MMA.fights.length ? MMA.fights.length + ' fights' : 'Full fight card';
-    if (MMA && MMA.fights && MMA.fights.length) {
-      const posLabel = {main:'Main Event','co-main':'Co-Main','main-card':'Main Card',prelim:'Prelim','early-prelim':'Early Prelim'};
-      const posColor = {main:'var(--mg)','co-main':'var(--amber)','main-card':'var(--text)',prelim:'var(--muted)','early-prelim':'var(--dim)'};
-      const promo = document.getElementById('mma-promo')?.value || MMA.promo || 'UFC';
-      const cardNum = document.getElementById('mma-card-num')?.value || '';
-      const cardDate = document.getElementById('mma-card-date')?.value || '';
-      feedEl.innerHTML = '<div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:14px">'
-        + '<div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">'
-        + '<div style="font-size:14px;font-weight:700">' + promo + ' ' + cardNum + '</div>'
-        + '<div style="font-size:11px;color:var(--muted)">' + cardDate + '</div>'
-        + '</div>'
-        + MMA.fights.map(f => '<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border)">'
-          + '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">' + f.fighterA + ' <span style="color:var(--dim);font-weight:400">vs</span> ' + f.fighterB + '</div>'
-          + '<div style="font-size:10px;color:var(--muted);margin-top:1px">' + f.division + ' &middot; <span style="color:' + (posColor[f.position]||'var(--muted)') + '">' + (posLabel[f.position]||f.position) + '</span> &middot; ' + f.rounds + 'R</div></div>'
-          + (f.prediction ? '<div style="text-align:right;flex-shrink:0"><div style="font-size:11px;font-weight:600;color:var(--mg)">' + f.prediction.pick + '</div><div style="font-size:10px;color:var(--muted)">' + f.prediction.method + '</div></div>' : '<div style="font-size:10px;color:var(--dim);flex-shrink:0">TBD</div>')
-          + '</div>').join('')
-        + '</div>'
-        + renderArchiveSection('efc');
+    if (MMA.cardHtml) {
+      // Use the published card HTML (set by mmaPublishFullCard)
+      if (subEl) subEl.textContent = MMA.fights.length + ' fights';
+      feedEl.innerHTML = MMA.cardHtml + renderArchiveSection('efc');
     } else {
-      feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">No card loaded</div><div class="empty-sub">Use the MMA Card Builder in Admin to parse and publish a fight card.</div></div>' + renderArchiveSection('efc');
+      if (subEl) subEl.textContent = 'Full fight card';
+      feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">No card loaded</div><div class="empty-sub">Use MMA Card Builder in Admin &mdash; parse fights, then click Publish Full Card.</div></div>' + renderArchiveSection('efc');
     }
     return;
   }
@@ -4608,7 +4596,7 @@ window.addEventListener('load', async () => {
 });
 
 // == MMA CARD BUILDER ==
-let MMA = { promo:'UFC', cardNum:'', date:'', fights:[] };
+let MMA = { promo:'UFC', cardNum:'', date:'', fights:[], cardHtml:'' };
 
 async function mmaFetchUrl() {
   const url = document.getElementById('mma-url-input').value.trim();
@@ -4972,14 +4960,15 @@ function mmaPublishFullCard() {
       +(note?'<div style="font-size:10px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">'+note+'</div>':'')
       +'</div>';
   });
-  inner.innerHTML=html;
+  // Store card HTML and let renderEfcPage use it ‚Äî don't write directly (causes double-render)
+  MMA.cardHtml = html;
   showToast('Full card published &mdash; '+sorted.length+' fights live','success');
-  // Switch EFC tab to Full Card view
+  // Switch public EFC tab to Full Card view
   currentEfcTab = 'card';
+  document.querySelectorAll('#page-efc .stab').forEach(t=>t.classList.remove('on'));
   const cardStab = document.getElementById('stab-efc-card');
-  const tipsStab = document.getElementById('stab-efc-tips');
-  if(cardStab){document.querySelectorAll('#page-efc .stab').forEach(t=>t.classList.remove('on'));cardStab.classList.add('on');}
-  if(typeof renderEfcPage==='function') renderEfcPage();
+  if(cardStab) cardStab.classList.add('on');
+  renderEfcPage();
 }
 
 async function mmaPublishSlip() {
@@ -5014,6 +5003,11 @@ async function mmaPublishSlip() {
     showToast('&#x2713; Published! '+legs.length+' fights @ '+totalOdds.toFixed(2)+'x = R'+potWin,'success');
     await loadAllData();
     if(typeof renderLiveSlips==='function') renderLiveSlips();
+    // Switch EFC page to Tips tab to show newly published bets
+    currentEfcTab = 'tips';
+    document.querySelectorAll('#page-efc .stab').forEach(t=>t.classList.remove('on'));
+    const tipStab = document.getElementById('stab-efc-tips');
+    if(tipStab) tipStab.classList.add('on');
     if(typeof renderEfcPage==='function') renderEfcPage();
   } catch(e) { showToast('Publish failed: '+e.message,'error'); }
   if(btn){btn.disabled=false; btn.textContent='Publish Slip to Supabase';}
