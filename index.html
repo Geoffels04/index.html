@@ -1730,7 +1730,7 @@ function updateSportNavCards() {
   if (!grid) return;
   const counts = {};
   ['racing','soccer','golf','efc'].forEach(s => {
-    counts[s] = allBets.filter(b => b.sport === s || (s==='efc' && b.sport==='ufc')).length;
+    counts[s] = allBets.filter(b => b.sport === s || (s==='efc' && (b.sport==='ufc' || b.sport==='mma'))).length;
   });
   // Golf always has Masters tips live (hardcoded) &mdash; show minimum 4
   if (counts['golf'] < 4) counts['golf'] = 4;
@@ -5022,10 +5022,6 @@ async function migrateSlipToSupabase(slipId) {
   const slip = LIVE_SLIPS.find(s => s.id === slipId);
   if (!slip) { showToast('Slip not found','error'); return; }
 
-  // Check if already migrated
-  const { data: existing } = await sb.from('live_slips').select('id').eq('id', 'HC-' + slipId).limit(1);
-  if (existing && existing.length) { showToast('Already migrated to Supabase','error'); return; }
-
   const legs = slip.legs.map(l => ({
     name: l.sel || l.name || '',
     detail: l.match || l.detail || '',
@@ -5034,7 +5030,6 @@ async function migrateSlipToSupabase(slipId) {
   }));
 
   const { error } = await sb.from('live_slips').insert([{
-    id: 'HC-' + slipId,
     title: slip.title.replace(/&#x[0-9A-F]+;/gi,'').replace(/&[a-z]+;/gi,'').trim(),
     subtitle: slip.subtitle.replace(/&[a-z]+;/gi,'').replace(/&#x[0-9A-F]+;/gi,'').trim(),
     total_odds: slip.totalOdds,
