@@ -758,7 +758,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
 <div class="page" id="page-efc">
   <div class="sport-hero">
     <div class="sport-hero-inner">
-      <div class="sport-hero-icon"><span style="font-size:44px;line-height:1">&#x1F94A;</span></div>
+      <div class="sport-hero-icon"><span style="font-size:44px;line-height:1">&#x1F44A;</span></div>
       <div>
         <div class="sport-hero-title">MMA</div>
         <div class="sport-hero-sub" id="efc-sub-label">Loading tips...</div>
@@ -806,7 +806,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
         <select class="form-select" id="cp-sport" style="font-size:12px;padding:7px 10px;width:auto">
           <option value="soccer">&#x26BD; Soccer</option>
           <option value="racing">&#x1F40E; Racing</option>
-          <option value="efc">&#x1F94A; MMA</option>
+          <option value="efc">&#x1F44A; MMA</option>
           <option value="golf">&#x26F3; Golf</option>
         </select>
         <input class="form-input" id="cp-legs" placeholder="Legs" type="number" min="1" max="20" style="width:66px;font-size:13px" value="4">
@@ -1028,8 +1028,8 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
               <option value="racing">&#x1F40E; Horse Racing</option>
               <option value="soccer">&#x26BD; Soccer</option>
               <option value="golf">&#x26F3; Golf</option>
-              <option value="efc">&#x1F94A; EFC</option>
-              <option value="ufc">&#x1F94A; UFC</option>
+              <option value="efc">&#x1F44A; EFC</option>
+              <option value="ufc">&#x1F44A; UFC</option>
             </select>
           </div>
           <div class="form-group"><label class="form-label">Event</label><input class="form-input" id="f-event" placeholder="e.g. Turffontein Race 4 &middot; 1400m"></div>
@@ -1105,7 +1105,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
                 <option value="racing">&#x1F40E; Horse Racing</option>
                 <option value="soccer">&#x26BD; Soccer</option>
                 <option value="golf">&#x26F3; Golf</option>
-                <option value="efc">&#x1F94A; MMA</option>
+                <option value="efc">&#x1F44A; MMA</option>
               </select>
               <input class="form-input" id="slip-event" placeholder="Event description">
               <input class="form-input" id="slip-time" placeholder="Time / date">
@@ -1524,7 +1524,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
             <div style="margin-top:8px"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--s3);color:var(--dim)">COMING SOON</span></div>
           </div>
           <div style="background:var(--s1);border:1px solid var(--red-b);border-radius:10px;padding:12px;opacity:0.8">
-            <div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:4px">&#x1F94A; MMA</div>
+            <div style="font-size:11px;color:var(--red);font-weight:700;margin-bottom:4px">&#x1F44A; MMA</div>
             <div style="font-family:sans-serif;font-weight:700;font-size:18px;font-weight:700;color:var(--red)">R99<span style="font-size:11px;color:var(--muted);font-weight:400">/mo</span></div>
             <div style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.6">Card breakdowns &middot; Method of victory &middot; Best value</div>
             <div style="margin-top:8px"><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--s3);color:var(--dim)">COMING SOON</span></div>
@@ -1724,7 +1724,7 @@ const SPORT_CONFIG = {
   racing: { name:'Horse Racing', color:'var(--amber)', bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x1F40E;</span>` },
   soccer: { name:'Soccer',       color:'var(--green)', bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x26BD;</span>` },
   golf:   { name:'Golf',         color:'#14B8A6',      bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x26F3;</span>` },
-  efc:    { name:'MMA',    color:'var(--red)',   bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x1F94A;</span>` }
+  efc:    { name:'MMA',    color:'var(--red)',   bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x1F44A;</span>` }
 };
 
 function updateSportNavCards() {
@@ -1903,7 +1903,7 @@ function renderPastBets(sport) {
     const mL = mFeature.filter(b=>b.status==='lost').length;
     const mId = 'past-m-' + month.replace(/[^a-z0-9]/gi,'');
     html += '<div style="margin-bottom:12px">'
-      + '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:4px" onclick="var el=document.getElementById('' + mId + '');el.style.display=el.style.display==='none'?'block':'none';this.querySelector('.pchev').textContent=el.style.display==='none'?'&#x25B8;':'&#x25BE;'">'
+      + '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;cursor:pointer;margin-bottom:4px" onclick="var el=document.getElementById(\'' + mId + '\');el.style.display=el.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.pchev\').textContent=el.style.display===\'none\'?\'&#x25B8;\':\'&#x25BE;\';">'
       + '<div style="font-size:13px;font-weight:700;flex:1">' + month + '</div>'
       + (mW||mL ? '<div style="font-size:11px"><span style="color:var(--green)">' + mW + 'W</span> <span style="color:var(--red)">' + mL + 'L</span></div>' : '')
       + '<span class="pchev" style="font-size:11px;color:var(--dim)">&#x25B8;</span>'
@@ -1916,7 +1916,7 @@ function renderPastBets(sport) {
       const dL = dFeature.filter(b=>b.status==='lost').length;
       const dId = mId + '-' + date.replace(/[^a-z0-9]/gi,'');
       html += '<div style="margin-bottom:4px;margin-left:8px">'
-        + '<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--s1);border:1px solid var(--border);border-radius:7px;cursor:pointer;margin-bottom:3px" onclick="var el=document.getElementById('' + dId + '');el.style.display=el.style.display==='none'?'block':'none';this.querySelector('.dchev').textContent=el.style.display==='none'?'&#x25B8;':'&#x25BE;'">'
+        + '<div style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--s1);border:1px solid var(--border);border-radius:7px;cursor:pointer;margin-bottom:3px" onclick="var el=document.getElementById(\'' + dId + '\');el.style.display=el.style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.dchev\').textContent=el.style.display===\'none\'?\'&#x25B8;\':\'&#x25BE;\';">'
         + '<div style="font-size:12px;font-weight:600;flex:1">' + date + '</div>'
         + '<div style="font-size:10px;color:var(--muted)">' + bets.length + ' tip' + (bets.length!==1?'s':'') + '</div>'
         + (dW||dL ? '<div style="font-size:10px;margin-left:6px"><span style="color:var(--green)">' + dW + 'W</span> <span style="color:var(--red)">' + dL + 'L</span></div>' : '')
@@ -2202,7 +2202,7 @@ function renderEfcPage() {
   if (subEl) subEl.textContent = bets.length ? bets.length + ' tip' + (bets.length>1?'s':'') + ' live' : 'No tips published yet';
   if (!bets.length) {
     feedEl.innerHTML = '<div class="empty-state">'
-      + '<div class="empty-icon" style="color:var(--red)">&#x1F94A;</div>'
+      + '<div class="empty-icon" style="color:var(--red)">&#x1F44A;</div>'
       + '<div class="empty-title">No tips yet</div>'
       + '<div class="empty-sub">Go to Admin &rarr; MMA Card Builder, parse the fight card and click <strong>Publish Slip to Supabase</strong>.</div>'
       + '</div>' + renderArchiveSection('efc');
@@ -3378,7 +3378,7 @@ function renderAdminTable(bets) {
   }
   tbody.innerHTML = filtered.map(b => `
     <tr>
-      <td>${{racing:'&#x1F40E;',soccer:'&#x26BD;',golf:'&#x26F3;',efc:'&#x1F94A;',ufc:'&#x1F94A;'}[b.sport]||'&#x1F3AF;'} ${(b.sport||'').toUpperCase()}</td>
+      <td>${{racing:'&#x1F40E;',soccer:'&#x26BD;',golf:'&#x26F3;',efc:'&#x1F44A;',ufc:'&#x1F44A;'}[b.sport]||'&#x1F3AF;'} ${(b.sport||'').toUpperCase()}</td>
       <td><div style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${b.event}</div><div style="font-family:monospace;font-size:9px;color:var(--dim)">${b.id}</div></td>
       <td><span style="font-size:9px;padding:2px 7px;border-radius:4px;background:var(--s3);color:var(--muted);font-weight:600">${(b.tier||'free').toUpperCase()}</span></td>
       <td style="font-family:monospace;font-size:10px;color:var(--mg)">${b.share_code||'&mdash;'}</td>
@@ -4349,7 +4349,7 @@ const SPORT_MEMBERSHIPS = {
   racing: { name:'Horse Racing', color:'var(--amber)', price:'R149/mo', icon:'&#x1F40E;' },
   soccer: { name:'Soccer', color:'var(--green)', price:'R99/mo', icon:'&#x26BD;' },
   golf:   { name:'Golf', color:'#14B8A6', price:'R99/mo', icon:'&#x26F3;' },
-  efc:    { name:'MMA', color:'var(--red)', price:'R99/mo', icon:'&#x1F94A;' }
+  efc:    { name:'MMA', color:'var(--red)', price:'R99/mo', icon:'&#x1F44A;' }
 };
 
 function openSignupModal() {
@@ -5375,4 +5375,3 @@ if (typeof switchAdmin === 'function') {
 </script>
 </body>
 </html>
-
