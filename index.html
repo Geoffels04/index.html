@@ -3936,9 +3936,9 @@ function renderSlipCards(feed, slips) {
       return '<div style="display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--border);background:' + (leg.status==='won'?'rgba(34,197,94,0.04)':leg.status==='lost'?'rgba(239,68,68,0.04)':'var(--s1)') + '">'
         + '<div style="width:24px;height:24px;border-radius:50%;background:' + (leg.status==='won'?'rgba(34,197,94,0.15)':leg.status==='lost'?'rgba(239,68,68,0.15)':'var(--s3)') + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:' + sc + ';flex-shrink:0">' + icon + '</div>'
         + '<div style="flex:1;min-width:0">'
-        + '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px">' + leg.sel + '</div>'
-        + '<div style="font-size:11px;color:var(--muted)">' + leg.match + '</div>'
-        + '<div style="font-size:10px;color:var(--dim);margin-top:1px">' + leg.date + '</div>'
+        + '<div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px">' + (leg.sel||leg.name||'') + '</div>'
+        + '<div style="font-size:11px;color:var(--muted)">' + (leg.match||leg.detail||'') + '</div>'
+        + '<div style="font-size:10px;color:var(--dim);margin-top:1px">' + (leg.date||'') + '</div>'
         + '</div>'
         + '<div style="font-size:12px;font-weight:800;color:' + sc + ';letter-spacing:.3px;font-family:Syne,sans-serif;flex-shrink:0">' + label + '</div>'
         + '</div>';
