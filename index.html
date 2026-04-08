@@ -1160,7 +1160,17 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
       </div>
 
       <!-- REORDER -->
-      <div class="admin-panel" id="panel-reorder">
+      <div class="admin-panel" id="panel-editslips">
+        <div class="admin-page-title">Edit Live Slips</div>
+        <div class="admin-page-sub">Result, archive or delete slips from Supabase. Changes go live instantly.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span style="font-size:11px;color:var(--muted)" id="edit-slips-count"></span>
+          <button class="btn btn-ghost btn-sm" onclick="adminLoadSlips()">&#x21BB; Refresh</button>
+        </div>
+        <div id="edit-slips-feed"></div>
+      </div>
+
+            <div class="admin-panel" id="panel-reorder">
         <div class="admin-page-title">Reorder Bets</div>
         <div class="admin-page-sub">Use the arrows to set the display order per sport. Changes save immediately to the database.</div>
         <div class="inner-tabs">
@@ -1306,6 +1316,11 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
       <div class="admin-panel" id="panel-settings">
         <div class="admin-page-title">Settings</div>
         <div class="admin-page-sub">Platform configuration and security.</div>
+        <div style="margin-top:16px;padding:14px;background:var(--s2);border:1px solid var(--border);border-radius:10px">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">Member Bet Codes</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Clear all submitted bet codes at the end of each weekend. This cannot be undone.</div>
+          <button class="btn btn-ghost btn-sm" style="border-color:var(--red-b);color:var(--red)" onclick="adminClearCommunityPicks()">&#x1F5D1; Clear All Bet Codes</button>
+        </div>
         <div class="settings-grid">
           <div class="settings-card">
             <div class="settings-card-title">Database connection</div>
@@ -1449,6 +1464,14 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <div><label class="form-label" style="display:block;margin-bottom:4px">Event</label><input class="modal-input" id="edit-event" style="margin-bottom:0"></div>
         <div><label class="form-label" style="display:block;margin-bottom:4px">Time</label><input class="modal-input" id="edit-time" style="margin-bottom:0"></div>
+      </div>
+      <div style="margin-bottom:8px">
+        <label class="form-label" style="display:block;margin-bottom:4px">Tier</label>
+        <select class="form-select" id="edit-tier" style="width:100%">
+          <option value="free">Free</option>
+          <option value="gold">Gold</option>
+          <option value="silver">Silver</option>
+        </select>
       </div>
       <label class="form-label" style="display:block;margin-bottom:4px">Analysis</label>
       <textarea class="modal-input" id="edit-note" style="min-height:60px;resize:vertical;margin-bottom:10px"></textarea>
@@ -2992,7 +3015,7 @@ function exitAdmin() {
 
 function switchAdmin(panel, el) {
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('on'));
-  if (panel === 'editslips') { const p = document.getElementById('panel-editslips'); if(p){p.classList.add('on');} adminLoadSlips(); return; }
+
   document.getElementById('panel-'+panel).classList.add('on');
   document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('on'));
   if (el) el.classList.add('on');
@@ -3420,6 +3443,8 @@ function openEditModal(id) {
   document.getElementById('edit-event').value = bet.event||'';
   document.getElementById('edit-time').value = bet.time||'';
   document.getElementById('edit-note').value = bet.note||'';
+  const tierSel = document.getElementById('edit-tier');
+  if (tierSel) tierSel.value = bet.tier||'free';
 
   // Populate per-leg status dropdowns
   const sels = bet.selections||[];
@@ -3482,11 +3507,13 @@ async function saveEdit() {
     const allWon = selections.every(s => s.status === 'won');
     const anyLost = selections.some(s => s.status === 'lost');
     const cardStatus = allWon ? 'won' : anyLost ? 'lost' : 'pending';
-    try { await edgeWrite('update',{event,time,note,selections,status:cardStatus},editingBetId); }
-    catch(e) { if (sb) await sb.from('bets').update({event,time,note,selections,status:cardStatus}).eq('id',editingBetId); }
+    const tier = document.getElementById('edit-tier')?.value || bet.tier || 'free';
+    try { await edgeWrite('update',{event,time,note,tier,selections,status:cardStatus},editingBetId); }
+    catch(e) { if (sb) await sb.from('bets').update({event,time,note,tier,selections,status:cardStatus}).eq('id',editingBetId); }
   } else {
-    try { await edgeWrite('update',{event,time,note},editingBetId); }
-    catch(e) { if (sb) await sb.from('bets').update({event,time,note}).eq('id',editingBetId); }
+    const tier = document.getElementById('edit-tier')?.value || (bet && bet.tier) || 'free';
+    try { await edgeWrite('update',{event,time,note,tier},editingBetId); }
+    catch(e) { if (sb) await sb.from('bets').update({event,time,note,tier}).eq('id',editingBetId); }
   }
   showToast('\u2713 Bet updated','success');
   closeModal('edit-modal');
@@ -5230,6 +5257,15 @@ async function adminDeleteSlip(slipId) {
   document.getElementById('slip-card-' + slipId)?.remove();
   showToast('Slip deleted','success');
   if (typeof renderLiveSlips === 'function') renderLiveSlips();
+}
+
+async function adminClearCommunityPicks() {
+  if (!sb) return;
+  if (!confirm('Clear ALL member bet codes? This cannot be undone.')) return;
+  const { error } = await sb.from('community_picks').delete().neq('id', 0);
+  if (error) { showToast('Clear failed: ' + error.message, 'error'); return; }
+  showToast('All bet codes cleared', 'success');
+  await loadCommunityStrip();
 }
 
 // Auto-load when switching to this panel
