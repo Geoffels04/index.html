@@ -1346,7 +1346,12 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
             <div class="form-group" style="margin-bottom:10px"><label class="form-label">Bet ID prefix</label><input class="form-input" id="s-watermark" value="FIQ"></div>
             <div style="display:flex;align-items:center;gap:8px"><button class="btn btn-green btn-sm" onclick="saveSettings('watermark')">Save</button><span class="saved-confirm" id="saved-wm">Saved &#x2713;</span></div>
           </div>
-          <div class="settings-card" style="grid-column:1/-1">
+          <div class="settings-card">
+            <div class="settings-card-title">The Odds API Key <span style="font-size:10px;font-weight:400;color:var(--muted)">&mdash; required for Odds Sync</span></div>
+            <div class="form-group" style="margin-bottom:10px"><label class="form-label">API Key (stored locally in your browser only)</label><input class="form-input" id="s-odds-key" type="password" placeholder="your-odds-api-key" style="font-family:monospace" oninput="this.style.color=this.value?'var(--green)':''"></div>
+            <div style="display:flex;align-items:center;gap:8px"><button class="btn btn-green btn-sm" onclick="saveSettings('odds')">Save Key</button><span class="saved-confirm" id="saved-odds">Saved &#x2713;</span><span style="font-size:10px;color:var(--dim);margin-left:4px">Get yours at the-odds-api.com</span></div>
+          </div>
+          <div class="settings-card">
             <div class="settings-card-title">Claude API Key <span style="font-size:10px;font-weight:400;color:var(--muted)">&mdash; required for MMA Card Builder URL fetch &amp; AI predictions</span></div>
             <div class="form-group" style="margin-bottom:10px"><label class="form-label">API Key (stored locally in your browser only)</label><input class="form-input" id="s-claude-key" type="password" placeholder="sk-ant-api03-..." style="font-family:monospace" oninput="this.style.color=this.value?'var(--green)':''"></div>
             <div style="display:flex;align-items:center;gap:8px"><button class="btn btn-green btn-sm" onclick="saveSettings('claude')">Save Key</button><span class="saved-confirm" id="saved-claude">Saved &#x2713;</span><span style="font-size:10px;color:var(--dim);margin-left:4px">Get yours at console.anthropic.com</span></div>
@@ -4017,6 +4022,9 @@ async function runOddsSync() {
 
   if (!leagues.length) { showToast('Select at least one league', 'error'); return; }
 
+  const oddsApiKey = localStorage.getItem('fiq_odds_key') || '';
+  if (!oddsApiKey) { showToast('Odds API key not set &mdash; go to Admin &rarr; Settings', 'error'); return; }
+
   btn.textContent = '&#x23F3; Syncing odds...'; btn.disabled = true;
   status.textContent = `Fetching odds for ${leagues.length} leagues on ${date}...`;
   resultsEl.innerHTML = '';
@@ -4039,7 +4047,7 @@ async function runOddsSync() {
           'Content-Type': 'application/json',
           'x-admin-secret': adminPw,
         },
-        body: JSON.stringify({ leagues: batch, date }),
+        body: JSON.stringify({ leagues: batch, date, apiKey: oddsApiKey }),
       });
 
       const data = await res.json();
@@ -4140,7 +4148,12 @@ function saveSettings(section) {
     if (!key.startsWith('sk-ant-')) { showToast('Invalid key &mdash; should start with sk-ant-', 'error'); return; }
     localStorage.setItem('fiq_claude_key', key);
   }
-  const idMap = {watermark:'wm', payfast:'pf', claude:'claude'};
+  if (section==='odds') {
+    const key = document.getElementById('s-odds-key').value.trim();
+    if (!key) { showToast('Enter your Odds API key', 'error'); return; }
+    localStorage.setItem('fiq_odds_key', key);
+  }
+  const idMap = {watermark:'wm', payfast:'pf', claude:'claude', odds:'odds'};
   const el = document.getElementById('saved-'+(idMap[section]||section));
   if (el) { el.style.display='block'; setTimeout(()=>el.style.display='none',3000); }
   showToast('Saved','success');
@@ -4150,6 +4163,9 @@ function initSettingsPanel() {
   const k = localStorage.getItem('fiq_claude_key');
   const el = document.getElementById('s-claude-key');
   if (el && k) { el.value = k; el.style.color = 'var(--green)'; }
+  const ok = localStorage.getItem('fiq_odds_key');
+  const oel = document.getElementById('s-odds-key');
+  if (oel && ok) { oel.value = ok; oel.style.color = 'var(--green)'; }
 }
 
 // ===============================================
