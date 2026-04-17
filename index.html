@@ -1215,7 +1215,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
               <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-bel" checked style="accent-color:var(--mg)"> Pro League (Belgium)</label>
               <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-ere" style="accent-color:var(--mg)"> Eredivisie</label>
               <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-por" style="accent-color:var(--mg)"> Liga Portugal</label>
-              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-tur" style="accent-color:var(--mg)"> Super Lig (Turkey)</label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer"><input type="checkbox" id="lg-tur" checked style="accent-color:var(--mg)"> Super Lig (Turkey)</label>
             </div>
           </div>
           <div class="form-group">
@@ -3789,12 +3789,15 @@ async function runPredictionsEngine() {
   ].filter(Boolean);
 
   if (!dates.length) {
-    // Default to this weekend
+    // Default to today + this weekend
     const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
     const day = today.getDay();
-    const sat = new Date(today); sat.setDate(today.getDate() + (6 - day + 7) % 7 || 7);
+    const daysToSat = (6 - day + 7) % 7 || 7;
+    const sat = new Date(today); sat.setDate(today.getDate() + daysToSat);
     const sun = new Date(sat); sun.setDate(sat.getDate() + 1);
-    dates.push(sat.toISOString().split('T')[0]);
+    dates.push(todayStr);
+    if (daysToSat > 0) dates.push(sat.toISOString().split('T')[0]);
     dates.push(sun.toISOString().split('T')[0]);
   }
 
