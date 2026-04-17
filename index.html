@@ -2072,10 +2072,10 @@ function renderSoccerPage() {
     sb.from('market_trends').select('id,home_team,away_team,league,match_date,match_time,btts_pct').eq('sport','soccer').not('btts_pct','is',null).order('btts_pct',{ascending:false}).limit(100).then(function(res) {
       var data = res.data; var error = res.error;
       if (error || !data || !data.length) { feedEl.innerHTML = '<div class="empty-state"><div class="empty-title">No BTTS data yet</div><div class="empty-sub">Run the Soccer Engine in admin to load fixtures.</div></div>'; return; }
-      var groups = {};
-      data.forEach(function(m) { var day = mmaDayLabel(m.match_date); if (!groups[day]) groups[day] = []; groups[day].push(m); });
+      var groups = {}; var groupDates = {};
+      data.forEach(function(m) { var day = mmaDayLabel(m.match_date); if (!groups[day]) { groups[day] = []; groupDates[day] = m.match_date||''; } groups[day].push(m); });
       var html = '';
-      Object.keys(groups).forEach(function(day) {
+      Object.keys(groups).sort(function(a,b){ return groupDates[a]<groupDates[b]?-1:groupDates[a]>groupDates[b]?1:0; }).forEach(function(day) {
         var dayData = groups[day];
         html += '<div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px">';
         html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--s2)">';
@@ -2116,10 +2116,10 @@ function renderSoccerPage() {
       else d.sort(function(a,b){return b._win-a._win;});
       var accentCol = tab==='over15'?'var(--green)':tab==='over25'?'var(--amber)':'var(--mg)';
       var accentBg  = tab==='over15'?'var(--green-dim)':tab==='over25'?'var(--amber-dim)':'var(--mg-dim)';
-      var groups = {};
-      d.forEach(function(m) { var day=mmaDayLabel(m.match_date); if(!groups[day])groups[day]=[]; groups[day].push(m); });
+      var groups = {}; var groupDates = {};
+      d.forEach(function(m) { var day=mmaDayLabel(m.match_date); if(!groups[day]){ groups[day]=[]; groupDates[day]=m.match_date||''; } groups[day].push(m); });
       var html = '';
-      Object.keys(groups).forEach(function(day) {
+      Object.keys(groups).sort(function(a,b){ return groupDates[a]<groupDates[b]?-1:groupDates[a]>groupDates[b]?1:0; }).forEach(function(day) {
         var dayData = groups[day];
         html += '<div style="background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px">';
         html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s2);border-bottom:1px solid var(--border)">';
