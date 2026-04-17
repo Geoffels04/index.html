@@ -2245,7 +2245,8 @@ function renderMastersHeader() {
     ['No debut wins since 1979','46/46 winners had prior Masters experience. Eliminates first-timers like Knapp.','var(--amber)'],
     ['4+ PGA Tour wins','Winning pedigree is non-negotiable.','var(--amber)'],
     ['Top 50 driving distance','16/17 winners. Par-5 advantage is decisive. Note: Rose (77th) falls short here.','var(--amber)'],
-    ['Augusta is ball-striking, not putting','Last 5 winners averaged 98th in SG Putting. Rory won in 2025 losing strokes on the greens.','var(--blue)']
+    ['Augusta is ball-striking, not putting','Last 5 winners averaged 98th in SG Putting. Rory won in 2025 losing strokes on the greens.','var(--blue)'],
+    ['Rory McIlroy &mdash; second only to Bryson in our model','Defending champion and stat leader &mdash; but could either win this again or come absolutely nowhere. Previous champions have had cold defence years. Our vote? Nowhere &mdash; but we hope he proves us wrong.','var(--red)']
   ];
   const trendsHtml = trends.map(function(row) {
     return '<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--s2);border-radius:7px;border:1px solid var(--border)">'
@@ -4113,7 +4114,8 @@ async function updateFormResults(rowId, homeResults, awayResults) {
 
 async function clearOldTrends() {
   if (!sb || !confirm('Clear all market trends from the database?')) return;
-  await sb.from('market_trends').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  const { error } = await sb.from('market_trends').delete().not('id', 'is', null);
+  if (error) { showToast('Clear failed: ' + error.message, 'error'); return; }
   showToast('Market trends cleared', 'success');
   document.getElementById('pred-results').innerHTML = '';
   document.getElementById('pred-status').textContent = 'Cleared';
