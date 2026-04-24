@@ -745,7 +745,7 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
     </div>
   </div>
   <div class="sport-sub-tabs">
-    <button class="stab on" id="stab-golf-tips" onclick="switchGolfTab('tips',this)">Masters 2026 Tips</button>
+    <button class="stab on" id="stab-golf-tips" onclick="switchGolfTab('tips',this)">Golf Tips</button>
     <button class="stab" id="stab-golf-rankings" onclick="switchGolfTab('rankings',this)">Rankings</button>
   </div>
   <div class="page-inner" style="padding-top:16px">
@@ -768,6 +768,24 @@ html,body{background:var(--black);color:var(--text);font-family:sans-serif;font-
   </div>
   <div class="page-inner" style="padding-top:16px">
     <div id="efc-feed"></div>
+  </div>
+</div>
+
+<!-- ==============================
+     PAGE: RUGBY
+============================== -->
+<div class="page" id="page-rugby">
+  <div class="sport-hero">
+    <div class="sport-hero-inner">
+      <div class="sport-hero-icon"><span style="font-size:44px;line-height:1">&#x1F3C9;</span></div>
+      <div>
+        <div class="sport-hero-title">Rugby</div>
+        <div class="sport-hero-sub" id="rugby-sub-label">Loading tips...</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-inner" style="padding-top:16px">
+    <div id="rugby-feed"></div>
   </div>
 </div>
 
@@ -1719,6 +1737,7 @@ function goPage(page, navEl) {
   if (page === 'home') updateSportNavCards();
   if (page === 'racing') renderSportFeed('racing');
   if (page === 'soccer') renderSoccerPage();
+  if (page === 'rugby') renderSportFeed('rugby');
   if (page === 'golf') renderGolfPage();
   if (page === 'efc') renderEfcPage();
   if (page === 'community') loadCommunityStrip();
@@ -1730,6 +1749,7 @@ function goPage(page, navEl) {
 function renderCurrentPage() {
   if (currentPage === 'racing') renderSportFeed('racing');
   else if (currentPage === 'soccer') renderSoccerPage();
+  else if (currentPage === 'rugby') renderSportFeed('rugby');
   else if (currentPage === 'golf') renderGolfPage();
   else if (currentPage === 'efc') renderEfcPage();
 }
@@ -1752,19 +1772,18 @@ document.addEventListener('click', e => {
 const SPORT_CONFIG = {
   racing: { name:'Horse Racing', color:'var(--amber)', bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x1F40E;</span>` },
   soccer: { name:'Soccer',       color:'var(--green)', bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x26BD;</span>` },
+  rugby:  { name:'Rugby',        color:'var(--mg)',    bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x1F3C9;</span>` },
   golf:   { name:'Golf',         color:'#14B8A6',      bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x26F3;</span>` },
-  efc:    { name:'MMA',    color:'var(--red)',   bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x1F44A;</span>` }
+  efc:    { name:'MMA',          color:'var(--red)',   bg:'transparent', icon:`<span style="font-size:36px;line-height:1">&#x1F44A;</span>` }
 };
 
 function updateSportNavCards() {
   const grid = document.getElementById('sport-nav-cards');
   if (!grid) return;
   const counts = {};
-  ['racing','soccer','golf','efc'].forEach(s => {
+  ['racing','soccer','rugby','golf','efc'].forEach(s => {
     counts[s] = allBets.filter(b => b.sport === s || (s==='efc' && (b.sport==='ufc' || b.sport==='mma'))).length;
   });
-  // Golf always has Masters tips live (hardcoded) &mdash; show minimum 4
-  if (counts['golf'] < 4) counts['golf'] = 4;
   grid.innerHTML = Object.entries(SPORT_CONFIG).map(([key, cfg]) => `
     <div class="sport-nav-card" onclick="goPage('${key}')">
       <div class="sport-nav-icon" style="color:${cfg.color}">${cfg.icon}</div>
@@ -2229,14 +2248,13 @@ function renderEfcPage() {
 function renderGolfPage() {
   const tab = currentGolfTab;
   const subEl = document.getElementById('golf-sub-label');
-  if (subEl) subEl.textContent = 'Masters 2026 &middot; Apr 10&ndash;13 &middot; Augusta National';
   const feedEl = document.getElementById('golf-feed');
   if (!feedEl) return;
   if (tab === 'rankings') { feedEl.innerHTML = renderMastersRankings(); return; }
-  // Masters 2026 Tips tab &mdash; analysis header + DB bets
   const dbBets = allBets.filter(b => b.sport === 'golf');
-  const dbHtml = dbBets.length ? dbBets.map((b,i) => renderBetCard(b,i)).join('') : '<div class="empty-state"><div class="empty-title">No tips yet</div></div>';
-  feedEl.innerHTML = renderMastersHeader() + dbHtml + renderArchiveSection('golf');
+  if (subEl) subEl.textContent = dbBets.length ? dbBets.length + ' tip' + (dbBets.length > 1 ? 's' : '') + ' live' : 'Next tournament tips coming soon';
+  const dbHtml = dbBets.length ? dbBets.map((b,i) => renderBetCard(b,i)).join('') : '<div class="empty-state"><div class="empty-title">No active golf tips</div><div class="empty-sub">Check back before the next tournament.</div></div>';
+  feedEl.innerHTML = dbHtml + renderArchiveSection('golf');
 }
 
 function renderMastersHeader() {
