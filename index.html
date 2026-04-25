@@ -5196,12 +5196,12 @@ function adminRenderEditSlip(slip) {
   const legsHtml = legs.map((leg,i) => {
     const ls = leg.status || 'pending';
     const lc = statusColor[ls] || 'var(--amber)';
-    const name = leg.name || leg.sel || 'Leg ' + (i+1);
+    const name = leg.name || leg.sel || '';
     const detail = leg.detail || leg.match || '';
     const odds = leg.odds ? parseFloat(leg.odds).toFixed(2) : '';
     return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--s1)" id="slip-leg-row-${slip.id}-${i}">
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:1px">${name}</div>
+        <input value="${name.replace(/"/g,'&quot;')}" onblur="adminUpdateLegName(${slip.id},${i},this.value)" placeholder="Selection detail (e.g. Man City Win + Under 4.5)" style="width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:5px;padding:5px 8px;color:var(--text);font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:3px;transition:border-color .2s" onfocus="this.style.borderColor='var(--mg-border)'" onblur2="this.style.borderColor='var(--border2)'">
         <div style="font-size:10px;color:var(--muted)">${detail}${odds?' &middot; @'+odds:''}</div>
       </div>
       <select onchange="adminUpdateLeg(${slip.id},${i},this.value)" style="background:var(--s2);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;color:${lc};font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;flex-shrink:0">
@@ -5279,6 +5279,19 @@ async function adminUpdateLeg(slipId, legIndex, newStatus) {
   const msg = document.getElementById('slip-save-msg-' + slipId);
   if (msg) { msg.style.display='block'; setTimeout(()=>msg.style.display='none', 2000); }
 
+  if (typeof renderLiveSlips === 'function') renderLiveSlips();
+}
+
+async function adminUpdateLegName(slipId, legIndex, newName) {
+  if (!sb) return;
+  const { data, error } = await sb.from('live_slips').select('legs').eq('id', slipId).single();
+  if (error || !data) { showToast('Failed to load slip', 'error'); return; }
+  const legs = Array.isArray(data.legs) ? [...data.legs] : [];
+  if (!legs[legIndex]) return;
+  legs[legIndex] = { ...legs[legIndex], name: newName };
+  const { error: updateError } = await sb.from('live_slips').update({ legs }).eq('id', slipId);
+  if (updateError) { showToast('Save failed', 'error'); return; }
+  showToast('Leg name saved', 'success');
   if (typeof renderLiveSlips === 'function') renderLiveSlips();
 }
 
