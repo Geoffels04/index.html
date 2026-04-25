@@ -3900,7 +3900,7 @@ const LIVE_SLIPS = [
     subtitle: '7-leg multi &mdash; Sat 25 Apr &mdash; Stake: R2,000 &rarr; R107,354.99',
     totalOdds: '52.67/1',
     potentialWin: 'R107,354.99',
-    archived: false,
+    archived: true,
     status: 'won',
     legs: [
       { sel: 'Man City 2UP (EP) + Under 4.5 Goals', match: 'Manchester City vs Southampton FC', date: 'Sat 25 Apr 18:15', status: 'won' },
@@ -3940,7 +3940,39 @@ function renderLiveSlips() {
 
   if (sb) {
     sb.from('live_slips').select('*').order('published_at',{ascending:false}).limit(20).then(function(res) {
-      const dbSlips = (res.data || []).filter(function(row){ return !row.archived; }).map(function(row) {
+      const rows = (res.data || []).filter(function(row){ return !row.archived; });
+
+      // Auto-patch: fill leg names + mark won for the 25 Apr 7-pick slip
+      var LEG_NAME_MAP = {
+        'manchester city': { name: 'Man City 2UP (EP) + Under 4.5 Goals', status: 'won' },
+        'celtic fc vs falkirk': { name: 'BTTS Yes + Over 2.5 Goals', status: 'won' },
+        'toulouse vs monaco': { name: 'BTTS Yes + Over 2.5 Goals', status: 'won' },
+        'arsenal fc vs newcastle': { name: 'Arsenal 2UP (EP) + Under 4.5 Goals', status: 'won' },
+        'hamburger sv': { name: 'BTTS Yes + Over 2.5 Goals', status: 'won' },
+        'valencia cf vs girona': { name: 'BTTS Yes', status: 'won' },
+        'darmstadt': { name: 'BTTS Yes', status: 'won' }
+      };
+      rows.forEach(function(row) {
+        var legs = Array.isArray(row.legs) ? row.legs : [];
+        var needsPatch = legs.some(function(l){ return !l.name && !l.sel; });
+        if (!needsPatch) return;
+        var patched = legs.map(function(l) {
+          if (l.name || l.sel) return l;
+          var matchLower = (l.match || l.detail || '').toLowerCase();
+          for (var key in LEG_NAME_MAP) {
+            if (matchLower.indexOf(key) !== -1) {
+              return Object.assign({}, l, LEG_NAME_MAP[key]);
+            }
+          }
+          return l;
+        });
+        var allWon = patched.every(function(l){ return l.status === 'won'; });
+        sb.from('live_slips').update({ legs: patched, status: allWon ? 'won' : row.status }).eq('id', row.id);
+        row.legs = patched;
+        if (allWon) row.status = 'won';
+      });
+
+      const dbSlips = rows.map(function(row) {
         return {
           id: row.id,
           title: row.title,
